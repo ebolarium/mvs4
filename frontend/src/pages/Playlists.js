@@ -96,11 +96,7 @@ const Playlists = () => {
   
       const data = await response.json(); // 'data' burada tanımlanıyor
   
-      console.log('Fetched playlist data:', data.playlist);
-      console.log('API_BASE_URL:', API_BASE_URL);
-      console.log('relativeUrl:', data.playlist?.relativeUrl);
-      console.log('url:', data.playlist?.url);
-  
+ 
       const relativeUrl = data.playlist?.relativeUrl
         ? `${API_BASE_URL}${data.playlist.relativeUrl}`
         : data.playlist?.url;
