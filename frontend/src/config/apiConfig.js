@@ -1,5 +1,5 @@
 // apiConfig.js
-const API_BASE_URL = `${process.env.REACT_APP_API_URL || 'Online URL Burada olacak'}/api`;
+const API_BASE_URL = `${process.env.REACT_APP_API_URL || 'https://mvs4.onrender.com'}/api`;
 
 export const BAND_API = `${API_BASE_URL}/bands`;
 export const PLAYLIST_API = `${API_BASE_URL}/playlist`;
