@@ -2,10 +2,8 @@
     "name": "mvs4-project",
     "version": "1.0.0",
     "scripts": {
-      "start": "npm run start:backend",
-      "start:backend": "node backend/server.js",
-      "start:frontend": "npm --prefix frontend start",
-      "install:all": "npm install && npm --prefix frontend install"
+        "start": "node backend/server.js",
+        "install:all": "npm install && npm --prefix frontend install",
+        "build": "npm --prefix frontend run build"
     }
   }
-  
