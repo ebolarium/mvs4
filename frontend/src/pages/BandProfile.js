@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Container, Form, Button, Card } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom'; // useNavigate hook'u eklendi
 import API_BASE_URL from '../config/apiConfig';
 
 const BandProfile = () => {
@@ -11,8 +12,9 @@ const BandProfile = () => {
   });
   const [selectedFile, setSelectedFile] = useState(null);
 
+  const navigate = useNavigate(); // useNavigate kullanımı
+
   useEffect(() => {
-    // Fetch band info
     const token = localStorage.getItem('token');
     if (!token) {
       alert('You need to login first');
@@ -81,9 +83,12 @@ const BandProfile = () => {
 
   return (
     <Container className="mt-5">
+      <Button variant="secondary" onClick={() => navigate('/dashboard')} className="mb-3">
+        ← Dashboard'a Dön
+      </Button>
       <Card className="shadow bg-dark text-white">
         <Card.Body>
-          <h2 className="text-center mb-4">Band Profile</h2>
+          <h2 className="text-center mb-4">Grup Profili</h2>
           <div className="text-center mb-4">
             {bandInfo.band_image ? (
               <img
@@ -97,11 +102,11 @@ const BandProfile = () => {
           </div>
           <Form onSubmit={handleImageUpload}>
             <Form.Group controlId="formFile" className="mb-3">
-              <Form.Label>Upload Band Image</Form.Label>
+              <Form.Label>Yüklemek İçin Resim Seç</Form.Label>
               <Form.Control type="file" onChange={handleFileChange} accept="image/*" />
             </Form.Group>
             <Button variant="primary" type="submit">
-              Upload Image
+             Resmi Yükle
             </Button>
           </Form>
         </Card.Body>

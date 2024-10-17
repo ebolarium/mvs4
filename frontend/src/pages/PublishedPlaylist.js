@@ -52,6 +52,7 @@ const PublishedPlaylist = () => {
         .then((data) => {
           if (data) {
             dispatch({ type: 'SET_PLAYLIST', payload: data });
+        
             const sortedSongs = data.songs
               .filter((song) => song.song_id)
               .map((song) => ({
@@ -61,7 +62,12 @@ const PublishedPlaylist = () => {
                 votecount: song.votecount,
                 played: song.played || false,
               }))
-              .sort((a, b) => b.votecount - a.votecount);
+              .sort((a, b) => {
+                if (a.played && !b.played) return 1;  // Çalınmış şarkıyı alta taşır
+                if (!a.played && b.played) return -1; // Çalınmamış şarkıyı üste taşır
+                return b.votecount - a.votecount; // Oy sayısına göre sıralar
+              });
+        
             dispatch({ type: 'SET_SONGS', payload: sortedSongs });
           }
         })

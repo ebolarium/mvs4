@@ -118,7 +118,7 @@ const Songs = () => {
         <Col md={6}>
           <Card className="shadow">
             <Card.Body>
-              <h2 className="text-center mb-4">Add a New Song</h2>
+              <h2 className="text-center mb-4">Yeni Şarkı Ekle</h2>
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3" controlId="formTitle">
                   <Form.Label>Song Title</Form.Label>
@@ -155,7 +155,7 @@ const Songs = () => {
         <Col md={6}>
           <Card className="shadow">
             <Card.Body>
-              <h2 className="text-center mb-4">Song List</h2>
+              <h2 className="text-center mb-4">Şarkı Deposu</h2>
               <ListGroup variant="flush">
                 {songs.length > 0 ? (
                   songs.map((song) => (

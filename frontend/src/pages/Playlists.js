@@ -189,7 +189,7 @@ const Playlists = () => {
         <Col md={6}>
           <Card className="shadow">
             <Card.Body>
-              <h2 className="text-center mb-4">Available Songs</h2>
+              <h2 className="text-center mb-4">Şarkı Deposu</h2>
               <ListGroup>
                 {allSongs
                   .filter((song) => !state.songs.some((p) => p._id === song._id))
@@ -206,7 +206,7 @@ const Playlists = () => {
                         onClick={() => handleSongAction(song._id, 'add')}
                         disabled={isPublished} // Disable when published
                       >
-                        Add
+                        Ekle
                       </Button>
                     </ListGroup.Item>
                   ))}
@@ -218,7 +218,7 @@ const Playlists = () => {
         <Col md={6}>
           <Card className="shadow">
             <Card.Body>
-              <h2 className="text-center mb-4">Playlist</h2>
+              <h2 className="text-center mb-4">Çalma Listesi</h2>
               {playlist ? (
                 <>
                   <ListGroup>
@@ -235,12 +235,12 @@ const Playlists = () => {
                             onClick={() => handleSongAction(song._id, 'remove')}
                             disabled={isPublished} // Disable when published
                           >
-                            Remove
+                            Çıkar
                           </Button>
                         </ListGroup.Item>
                       ))
                     ) : (
-                      <p>No songs in playlist.</p>
+                      <p>Listede Şarkı Yok.</p>
                     )}
                   </ListGroup>
                   <Button
@@ -267,7 +267,7 @@ const Playlists = () => {
                   )}
                 </>
               ) : (
-                <p>No playlist created yet.</p>
+                <p>Şarkı Listesi Oluşturulmadı.</p>
               )}
             </Card.Body>
           </Card>

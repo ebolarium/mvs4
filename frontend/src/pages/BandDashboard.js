@@ -53,7 +53,7 @@ const BandDashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     alert('Logged out successfully!');
-    navigate('/login');
+    navigate('/');
   };
 
   return (
@@ -62,26 +62,26 @@ const BandDashboard = () => {
         <Col>
           <Card className="shadow">
             <Card.Body>
-              <h2 className="text-center mb-4">Band Dashboard</h2>
+              <h2 className="text-center mb-4">Grup Sayfası</h2>
               <Button variant="danger" onClick={handleLogout}>
-                Logout
+                Çıkış
               </Button>
               <Button variant="info" as={Link} to="/profile" className="ms-2">
-                Edit Profile
+                Profili Düzenle
               </Button>
               <Tab.Container defaultActiveKey="analytics">
                 <Nav variant="tabs" className="justify-content-center">
                   <Nav.Item>
-                    <Nav.Link eventKey="analytics">Analytics</Nav.Link>
+                    <Nav.Link eventKey="analytics">Analiz</Nav.Link>
                   </Nav.Item>
                   <Nav.Item>
-                    <Nav.Link eventKey="songs">Songs</Nav.Link>
+                    <Nav.Link eventKey="songs">Şarkılar</Nav.Link>
                   </Nav.Item>
                   <Nav.Item>
-                    <Nav.Link eventKey="playlists">Playlists</Nav.Link>
+                    <Nav.Link eventKey="playlists">Çalma Listesi</Nav.Link>
                   </Nav.Item>
                   <Nav.Item>
-                    <Nav.Link eventKey="gigmode">Gig Mode</Nav.Link>
+                    <Nav.Link eventKey="gigmode">Sahne Modu</Nav.Link>
                   </Nav.Item>
                 </Nav>
                 <Tab.Content className="mt-4">
@@ -98,7 +98,7 @@ const BandDashboard = () => {
                     {playlistId ? (
                       <GigMode playlistId={playlistId} />
                     ) : (
-                      <p>No published playlist found</p>
+                      <p>Yayınlanmış Bir Şarkı Listesi Yok.</p>
                     )}
                   </Tab.Pane>
                 </Tab.Content>
