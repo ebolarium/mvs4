@@ -66,7 +66,7 @@ const Playlists = () => {
     if (!token) {
       return alert('You need to login first');
     }
-
+  
     try {
       const response = await fetch(`${API_BASE_URL}/playlist`, {
         method: 'GET',
@@ -74,32 +74,37 @@ const Playlists = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-
+  
       if (response.status === 401) {
         alert('Your session has expired. Please login again.');
         localStorage.removeItem('token');
         window.location.href = '/login';
         return;
       }
-
+  
       if (response.status === 404) {
-        // Playlist not found
         setPlaylist(null);
         setIsPublished(false);
         setQrCodeUrl(null);
         dispatch({ type: 'SET_SONGS', payload: [] });
         return;
       }
-
+  
       if (!response.ok) {
         throw new Error('Failed to fetch playlist');
       }
-
-      const data = await response.json();
-
-      // Process the songs to flatten the structure
+  
+      const data = await response.json(); // 'data' burada tanımlanıyor
+  
+ 
+      const relativeUrl = data.playlist?.relativeUrl
+        ? `${API_BASE_URL}${data.playlist.relativeUrl}`
+        : data.playlist?.url;
+      setQrCodeUrl(relativeUrl);
+  
+      // Update global state with processed songs
       const processedSongs = data.playlist.songs
-        .filter((song) => song.song_id) // Ensure song_id exists
+        .filter((song) => song.song_id)
         .map((song) => ({
           _id: song.song_id._id,
           title: song.song_id.title,
@@ -113,26 +118,16 @@ const Playlists = () => {
           }
           return a.played ? 1 : -1;
         });
-
+  
       setPlaylist(data.playlist || null);
       setIsPublished(data.playlist?.published || false);
-      // Save only relative path to the database if available, otherwise use the full URL from the API
-      const relativeUrl = data.playlist?.relativeUrl ? `${API_BASE_URL}${data.playlist.relativeUrl}` : data.playlist?.url;
-      setQrCodeUrl(relativeUrl);
-
-      // Update global state with processed songs
       dispatch({ type: 'SET_SONGS', payload: processedSongs });
+  
     } catch (error) {
       console.error('Error fetching playlist:', error);
     }
-
-    console.log('Fetched playlist data:', data.playlist);
-    console.log('API_BASE_URL:', API_BASE_URL);
-    console.log('relativeUrl:', data.playlist?.relativeUrl);
-    console.log('url:', data.playlist?.url);
-
-
   };
+  
 
   const handleSongAction = async (song_id, action) => {
     const token = localStorage.getItem('token');
