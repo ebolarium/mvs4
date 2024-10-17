@@ -125,6 +125,13 @@ const Playlists = () => {
     } catch (error) {
       console.error('Error fetching playlist:', error);
     }
+
+    console.log('Fetched playlist data:', data.playlist);
+    console.log('API_BASE_URL:', API_BASE_URL);
+    console.log('relativeUrl:', data.playlist?.relativeUrl);
+    console.log('url:', data.playlist?.url);
+
+
   };
 
   const handleSongAction = async (song_id, action) => {
