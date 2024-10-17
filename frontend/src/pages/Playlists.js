@@ -151,9 +151,9 @@ const Playlists = () => {
     if (!token) {
       return alert('You need to login first');
     }
-
+  
     const newPublishState = !isPublished;
-
+  
     const response = await fetch(`${API_BASE_URL}/playlist/publish`, {
       method: 'PUT',
       headers: {
@@ -162,26 +162,22 @@ const Playlists = () => {
       },
       body: JSON.stringify({ publish: newPublishState }),
     });
-
+  
     if (!response.ok) {
       const data = await response.json();
       alert(data.message);
       return;
     }
-
-    // Update the isPublished state
+  
+    // Publish durumunu güncelliyoruz.
     setIsPublished(newPublishState);
-
-    if (!newPublishState) {
-      // If the playlist is unpublished, clear the playlist state
-      setPlaylist(null);
-      dispatch({ type: 'SET_SONGS', payload: [] });
-      setQrCodeUrl(null);
-    } else {
-      // Fetch the updated playlist when publishing
+  
+    if (newPublishState) {
+      // Eğer publish edildiyse, güncel playlist'i getiriyoruz.
       fetchPlaylist();
     }
   };
+  
 
   return (
     <Container className="mt-5">
