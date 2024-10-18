@@ -110,13 +110,17 @@ const GigMode = ({ playlistId }) => {
               song.played ? 'bg-secondary text-muted' : ''
             }`}
           >
-            <div>
-              {song.title} by {song.artist} - 👍 {song.votecount}
-            </div>
+            <div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>
+  {song.title} by {song.artist} - 👍 {song.votecount}
+</div>
             {!song.played ? (
-              <Button variant="success" onClick={() => handleMarkAsPlayed(song._id)}>
-                Çal
-              </Button>
+<Button
+  variant="success"
+  style={{ fontSize: '1.5rem', padding: '0.5rem', width: '200px' }}
+  onClick={() => handleMarkAsPlayed(song._id)}
+>
+  Çal
+</Button>
             ) : (
               <Button variant="secondary" disabled>
                 Çalındı
@@ -149,9 +153,11 @@ const GigMode = ({ playlistId }) => {
             </Button>
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body className="bg-dark text-light">
-          <h2 style={{ fontSize: '2rem', fontWeight: 'bold' }}>Sahne Modu - Tam Ekran</h2>
-          <div style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>
+        <Modal.Body className="bg-dark text-light" style={{ padding: '2rem' }}>
+          <h2 style={{ fontSize: '3rem', fontWeight: 'bold', textAlign: 'center' }}>
+            Sahne Modu - Tam Ekran
+          </h2>
+          <div style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>
             {renderSongList()}
           </div>
         </Modal.Body>

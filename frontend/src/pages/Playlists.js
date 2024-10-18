@@ -172,10 +172,11 @@ const Playlists = () => {
     // Publish durumunu güncelliyoruz.
     setIsPublished(newPublishState);
   
-    if (newPublishState) {
+    //if (newPublishState) {
       // Eğer publish edildiyse, güncel playlist'i getiriyoruz.
       fetchPlaylist();
-    }
+
+    //}
   };
   
 
@@ -186,8 +187,8 @@ const Playlists = () => {
           <Card className="shadow">
             <Card.Body>
               <h2 className="text-center mb-4">Şarkı Deposu</h2>
-              <ListGroup>
-                {allSongs
+              <ListGroup style={{ maxHeight: '300px', overflowY: 'auto' }}>
+              {allSongs
                   .filter((song) => !state.songs.some((p) => p._id === song._id))
                   .map((song) => (
                     <ListGroup.Item
@@ -217,8 +218,8 @@ const Playlists = () => {
               <h2 className="text-center mb-4">Çalma Listesi</h2>
               {playlist ? (
                 <>
-                  <ListGroup>
-                    {state.songs.length > 0 ? (
+<ListGroup style={{ maxHeight: '300px', overflowY: 'auto' }}>
+{state.songs.length > 0 ? (
                       state.songs.map((song, index) => (
                         <ListGroup.Item
                           key={`${song._id}-${index}`}

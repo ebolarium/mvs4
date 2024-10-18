@@ -1,0 +1,33 @@
+/* Homepage.css */
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #212529;
+    color: #fff;
+  }
+  
+  .MuiAppBar-root {
+    box-shadow: none;
+  }
+  
+  .MuiButton-root {
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+  
+  img {
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  img:hover {
+    transform: scale(1.05);
+  }
+  
+  .MuiCard-root {
+    transition: box-shadow 0.3s ease-in-out;
+  }
+  
+  .MuiCard-root:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  }
+  

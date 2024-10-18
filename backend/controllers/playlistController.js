@@ -95,6 +95,7 @@ const publishPlaylist = async (req, res) => {
   if (io && playlist._id) {
     io.to(playlist._id.toString()).emit('playlistStatusChanged', {
       published: publish,
+      playlist,
     });
   }
 
