@@ -47,7 +47,7 @@ const Playlists = () => {
       if (response.status === 401) {
         alert('Your session has expired. Please login again.');
         localStorage.removeItem('token');
-        window.location.href = '/login';
+        window.location.href = '/';
         return;
       }
 
@@ -78,7 +78,7 @@ const Playlists = () => {
       if (response.status === 401) {
         alert('Your session has expired. Please login again.');
         localStorage.removeItem('token');
-        window.location.href = '/login';
+        window.location.href = '/';
         return;
       }
   
@@ -186,7 +186,7 @@ const Playlists = () => {
         <Col md={6}>
           <Card className="shadow">
             <Card.Body>
-              <h2 className="text-center mb-4">Şarkı Deposu</h2>
+              <h2 className="text-center mb-4">Song Repository</h2>
               <ListGroup style={{ maxHeight: '300px', overflowY: 'auto' }}>
               {allSongs
                   .filter((song) => !state.songs.some((p) => p._id === song._id))
@@ -203,7 +203,7 @@ const Playlists = () => {
                         onClick={() => handleSongAction(song._id, 'add')}
                         disabled={isPublished} // Disable when published
                       >
-                        Ekle
+                        Add
                       </Button>
                     </ListGroup.Item>
                   ))}
@@ -215,7 +215,7 @@ const Playlists = () => {
         <Col md={6}>
           <Card className="shadow">
             <Card.Body>
-              <h2 className="text-center mb-4">Çalma Listesi</h2>
+              <h2 className="text-center mb-4">Playlist</h2>
               {playlist ? (
                 <>
 <ListGroup style={{ maxHeight: '300px', overflowY: 'auto' }}>
@@ -232,12 +232,12 @@ const Playlists = () => {
                             onClick={() => handleSongAction(song._id, 'remove')}
                             disabled={isPublished} // Disable when published
                           >
-                            Çıkar
+                            Remove
                           </Button>
                         </ListGroup.Item>
                       ))
                     ) : (
-                      <p>Listede Şarkı Yok.</p>
+                      <p>No songs available.</p>
                     )}
                   </ListGroup>
                   <Button
@@ -264,7 +264,7 @@ const Playlists = () => {
                   )}
                 </>
               ) : (
-                <p>Şarkı Listesi Oluşturulmadı.</p>
+                <p>Playlist not created.</p>
               )}
             </Card.Body>
           </Card>

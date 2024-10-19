@@ -14,7 +14,7 @@ exports.register = async (req, res) => {
     // Kullanıcı zaten var mı kontrol et.
     let user = await User.findOne({ email });
     if (user) {
-      return res.status(400).json({ message: 'Bu e-posta adresi zaten kullanılıyor.' });
+      return res.status(400).json({ message: 'This email address is already in use.' });
     }
 
     // Şifreyi hashle.
@@ -36,7 +36,7 @@ exports.register = async (req, res) => {
 
     res.status(201).json({ token, userId: user._id });
   } catch (error) {
-    res.status(500).json({ message: 'Sunucu hatası' });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -49,13 +49,13 @@ exports.login = async (req, res) => {
     // Kullanıcı var mı kontrol et.
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: 'Geçersiz kimlik bilgileri.' });
+      return res.status(400).json({ message: 'Invalid credentials.' });
     }
 
     // Şifre doğru mu kontrol et.
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Geçersiz kimlik bilgileri.' });
+      return res.status(400).json({ message: 'Invalid credentials.' });
     }
 
     // JWT token oluştur.
@@ -65,6 +65,6 @@ exports.login = async (req, res) => {
 
     res.status(200).json({ token, userId: user._id });
   } catch (error) {
-    res.status(500).json({ message: 'Sunucu hatası' });
+    res.status(500).json({ message: 'Server error' });
   }
 };

@@ -18,7 +18,7 @@ const BandProfile = () => {
     const token = localStorage.getItem('token');
     if (!token) {
       alert('You need to login first');
-      window.location.href = '/login';
+      window.location.href = '/';
       return;
     }
 
@@ -52,7 +52,7 @@ const BandProfile = () => {
     const token = localStorage.getItem('token');
     if (!token) {
       alert('You need to login first');
-      window.location.href = '/login';
+      window.location.href = '/';
       return;
     }
 
@@ -84,11 +84,11 @@ const BandProfile = () => {
   return (
     <Container className="mt-5">
       <Button variant="secondary" onClick={() => navigate('/dashboard')} className="mb-3">
-        ← Dashboard'a Dön
+        ← Return to Dashboard
       </Button>
       <Card className="shadow bg-dark text-white">
         <Card.Body>
-          <h2 className="text-center mb-4">Grup Profili</h2>
+          <h2 className="text-center mb-4">Band Profile</h2>
           <div className="text-center mb-4">
             {bandInfo.band_image ? (
               <img
@@ -102,11 +102,11 @@ const BandProfile = () => {
           </div>
           <Form onSubmit={handleImageUpload}>
             <Form.Group controlId="formFile" className="mb-3">
-              <Form.Label>Yüklemek İçin Resim Seç</Form.Label>
+              <Form.Label>Select an image to upload</Form.Label>
               <Form.Control type="file" onChange={handleFileChange} accept="image/*" />
             </Form.Group>
             <Button variant="primary" type="submit">
-             Resmi Yükle
+            Upload Image
             </Button>
           </Form>
         </Card.Body>

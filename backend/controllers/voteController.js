@@ -13,13 +13,13 @@ exports.vote = async (req, res) => {
     // Playlisti bul.
     const playlist = await Playlist.findById(playlistId);
     if (!playlist) {
-      return res.status(404).json({ message: 'Playlist bulunamadı.' });
+      return res.status(404).json({ message: 'Playlist not found.' });
     }
 
     // Şarkıyı bul.
     const song = await Song.findById(songId);
     if (!song) {
-      return res.status(404).json({ message: 'Şarkı bulunamadı.' });
+      return res.status(404).json({ message: 'Song not found.' });
     }
 
     // Anlık oy sayısını artır.
@@ -32,8 +32,8 @@ exports.vote = async (req, res) => {
     await playlist.save();
     await song.save();
 
-    res.status(200).json({ message: 'Oy başarıyla verildi.' });
+    res.status(200).json({ message: 'Vote registered successfully.' });
   } catch (error) {
-    res.status(500).json({ message: 'Sunucu hatası' });
+    res.status(500).json({ message: 'Server error' });
   }
 };

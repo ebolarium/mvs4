@@ -123,7 +123,7 @@ const GigMode = ({ playlistId }) => {
 </Button>
             ) : (
               <Button variant="secondary" disabled>
-                Çalındı
+                Played
               </Button>
             )}
           </ListGroup.Item>
@@ -134,7 +134,7 @@ const GigMode = ({ playlistId }) => {
 
   return (
     <Container className="mt-5">
-      <h2>Sahne Modu</h2>
+      <h2>Gig Mode</h2>
       <div className="d-flex justify-content-end mb-3">
         <Button variant="link" onClick={() => setShowFullscreen(true)}>
           <Fullscreen fontSize="large" />
@@ -155,7 +155,7 @@ const GigMode = ({ playlistId }) => {
         </Modal.Header>
         <Modal.Body className="bg-dark text-light" style={{ padding: '2rem' }}>
           <h2 style={{ fontSize: '3rem', fontWeight: 'bold', textAlign: 'center' }}>
-            Sahne Modu - Tam Ekran
+            Gig Mode - Fullscreen
           </h2>
           <div style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>
             {renderSongList()}

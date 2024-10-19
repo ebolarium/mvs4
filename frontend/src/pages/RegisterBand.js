@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Container, Form, Button, Row, Col, Card } from 'react-bootstrap';
-import { v4 as uuidv4 } from 'uuid'; // UUID ile otomatik band_id oluşturmak için
-import { useNavigate } from 'react-router-dom'; // Yönlendirme için gerekli
+import { Form, Button, Card } from 'react-bootstrap';
+import { v4 as uuidv4 } from 'uuid';
+import { useNavigate } from 'react-router-dom';
 import API_BASE_URL from '../config/apiConfig';
-
 
 const RegisterBand = () => {
   const [formData, setFormData] = useState({
@@ -15,7 +14,7 @@ const RegisterBand = () => {
 
   const { band_name, band_email, band_password, band_confirm_password } = formData;
   const [errorMessage, setErrorMessage] = useState('');
-  const navigate = useNavigate(); // Yönlendirme için hook
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -29,7 +28,7 @@ const RegisterBand = () => {
       return;
     }
 
-    const band_id = uuidv4(); 
+    const band_id = uuidv4();
 
     try {
       const response = await fetch(`${API_BASE_URL}/bands/register`, {
@@ -47,6 +46,8 @@ const RegisterBand = () => {
 
       const data = await response.json();
       if (response.ok) {
+        // Token'ı localStorage'a kaydet ve dashboard'a yönlendir
+        localStorage.setItem('token', data.token);
         alert('Band registered successfully!');
         setFormData({
           band_name: '',
@@ -55,7 +56,7 @@ const RegisterBand = () => {
           band_confirm_password: ''
         });
         setErrorMessage('');
-        navigate('/login'); // Başarıyla kayıt olduktan sonra login sayfasına yönlendirme
+        navigate('/'); // Kullanıcıyı dashboard'a yönlendir
       } else {
         setErrorMessage(`Error: ${data.message}`);
       }
@@ -66,71 +67,65 @@ const RegisterBand = () => {
   };
 
   return (
-    <Container className="d-flex justify-content-center align-items-center min-vh-100">
-      <Row>
-        <Col>
-          <Card className="p-4 shadow">
-            <Card.Body>
-              <h2 className="mb-4 text-center">Pechete Band Registration</h2>
-              {errorMessage && <p className="text-danger text-center">{errorMessage}</p>}
-              <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3" controlId="formBandName">
-                  <Form.Label>Band Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="band_name"
-                    value={band_name}
-                    onChange={handleChange}
-                    placeholder="Band Name"
-                    required
-                  />
-                </Form.Group>
+    <Card className="shadow-sm" style={{ padding: '20px', borderRadius: '10px' }}>
+      <Card.Body>
+        <h2 className="text-center mb-3">Band Registration</h2>
+        {errorMessage && <p className="text-danger text-center">{errorMessage}</p>}
+        <Form onSubmit={handleSubmit}>
+          <Form.Group className="mb-2" controlId="formBandName">
+            <Form.Label>Band Name</Form.Label>
+            <Form.Control
+              type="text"
+              name="band_name"
+              value={band_name}
+              onChange={handleChange}
+              placeholder="Enter Band Name"
+              required
+            />
+          </Form.Group>
 
-                <Form.Group className="mb-3" controlId="formBandEmail">
-                  <Form.Label>Band Email</Form.Label>
-                  <Form.Control
-                    type="email"
-                    name="band_email"
-                    value={band_email}
-                    onChange={handleChange}
-                    placeholder="Band Email"
-                    required
-                  />
-                </Form.Group>
+          <Form.Group className="mb-2" controlId="formBandEmail">
+            <Form.Label>Band Email</Form.Label>
+            <Form.Control
+              type="email"
+              name="band_email"
+              value={band_email}
+              onChange={handleChange}
+              placeholder="Enter Band Email"
+              required
+            />
+          </Form.Group>
 
-                <Form.Group className="mb-3" controlId="formBandPassword">
-                  <Form.Label>Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    name="band_password"
-                    value={band_password}
-                    onChange={handleChange}
-                    placeholder="Password"
-                    required
-                  />
-                </Form.Group>
+          <Form.Group className="mb-2" controlId="formBandPassword">
+            <Form.Label>Password</Form.Label>
+            <Form.Control
+              type="password"
+              name="band_password"
+              value={band_password}
+              onChange={handleChange}
+              placeholder="Enter Password"
+              required
+            />
+          </Form.Group>
 
-                <Form.Group className="mb-4" controlId="formConfirmPassword">
-                  <Form.Label>Confirm Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    name="band_confirm_password"
-                    value={band_confirm_password}
-                    onChange={handleChange}
-                    placeholder="Confirm Password"
-                    required
-                  />
-                </Form.Group>
+          <Form.Group className="mb-3" controlId="formConfirmPassword">
+            <Form.Label>Confirm Password</Form.Label>
+            <Form.Control
+              type="password"
+              name="band_confirm_password"
+              value={band_confirm_password}
+              onChange={handleChange}
+              placeholder="Confirm Password"
+              required
+            />
+          </Form.Group>
 
-                <Button variant="primary" type="submit" className="w-100">
-                  Register
-                </Button>
-              </Form>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+          <Button variant="primary" type="submit" className="w-100">
+            Register
+          </Button>
+        </Form>
+      </Card.Body>
+    </Card>
   );
 };
 

@@ -23,7 +23,7 @@ const loginBand = async (req, res) => {
     }
 
     const token = jwt.sign({ id: band._id }, process.env.JWT_SECRET, {
-      expiresIn: '10h',
+      expiresIn: '1h',
     });
 
     res.json({ token });

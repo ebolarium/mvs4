@@ -168,7 +168,7 @@ const PublishedPlaylist = () => {
             {state.playlist.band_id.band_name || 'Live Music'}
           </Card.Title>
           <Card.Text className="text-white" style={{ fontSize: '1.2rem' }}>
-            Şarkına Oy Ver!
+          Vote for Your Song!
           </Card.Text>
         </Card.Body>
       </Card>
@@ -177,7 +177,7 @@ const PublishedPlaylist = () => {
       {/* Cooldown Timer */}
       {cooldown > 0 && (
         <p className="text-center">
-          {Math.ceil(cooldown / 1000)} saniye sonra tekrar oy verebilirsin.
+          {Math.ceil(cooldown / 1000)} Seconds to Next Vote.
         </p>
       )}
 
@@ -198,7 +198,7 @@ const PublishedPlaylist = () => {
               onClick={() => handleVote(song._id)}
               disabled={song.played || cooldown > 0} // Disable if played or in cooldown
             >
-              {song.played ? 'Çalındı' : 'Oy Ver'}
+              {song.played ? 'Played' : 'Oy Ver'}
             </Button>
           </ListGroup.Item>
         ))}

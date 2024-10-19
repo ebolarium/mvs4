@@ -20,7 +20,7 @@ const BandDashboard = () => {
     const token = localStorage.getItem('token');
     if (!token) {
       alert('You need to login first');
-      navigate('/login');
+      navigate('/');
       return;
     }
 
