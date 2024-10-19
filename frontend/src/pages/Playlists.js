@@ -4,8 +4,10 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Container, Row, Col, Button, Card, ListGroup } from 'react-bootstrap';
 import { GlobalStateContext } from '../context/GlobalStateProvider';
 import API_BASE_URL from '../config/apiConfig';
+import { useTranslation } from 'react-i18next';
 
 const Playlists = () => {
+  const { t } = useTranslation();
   const [playlist, setPlaylist] = useState(null);
   const [isPublished, setIsPublished] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState(null);
@@ -19,7 +21,7 @@ const Playlists = () => {
 
   useEffect(() => {
     if (playlist?._id && socket) {
-      console.log('Attempting to join playlist with ID:', playlist._id);
+      console.log(t('attempt_join_playlist'), playlist._id);
       socket.emit('joinPlaylist', playlist._id);
     }
 
@@ -33,7 +35,7 @@ const Playlists = () => {
   const fetchSongs = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
-      return alert('You need to login first');
+      return alert(t('login_required'));
     }
 
     try {
@@ -45,26 +47,26 @@ const Playlists = () => {
       });
 
       if (response.status === 401) {
-        alert('Your session has expired. Please login again.');
+        alert(t('session_expired'));
         localStorage.removeItem('token');
         window.location.href = '/';
         return;
       }
 
       if (!response.ok) {
-        throw new Error('Failed to fetch songs');
+        throw new Error(t('error_fetching_songs'));
       }
       const data = await response.json();
       dispatch({ type: 'SET_ALL_SONGS', payload: data.songs || [] });
     } catch (error) {
-      console.error('Error fetching songs:', error);
+      console.error(t('error_fetching_songs'), error);
     }
   };
 
   const fetchPlaylist = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
-      return alert('You need to login first');
+      return alert(t('login_required'));
     }
   
     try {
@@ -76,7 +78,7 @@ const Playlists = () => {
       });
   
       if (response.status === 401) {
-        alert('Your session has expired. Please login again.');
+        alert(t('session_expired'));
         localStorage.removeItem('token');
         window.location.href = '/';
         return;
@@ -91,18 +93,16 @@ const Playlists = () => {
       }
   
       if (!response.ok) {
-        throw new Error('Failed to fetch playlist');
+        throw new Error(t('error_fetching_playlist'));
       }
   
-      const data = await response.json(); // 'data' burada tanımlanıyor
+      const data = await response.json();
   
- 
       const relativeUrl = data.playlist?.relativeUrl
         ? `${API_BASE_URL}${data.playlist.relativeUrl}`
         : data.playlist?.url;
       setQrCodeUrl(relativeUrl);
   
-      // Update global state with processed songs
       const processedSongs = data.playlist.songs
         .filter((song) => song.song_id)
         .map((song) => ({
@@ -124,7 +124,7 @@ const Playlists = () => {
       dispatch({ type: 'SET_SONGS', payload: processedSongs });
   
     } catch (error) {
-      console.error('Error fetching playlist:', error);
+      console.error(t('error_fetching_playlist'), error);
     }
   };
   
@@ -132,7 +132,7 @@ const Playlists = () => {
   const handleSongAction = async (song_id, action) => {
     const token = localStorage.getItem('token');
     if (!token) {
-      return alert('You need to login first');
+      return alert(t('login_required'));
     }
 
     await fetch(`${API_BASE_URL}/playlist/update-songs`, {
@@ -149,7 +149,7 @@ const Playlists = () => {
   const handlePublish = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
-      return alert('You need to login first');
+      return alert(t('login_required'));
     }
   
     const newPublishState = !isPublished;
@@ -165,18 +165,13 @@ const Playlists = () => {
   
     if (!response.ok) {
       const data = await response.json();
-      alert(data.message);
+      alert(t(data.message));
       return;
     }
   
-    // Publish durumunu güncelliyoruz.
     setIsPublished(newPublishState);
   
-    //if (newPublishState) {
-      // Eğer publish edildiyse, güncel playlist'i getiriyoruz.
-      fetchPlaylist();
-
-    //}
+    fetchPlaylist();
   };
   
 
@@ -186,7 +181,7 @@ const Playlists = () => {
         <Col md={6}>
           <Card className="shadow">
             <Card.Body>
-              <h2 className="text-center mb-4">Song Repository</h2>
+              <h2 className="text-center mb-4">{t('song_repository')}</h2>
               <ListGroup style={{ maxHeight: '300px', overflowY: 'auto' }}>
               {allSongs
                   .filter((song) => !state.songs.some((p) => p._id === song._id))
@@ -196,14 +191,14 @@ const Playlists = () => {
                       className="d-flex justify-content-between align-items-center"
                     >
                       <div>
-                        {song.title} by {song.artist}
+                        {song.title} {t('by')} {song.artist}
                       </div>
                       <Button
                         variant="primary"
                         onClick={() => handleSongAction(song._id, 'add')}
                         disabled={isPublished} // Disable when published
                       >
-                        Add
+                        {t('add')}
                       </Button>
                     </ListGroup.Item>
                   ))}
@@ -215,29 +210,29 @@ const Playlists = () => {
         <Col md={6}>
           <Card className="shadow">
             <Card.Body>
-              <h2 className="text-center mb-4">Playlist</h2>
+              <h2 className="text-center mb-4">{t('playlist')}</h2>
               {playlist ? (
                 <>
-<ListGroup style={{ maxHeight: '300px', overflowY: 'auto' }}>
-{state.songs.length > 0 ? (
+                  <ListGroup style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                    {state.songs.length > 0 ? (
                       state.songs.map((song, index) => (
                         <ListGroup.Item
                           key={`${song._id}-${index}`}
                           className="d-flex justify-content-between align-items-center"
                         >
-                          {song.title} by {song.artist} - Votes: {song.votecount}
+                          {song.title} {t('by')} {song.artist} - {t('votes')}: {song.votecount}
                           <Button
                             variant="danger"
                             className="ms-3"
                             onClick={() => handleSongAction(song._id, 'remove')}
                             disabled={isPublished} // Disable when published
                           >
-                            Remove
+                            {t('remove')}
                           </Button>
                         </ListGroup.Item>
                       ))
                     ) : (
-                      <p>No songs available.</p>
+                      <p>{t('no_songs_available')}</p>
                     )}
                   </ListGroup>
                   <Button
@@ -246,25 +241,25 @@ const Playlists = () => {
                     onClick={handlePublish}
                     disabled={state.songs.length === 0 && !isPublished} // Disable if empty and not published
                   >
-                    {isPublished ? 'Unpublish' : 'Publish'}
+                    {isPublished ? t('unpublish') : t('publish')}
                   </Button>
                   {isPublished && (
                     <>
                       <p className="mt-3">
-                        Playlist URL:{' '}
+                        {t('playlist_url')}: 
                         <a href={qrCodeUrl} target="_blank" rel="noopener noreferrer">
                           {qrCodeUrl}
                         </a>
                       </p>
                       <img
                         src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${qrCodeUrl}`}
-                        alt="QR Code"
+                        alt={t('qr_code')}
                       />
                     </>
                   )}
                 </>
               ) : (
-                <p>Playlist not created.</p>
+                <p>{t('playlist_not_created')}</p>
               )}
             </Card.Body>
           </Card>

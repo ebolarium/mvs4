@@ -3,8 +3,10 @@ import { Form, Button, Card } from 'react-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
 import API_BASE_URL from '../config/apiConfig';
+import { useTranslation } from 'react-i18next';
 
 const RegisterBand = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     band_name: '',
     band_email: '',
@@ -24,7 +26,7 @@ const RegisterBand = () => {
     e.preventDefault();
 
     if (band_password !== band_confirm_password) {
-      setErrorMessage('Passwords do not match.');
+      setErrorMessage(t('passwords_do_not_match'));
       return;
     }
 
@@ -48,7 +50,7 @@ const RegisterBand = () => {
       if (response.ok) {
         // Token'ı localStorage'a kaydet ve dashboard'a yönlendir
         localStorage.setItem('token', data.token);
-        alert('Band registered successfully!');
+        alert(t('band_registered_successfully'));
         setFormData({
           band_name: '',
           band_email: '',
@@ -58,70 +60,70 @@ const RegisterBand = () => {
         setErrorMessage('');
         navigate('/'); // Kullanıcıyı dashboard'a yönlendir
       } else {
-        setErrorMessage(`Error: ${data.message}`);
+        setErrorMessage(`Error: ${t(data.message)}`);
       }
     } catch (error) {
       console.error('Error:', error);
-      setErrorMessage('An error occurred while registering the band.');
+      setErrorMessage(t('error_registering_band'));
     }
   };
 
   return (
     <Card className="shadow-sm" style={{ padding: '20px', borderRadius: '10px' }}>
       <Card.Body>
-        <h2 className="text-center mb-3">Band Registration</h2>
+        <h2 className="text-center mb-3">{t('band_registration')}</h2>
         {errorMessage && <p className="text-danger text-center">{errorMessage}</p>}
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-2" controlId="formBandName">
-            <Form.Label>Band Name</Form.Label>
+            <Form.Label>{t('band_name')}</Form.Label>
             <Form.Control
               type="text"
               name="band_name"
               value={band_name}
               onChange={handleChange}
-              placeholder="Enter Band Name"
+              placeholder={t('enter_band_name')}
               required
             />
           </Form.Group>
 
           <Form.Group className="mb-2" controlId="formBandEmail">
-            <Form.Label>Band Email</Form.Label>
+            <Form.Label>{t('band_email')}</Form.Label>
             <Form.Control
               type="email"
               name="band_email"
               value={band_email}
               onChange={handleChange}
-              placeholder="Enter Band Email"
+              placeholder={t('enter_band_email')}
               required
             />
           </Form.Group>
 
           <Form.Group className="mb-2" controlId="formBandPassword">
-            <Form.Label>Password</Form.Label>
+            <Form.Label>{t('password')}</Form.Label>
             <Form.Control
               type="password"
               name="band_password"
               value={band_password}
               onChange={handleChange}
-              placeholder="Enter Password"
+              placeholder={t('enter_password')}
               required
             />
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="formConfirmPassword">
-            <Form.Label>Confirm Password</Form.Label>
+            <Form.Label>{t('confirm_password')}</Form.Label>
             <Form.Control
               type="password"
               name="band_confirm_password"
               value={band_confirm_password}
               onChange={handleChange}
-              placeholder="Confirm Password"
+              placeholder={t('confirm_password')}
               required
             />
           </Form.Group>
 
           <Button variant="primary" type="submit" className="w-100">
-            Register
+            {t('register')}
           </Button>
         </Form>
       </Card.Body>

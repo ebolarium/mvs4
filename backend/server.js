@@ -10,12 +10,23 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const path = require('path');
+const i18n = require('i18n'); // i18n kütüphanesini ekliyoruz
 const app = express();
 const server = http.createServer(app);
 const Playlist = require('./models/Playlist');
 
 dotenv.config();
 
+// i18n configuration
+i18n.configure({
+  locales: ['en', 'tr'], // Kullanılacak diller
+  directory: path.join(__dirname, 'locales'), // JSON dosyalarının bulunduğu klasör
+  defaultLocale: 'en', // Varsayılan dil
+  objectNotation: true, // JSON dosyalarındaki iç içe objeleri kullanmak için
+});
+
+// i18n middleware olarak ekliyoruz
+app.use(i18n.init);
 
 // Socket.io setup
 const io = new Server(server, {
@@ -51,7 +62,6 @@ app.use('/api/bands', bandRoutes);
 app.use('/api/songs', songRoutes);
 app.use('/api/playlist', playlistRoutes);
 
-
 // Serve frontend files
 app.use(express.static(path.join(__dirname, '../frontend/build')));
 
@@ -60,7 +70,7 @@ app.use('/uploads', cors(), express.static(path.join(__dirname, 'uploads')));
 
 // Wildcard route for frontend
 app.get('*', (req, res) => {
-res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
+  res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
 });
 
 // Socket.io connections

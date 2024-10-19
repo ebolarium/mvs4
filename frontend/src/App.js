@@ -9,6 +9,8 @@ import Homepage from './pages/Homepage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { GlobalStateProvider } from './context/GlobalStateProvider';
 import BandProfile from './pages/BandProfile';
+import './i18n'; // i18n dosyamızı buraya ekliyoruz
+
 
 function App() {
   return (

@@ -4,8 +4,10 @@ import React, { useContext, useEffect } from 'react';
 import { Table } from 'react-bootstrap';
 import { GlobalStateContext } from '../context/GlobalStateProvider';
 import API_BASE_URL from '../config/apiConfig';
+import { useTranslation } from 'react-i18next';
 
 const Analytics = () => {
+  const { t } = useTranslation();
   const { state, dispatch } = useContext(GlobalStateContext);
   const songs = state.allSongs || [];
 
@@ -13,7 +15,7 @@ const Analytics = () => {
     const fetchSongs = async () => {
       const token = localStorage.getItem('token');
       if (!token) {
-        return alert('You need to login first');
+        return alert(t('login_required'));
       }
 
       try {
@@ -25,28 +27,28 @@ const Analytics = () => {
         });
 
         if (!response.ok) {
-          throw new Error('Failed to fetch songs');
+          throw new Error(t('error_fetching_songs'));
         }
         const data = await response.json();
         dispatch({ type: 'SET_ALL_SONGS', payload: data.songs || [] });
       } catch (error) {
-        console.error('Error fetching songs:', error);
+        console.error(t('error_fetching_songs'), error);
       }
     };
 
     fetchSongs();
-  }, [dispatch]);
+  }, [dispatch, t]);
 
   return (
     <div>
-      <h2>Analytics</h2>
+      <h2>{t('analytics')}</h2>
       <Table striped bordered hover>
         <thead>
           <tr>
-            <th>Title</th>
-            <th>Artist</th>
-            <th>Total Votes</th>
-            <th>Play Count</th>
+            <th>{t('title')}</th>
+            <th>{t('artist')}</th>
+            <th>{t('total_votes')}</th>
+            <th>{t('play_count')}</th>
           </tr>
         </thead>
         <tbody>

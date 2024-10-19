@@ -4,8 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { Container, Form, Button, Card } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom'; // useNavigate hook'u eklendi
 import API_BASE_URL from '../config/apiConfig';
+import { useTranslation } from 'react-i18next';
 
 const BandProfile = () => {
+  const { t } = useTranslation();
   const [bandInfo, setBandInfo] = useState({
     band_name: '',
     band_image: '',
@@ -17,7 +19,7 @@ const BandProfile = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      alert('You need to login first');
+      alert(t('login_required'));
       window.location.href = '/';
       return;
     }
@@ -30,7 +32,7 @@ const BandProfile = () => {
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error('Failed to fetch band info');
+          throw new Error(t('error_fetching_band_profile'));
         }
         return response.json();
       })
@@ -38,9 +40,9 @@ const BandProfile = () => {
         setBandInfo(data.band);
       })
       .catch((error) => {
-        console.error('Error fetching band info:', error);
+        console.error(t('error_fetching_band_profile'), error);
       });
-  }, []);
+  }, [t]);
 
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
@@ -51,7 +53,7 @@ const BandProfile = () => {
 
     const token = localStorage.getItem('token');
     if (!token) {
-      alert('You need to login first');
+      alert(t('login_required'));
       window.location.href = '/';
       return;
     }
@@ -68,27 +70,27 @@ const BandProfile = () => {
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error('Failed to upload image');
+          throw new Error(t('failed_to_upload_image'));
         }
         return response.json();
       })
       .then((data) => {
         setBandInfo({ ...bandInfo, band_image: data.imageUrl });
-        alert('Image uploaded successfully');
+        alert(t('image_uploaded_successfully'));
       })
       .catch((error) => {
-        console.error('Error uploading image:', error);
+        console.error(t('failed_to_upload_image'), error);
       });
   };
 
   return (
     <Container className="mt-5">
       <Button variant="secondary" onClick={() => navigate('/dashboard')} className="mb-3">
-        ← Return to Dashboard
+        ← {t('return_to_dashboard')}
       </Button>
       <Card className="shadow bg-dark text-white">
         <Card.Body>
-          <h2 className="text-center mb-4">Band Profile</h2>
+          <h2 className="text-center mb-4">{t('band_profile')}</h2>
           <div className="text-center mb-4">
             {bandInfo.band_image ? (
               <img
@@ -97,16 +99,16 @@ const BandProfile = () => {
                 style={{ width: '200px', height: '200px', borderRadius: '50%' }}
               />
             ) : (
-              <p>No image uploaded</p>
+              <p>{t('no_image_uploaded')}</p>
             )}
           </div>
           <Form onSubmit={handleImageUpload}>
             <Form.Group controlId="formFile" className="mb-3">
-              <Form.Label>Select an image to upload</Form.Label>
+              <Form.Label>{t('select_image_to_upload')}</Form.Label>
               <Form.Control type="file" onChange={handleFileChange} accept="image/*" />
             </Form.Group>
             <Button variant="primary" type="submit">
-            Upload Image
+              {t('upload_image')}
             </Button>
           </Form>
         </Card.Body>

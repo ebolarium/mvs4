@@ -9,8 +9,10 @@ import Loader from './Loader'; // Loader bileşeni eklendi.
 import API_BASE_URL from '../config/apiConfig';
 import { GlobalStateContext } from '../context/GlobalStateProvider';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const BandDashboard = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [playlistId, setPlaylistId] = useState(null);
   const [loading, setLoading] = useState(true); // Yükleme state'i
@@ -19,7 +21,7 @@ const BandDashboard = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      alert('You need to login first');
+      alert(t('login_required'));
       navigate('/');
       return;
     }
@@ -37,7 +39,7 @@ const BandDashboard = () => {
           return null;
         }
         if (!response.ok) {
-          throw new Error('Failed to fetch current playlist');
+          throw new Error(t('error_fetching_current_playlist'));
         }
         return response.json();
       })
@@ -46,13 +48,13 @@ const BandDashboard = () => {
           setPlaylistId(data.playlist._id);
         }
       })
-      .catch((error) => console.error('Error fetching current playlist:', error))
+      .catch((error) => console.error(t('error_fetching_current_playlist'), error))
       .finally(() => setLoading(false)); // Yükleme tamamlandığında spinner kapatılır.
-  }, [navigate]);
+  }, [navigate, t]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    alert('Logged out successfully!');
+    alert(t('logged_out_successfully'));
     navigate('/');
   };
 
@@ -66,26 +68,26 @@ const BandDashboard = () => {
         <Col>
           <Card className="shadow">
             <Card.Body>
-              <h2 className="text-center mb-4">Band Dashboard</h2>
+              <h2 className="text-center mb-4">{t('band_dashboard')}</h2>
               <Button variant="danger" onClick={handleLogout}>
-                Logout
+                {t('logout')}
               </Button>
               <Button variant="info" as={Link} to="/profile" className="ms-2">
-                Edit Profile
+                {t('edit_profile')}
               </Button>
               <Tab.Container defaultActiveKey="analytics">
                 <Nav variant="tabs" className="justify-content-center">
                   <Nav.Item>
-                    <Nav.Link eventKey="analytics">Analytics</Nav.Link>
+                    <Nav.Link eventKey="analytics">{t('analytics')}</Nav.Link>
                   </Nav.Item>
                   <Nav.Item>
-                    <Nav.Link eventKey="songs">Songs</Nav.Link>
+                    <Nav.Link eventKey="songs">{t('songs')}</Nav.Link>
                   </Nav.Item>
                   <Nav.Item>
-                    <Nav.Link eventKey="playlists">Playlists</Nav.Link>
+                    <Nav.Link eventKey="playlists">{t('playlists')}</Nav.Link>
                   </Nav.Item>
                   <Nav.Item>
-                    <Nav.Link eventKey="gigmode">Gig Mode</Nav.Link>
+                    <Nav.Link eventKey="gigmode">{t('gig_mode')}</Nav.Link>
                   </Nav.Item>
                 </Nav>
                 <Tab.Content className="mt-4">
@@ -102,7 +104,7 @@ const BandDashboard = () => {
                     {playlistId ? (
                       <GigMode playlistId={playlistId} />
                     ) : (
-                      <p>No published playlist found</p>
+                      <p>{t('no_published_playlist_found')}</p>
                     )}
                   </Tab.Pane>
                 </Tab.Content>

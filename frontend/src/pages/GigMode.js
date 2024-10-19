@@ -5,8 +5,10 @@ import { Container, ListGroup, Button, Modal } from 'react-bootstrap';
 import { GlobalStateContext } from '../context/GlobalStateProvider';
 import { Fullscreen, FullscreenExit } from '@mui/icons-material';
 import API_BASE_URL from '../config/apiConfig';
+import { useTranslation } from 'react-i18next';
 
 const GigMode = ({ playlistId }) => {
+  const { t } = useTranslation();
   const { state, dispatch, socket } = useContext(GlobalStateContext);
   const [showFullscreen, setShowFullscreen] = React.useState(false);
 
@@ -18,7 +20,7 @@ const GigMode = ({ playlistId }) => {
     const fetchInitialData = () => {
       const token = localStorage.getItem('token');
       if (!token) {
-        return alert('You need to login first');
+        return alert(t('login_required'));
       }
 
       fetch(`${API_BASE_URL}/playlist`, {
@@ -29,7 +31,7 @@ const GigMode = ({ playlistId }) => {
       })
         .then((response) => {
           if (!response.ok) {
-            throw new Error('Failed to fetch playlist');
+            throw new Error(t('error_fetching_playlist'));
           }
           return response.json();
         })
@@ -54,7 +56,7 @@ const GigMode = ({ playlistId }) => {
             dispatch({ type: 'SET_PLAYLIST', payload: data.playlist });
           }
         })
-        .catch((error) => console.error('Error fetching playlist:', error));
+        .catch((error) => console.error(t('error_fetching_playlist'), error));
     };
 
     const handleConnect = () => {
@@ -72,7 +74,7 @@ const GigMode = ({ playlistId }) => {
       socket.off('connect', handleConnect);
       socket.emit('leavePlaylist', playlistId);
     };
-  }, [playlistId, socket, dispatch]);
+  }, [playlistId, socket, dispatch, t]);
 
   const handleMarkAsPlayed = async (songId) => {
     try {
@@ -85,23 +87,23 @@ const GigMode = ({ playlistId }) => {
       });
   
       if (response.ok) {
-        console.log('Song marked as played:', songId);
+        console.log(t('song_marked_as_played'), songId);
         if (socket && playlistId) {
           socket.emit('songPlayed', songId, playlistId);
         }
       } else {
         const errorData = await response.json();
-        console.error('Failed to mark the song as played:', errorData.message);
+        console.error(t('error_marking_song_as_played'), errorData.message);
       }
     } catch (error) {
-      console.error('Error marking song as played:', error);
+      console.error(t('error_marking_song_as_played'), error);
     }
   };
 
   const renderSongList = () => (
     <ListGroup>
       {state.songs.length === 0 ? (
-        <p>No songs available in the current playlist.</p>
+        <p>{t('no_songs_available_playlist')}</p>
       ) : (
         state.songs.map((song) => (
           <ListGroup.Item
@@ -111,19 +113,19 @@ const GigMode = ({ playlistId }) => {
             }`}
           >
             <div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>
-  {song.title} by {song.artist} - 👍 {song.votecount}
-</div>
+              {song.title} {t('by')} {song.artist} - 👍 {song.votecount}
+            </div>
             {!song.played ? (
-<Button
-  variant="success"
-  style={{ fontSize: '1.5rem', padding: '0.5rem', width: '200px' }}
-  onClick={() => handleMarkAsPlayed(song._id)}
->
-  Çal
-</Button>
+              <Button
+                variant="success"
+                style={{ fontSize: '1.5rem', padding: '0.5rem', width: '200px' }}
+                onClick={() => handleMarkAsPlayed(song._id)}
+              >
+                {t('play')}
+              </Button>
             ) : (
               <Button variant="secondary" disabled>
-                Played
+                {t('played')}
               </Button>
             )}
           </ListGroup.Item>
@@ -134,7 +136,7 @@ const GigMode = ({ playlistId }) => {
 
   return (
     <Container className="mt-5">
-      <h2>Gig Mode</h2>
+      <h2>{t('gig_mode')}</h2>
       <div className="d-flex justify-content-end mb-3">
         <Button variant="link" onClick={() => setShowFullscreen(true)}>
           <Fullscreen fontSize="large" />
@@ -155,7 +157,7 @@ const GigMode = ({ playlistId }) => {
         </Modal.Header>
         <Modal.Body className="bg-dark text-light" style={{ padding: '2rem' }}>
           <h2 style={{ fontSize: '3rem', fontWeight: 'bold', textAlign: 'center' }}>
-            Gig Mode - Fullscreen
+            {t('gig_mode_fullscreen')}
           </h2>
           <div style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>
             {renderSongList()}

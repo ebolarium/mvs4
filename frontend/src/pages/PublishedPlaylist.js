@@ -5,8 +5,10 @@ import { useParams } from 'react-router-dom';
 import { Container, ListGroup, Button, Card } from 'react-bootstrap';
 import { GlobalStateContext } from '../context/GlobalStateProvider';
 import API_BASE_URL from '../config/apiConfig';
+import { useTranslation } from 'react-i18next';
 
 const PublishedPlaylist = () => {
+  const { t } = useTranslation();
   const { playlistId } = useParams();
   const { state, dispatch, socket } = useContext(GlobalStateContext);
   const [cooldown, setCooldown] = useState(0); // Declare cooldown state variable
@@ -45,7 +47,7 @@ const PublishedPlaylist = () => {
             return;
           }
           if (!response.ok) {
-            throw new Error('Failed to fetch playlist');
+            throw new Error(t('error_fetching_playlist'));
           }
           return response.json();
         })
@@ -71,11 +73,11 @@ const PublishedPlaylist = () => {
             dispatch({ type: 'SET_SONGS', payload: sortedSongs });
           }
         })
-        .catch((error) => console.error('Error fetching playlist:', error));
+        .catch((error) => console.error(t('error_fetching_playlist'), error));
     };
 
     const handleConnect = () => {
-      console.log('PublishedPlaylist: Socket connected, joining playlist room');
+      console.log(t('socket_connected_join_playlist'));
       socket.emit('joinPlaylist', playlistId);
       fetchPlaylistData();
     };
@@ -102,13 +104,13 @@ const PublishedPlaylist = () => {
         socket.emit('leavePlaylist', playlistId);
       };
     }
-  }, [playlistId, socket, dispatch]);
+  }, [playlistId, socket, dispatch, t]);
 
   const handleVote = async (songId) => {
     if (cooldown > 0) return;
 
     try {
-      console.log('Attempting to vote for song ID:', songId);
+      console.log(t('attempting_vote'), songId);
       // Send a PUT request to vote for a song
       const response = await fetch(`${API_BASE_URL}/songs/vote/${songId}`, {
         method: 'PUT',
@@ -119,7 +121,7 @@ const PublishedPlaylist = () => {
       });
 
       if (response.ok) {
-        console.log(`Successfully voted for song with ID: ${songId}`);
+        console.log(t('vote_successful'), songId);
 
         // Set cooldown
         const cooldownTime = 5 * 60 * 1000; // 5 minutes
@@ -138,15 +140,15 @@ const PublishedPlaylist = () => {
           });
         }, 1000);
       } else {
-        console.error('Failed to vote for the song');
+        console.error(t('failed_to_vote'));
       }
     } catch (error) {
-      console.error('Error voting for song:', error);
+      console.error(t('error_voting_song'), error);
     }
   };
 
   if (!state.playlist || !state.playlist.published) {
-    return <p style={{ color: 'white' }}>No active playlist at the moment.</p>;
+    return <p style={{ color: 'white' }}>{t('no_active_playlist')}</p>;
   }
 
   return (
@@ -160,15 +162,15 @@ const PublishedPlaylist = () => {
           {state.playlist.band_id.band_image && (
             <img
               src={state.playlist.band_id.band_image}
-              alt="Band"
+              alt={t('band_image')}
               style={{ width: '100%', height: '200px', objectFit: 'cover' }}
               />
           )}
           <Card.Title style={{ fontSize: '2rem', fontWeight: 'bold' }}>
-            {state.playlist.band_id.band_name || 'Live Music'}
+            {state.playlist.band_id.band_name || t('live_music')}
           </Card.Title>
           <Card.Text className="text-white" style={{ fontSize: '1.2rem' }}>
-          Vote for Your Song!
+          {t('vote_for_your_song')}
           </Card.Text>
         </Card.Body>
       </Card>
@@ -177,7 +179,7 @@ const PublishedPlaylist = () => {
       {/* Cooldown Timer */}
       {cooldown > 0 && (
         <p className="text-center">
-          {Math.ceil(cooldown / 1000)} Seconds to Next Vote.
+          {Math.ceil(cooldown / 1000)} {t('seconds_to_next_vote')}
         </p>
       )}
 
@@ -191,14 +193,14 @@ const PublishedPlaylist = () => {
             }`}
           >
             <div>
-              <strong>{song.title}</strong> by {song.artist} - 👍 {song.votecount}
+              <strong>{song.title}</strong> {t('by')} {song.artist} - 👍 {song.votecount}
             </div>
             <Button
               style={{ backgroundColor: '#6c757d', color: 'white', borderColor: '#6c757d' }}
               onClick={() => handleVote(song._id)}
               disabled={song.played || cooldown > 0} // Disable if played or in cooldown
             >
-              {song.played ? 'Played' : 'Oy Ver'}
+              {song.played ? t('played') : t('vote')}
             </Button>
           </ListGroup.Item>
         ))}

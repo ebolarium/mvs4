@@ -7,8 +7,10 @@ import StockImage from '../assets/vote_song_background.png';
 import { MusicNote, PlaylistAdd, Headset } from '@mui/icons-material';
 import Login from './Login';
 import RegisterBand from './RegisterBand'; // Register bileşeni
+import { useTranslation } from 'react-i18next';
 
 const Homepage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [loginOpen, setLoginOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false); // Register modal state
@@ -55,21 +57,21 @@ const Homepage = () => {
       <AppBar position="sticky" sx={{ backgroundColor: '#1c1c1c' }}>
         <Toolbar sx={{ justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <img src={Logo} alt="Vote Song Logo" width={40} style={{ borderRadius: '50%' }} />
-            <Typography variant="h6">Vote Song</Typography>
+            <img src={Logo} alt={t('vote_song_logo')} width={40} style={{ borderRadius: '50%' }} />
+            <Typography variant="h6">{t('vote_song')}</Typography>
           </Box>
           <Box>
             {isLoggedIn ? (
               <Button color="inherit" onClick={() => navigate('/dashboard')}>
-                Dashboard
+                {t('dashboard')}
               </Button>
             ) : (
               <>
                 <Button ref={anchorRef} color="inherit" onClick={handleLoginToggle}>
-                  Login
+                  {t('login')}
                 </Button>
                 <Button color="inherit" onClick={handleRegisterToggle}>
-                  Register
+                  {t('register')}
                 </Button>
               </>
             )}
@@ -122,9 +124,9 @@ const Homepage = () => {
       )}
 
       <Box sx={{ color: '#fff', textAlign: 'center', py: 8 }}>
-        <img src={Logo} alt="Vote Song Logo" width={200} style={{ marginBottom: '1rem' }} />
-        <Typography variant="h2" gutterBottom>Elevate Your Live Music</Typography>
-        <Typography variant="h5">Engage your audience with interactive music experiences.</Typography>
+        <img src={Logo} alt={t('vote_song_logo')} width={200} style={{ marginBottom: '1rem' }} />
+        <Typography variant="h2" gutterBottom>{t('elevate_music')}</Typography>
+        <Typography variant="h5">{t('engage_audience')}</Typography>
       </Box>
 
       <Container maxWidth="lg" sx={{ py: 10 }}>
@@ -132,14 +134,14 @@ const Homepage = () => {
           <Grid item xs={12} md={6}>
             <Card sx={{ backgroundColor: '#ffffffcc', borderRadius: '16px' }}>
               <CardContent>
-                <Typography variant="h5" align="center">Basic Plan</Typography>
+                <Typography variant="h5" align="center">{t('basic_plan')}</Typography>
                 <ul>
-                  <li>1 Playlist</li>
-                  <li>10 Songs Limit</li>
-                  <li>$5/month</li>
+                  <li>{t('one_playlist')}</li>
+                  <li>{t('ten_songs_limit')}</li>
+                  <li>{t('five_dollars_month')}</li>
                 </ul>
                 <Button variant="outlined" color="primary" fullWidth>
-                  Choose Basic
+                  {t('choose_basic')}
                 </Button>
               </CardContent>
             </Card>
@@ -147,15 +149,15 @@ const Homepage = () => {
           <Grid item xs={12} md={6}>
             <Card sx={{ backgroundColor: '#ffffffcc', borderRadius: '16px' }}>
               <CardContent>
-                <Typography variant="h5" align="center">Pro Plan</Typography>
+                <Typography variant="h5" align="center">{t('pro_plan')}</Typography>
                 <ul>
-                  <li>Unlimited Playlists</li>
-                  <li>Unlimited Songs</li>
-                  <li>Additional Features: Raffle and more</li>
-                  <li>$10/month</li>
+                  <li>{t('unlimited_playlists')}</li>
+                  <li>{t('unlimited_songs')}</li>
+                  <li>{t('additional_features')}</li>
+                  <li>{t('ten_dollars_month')}</li>
                 </ul>
                 <Button variant="outlined" color="secondary" fullWidth>
-                  Choose Pro
+                  {t('choose_pro')}
                 </Button>
               </CardContent>
             </Card>
