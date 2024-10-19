@@ -1,16 +1,18 @@
 // src/pages/Songs.js
 
 import React, { useState, useEffect, useContext } from 'react';
-import { Container, Form, Button, Row, Col, Card, ListGroup } from 'react-bootstrap';
+import { Container, Form, Button, Row, Col, Card, ListGroup, Modal } from 'react-bootstrap';
 import { GlobalStateContext } from '../context/GlobalStateProvider';
 import API_BASE_URL from '../config/apiConfig';
+import './Songs.css'; // CSS dosyasını içe aktardık
+
+
 
 const Songs = () => {
   const [songs, setSongs] = useState([]);
-  const [formData, setFormData] = useState({
-    title: '',
-    artist: '',
-  });
+  const [formData, setFormData] = useState({ title: '', artist: '' });
+  const [editSong, setEditSong] = useState(null); // Düzenlenecek şarkı bilgisi
+  const [showEditModal, setShowEditModal] = useState(false); // Modal kontrolü
   const { state, dispatch } = useContext(GlobalStateContext);
 
   const { title, artist } = formData;
@@ -44,6 +46,44 @@ const Songs = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+
+  const handleEdit = (song) => {
+    setEditSong(song);
+    setFormData({ title: song.title, artist: song.artist });
+    setShowEditModal(true);
+  };
+
+  const handleUpdate = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return alert('You need to login first');
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/songs/update/${editSong._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        const updatedSongs = songs.map((song) =>
+          song._id === editSong._id ? { ...song, ...formData } : song
+        );
+        setSongs(updatedSongs);
+        setShowEditModal(false);
+      } else {
+        alert('Error updating song');
+      }
+    } catch (error) {
+      console.error('Error updating song:', error);
+    }
+  };
+
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -159,28 +199,42 @@ const Songs = () => {
               <ListGroup variant="flush">
                 {songs.length > 0 ? (
                   songs.map((song) => (
-                    <ListGroup.Item
-                      key={song._id}
-                      className="d-flex justify-content-between align-items-center"
-                    >
-                      <div>
-                        <strong>{song.title}</strong> by {song.artist}
-                      </div>
-                      <div className="d-flex align-items-center">
-                        {/* Total Vote Count */}
-                        <div className="me-3">👍 {song.totalvotecount || 0}</div>
-                        {/* Play Count */}
-                        <div className="me-3">▶ {song.playcount || 0}</div>
-                        {/* Delete Button */}
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          onClick={() => handleDelete(song._id)}
-                        >
-                          Delete
-                        </Button>
-                      </div>
-                    </ListGroup.Item>
+<ListGroup.Item key={song._id} className="d-flex justify-content-between align-items-center">
+  <div>
+    <strong>{song.title}</strong> <br /> by {song.artist}
+  </div>
+  <div className="d-flex align-items-center icon-container">
+    <div className="d-flex align-items-center me-3">
+      <span className="emoji">👍</span>
+      <span className="count">{song.totalvotecount || 0}</span>
+    </div>
+
+    <div className="d-flex align-items-center me-3">
+      <span className="emoji">▶</span>
+      <span className="count">{song.playcount || 0}</span>
+    </div>
+
+    <Button
+      variant="warning"
+      size="sm"
+      className="emoji-button me-2"
+      onClick={() => handleEdit(song)}
+    >
+      ✏️
+    </Button>
+
+    <Button
+      variant="danger"
+      size="sm"
+      className="emoji-button"
+      onClick={() => handleDelete(song._id)}
+    >
+      🗑️
+    </Button>
+  </div>
+</ListGroup.Item>
+
+
                   ))
                 ) : (
                   <p>No songs available.</p>
@@ -190,6 +244,38 @@ const Songs = () => {
           </Card>
         </Col>
       </Row>
+      <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Şarkıyı Düzenle</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3" controlId="formTitle">
+              <Form.Label>Song Title</Form.Label>
+              <Form.Control
+                type="text"
+                name="title"
+                value={title}
+                onChange={handleChange}
+                required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="formArtist">
+              <Form.Label>Artist</Form.Label>
+              <Form.Control
+                type="text"
+                name="artist"
+                value={artist}
+                onChange={handleChange}
+                required
+              />
+            </Form.Group>
+            <Button variant="primary" onClick={handleUpdate}>
+              Save Changes
+            </Button>
+          </Form>
+        </Modal.Body>
+      </Modal>
     </Container>
   );
 };

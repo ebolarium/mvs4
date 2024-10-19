@@ -136,4 +136,23 @@ const markAsPlayed = async (req, res) => {
   }
 };
 
-module.exports = { addSong, deleteSong, getSongs, voteSong, markAsPlayed };
+// controllers/songController.js
+
+const updateSong = async (req, res) => {
+  const { title, artist } = req.body;
+  const { id } = req.params;
+
+  try {
+    const updatedSong = await Song.findByIdAndUpdate(id, { title, artist }, { new: true });
+    if (!updatedSong) return res.status(404).json({ message: 'Song not found' });
+
+    res.json({ message: 'Song updated successfully', song: updatedSong });
+  } catch (error) {
+    console.error('Error updating song:', error);
+    res.status(500).json({ message: 'Error updating song', error });
+  }
+};
+
+module.exports = { addSong, deleteSong, getSongs, voteSong, markAsPlayed, updateSong };
+
+

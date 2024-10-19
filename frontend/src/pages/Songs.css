@@ -1,0 +1,37 @@
+.icon-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    font-size: 20px;
+    line-height: 1;
+    border-radius: 50%;
+  }
+  
+  .icon-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .emoji, .emoji-button {
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    margin: 0;
+    border-radius: 50%;
+    background-color: transparent;
+    border: none;
+  }
+  
+  .count {
+    font-size: 18px;
+    margin-left: 5px; /* Sayıyı ikondan biraz uzaklaştırmak için */
+  }
+  

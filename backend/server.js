@@ -51,6 +51,7 @@ app.use('/api/bands', bandRoutes);
 app.use('/api/songs', songRoutes);
 app.use('/api/playlist', playlistRoutes);
 
+
 // Serve frontend files
 app.use(express.static(path.join(__dirname, '../frontend/build')));
 

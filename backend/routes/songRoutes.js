@@ -7,6 +7,7 @@ const {
   getSongs,
   voteSong,
   markAsPlayed,
+  updateSong, // Burada updateSong'u ekledik
 } = require('../controllers/songController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -20,6 +21,10 @@ router.delete('/delete/:id', protect, deleteSong);
 
 // Get songs (protected)
 router.get('/', protect, getSongs);
+
+// Update a song (protected)
+router.put('/update/:id', protect, updateSong); // Yeni route eklendi
+
 
 // Vote for a song
 router.put('/vote/:id', voteSong);
