@@ -12,7 +12,7 @@ const SongRequestModal = ({ show, onClose, onRequest }) => {
   // Function to get the Spotify Access Token
   const getAccessToken = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/spotify/token`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/spotify/token`, {
         method: 'POST',
       });
       const data = await response.json();
