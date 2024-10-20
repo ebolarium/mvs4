@@ -6,6 +6,8 @@ import { GlobalStateContext } from '../context/GlobalStateProvider';
 import API_BASE_URL from '../config/apiConfig';
 import { useTranslation } from 'react-i18next';
 import './Songs.css'; // CSS dosyasını içe aktardık
+import { levenshtein } from 'fast-levenshtein'; // Levenshtein mesafesi kütüphanesi ekleniyor
+
 
 const Songs = () => {
   const { t } = useTranslation();
@@ -81,14 +83,55 @@ const Songs = () => {
     }
   };
 
+
+
+  function levenshteinDistance(a = '', b = '') {
+    const matrix = Array(a.length + 1).fill(null).map(() =>
+      Array(b.length + 1).fill(null)
+    );
+  
+    for (let i = 0; i <= a.length; i++) {
+      matrix[i][0] = i;
+    }
+    for (let j = 0; j <= b.length; j++) {
+      matrix[0][j] = j;
+    }
+  
+    for (let i = 1; i <= a.length; i++) {
+      for (let j = 1; j <= b.length; j++) {
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j] + 1,    // silme
+          matrix[i][j - 1] + 1,    // ekleme
+          matrix[i - 1][j - 1] + cost // değiştirme
+        );
+      }
+    }
+  
+    return matrix[a.length][b.length];
+  }
+
+
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const token = localStorage.getItem('token');
     if (!token) {
       return alert(t('login_required'));
     }
-
+  
+    // Aynı veya benzer şarkı var mı kontrol et
+    const existingSong = songs.find(song => 
+      levenshteinDistance(song.title.toLowerCase(), formData.title.toLowerCase()) <= 2 &&
+      levenshteinDistance(song.artist.toLowerCase(), formData.artist.toLowerCase()) <= 2
+    );
+  
+    if (existingSong) {
+      return alert(t('song_already_exists'));
+    }
+  
     try {
       const response = await fetch(`${API_BASE_URL}/songs/add`, {
         method: 'POST',
@@ -98,14 +141,13 @@ const Songs = () => {
         },
         body: JSON.stringify(formData),
       });
-
+  
       if (response.ok) {
         const data = await response.json();
         const updatedSongs = [...songs, data.song];
         setSongs(updatedSongs);
         setFormData({ title: '', artist: '' });
-
-        // Update global state
+  
         dispatch({ type: 'ADD_SONG', payload: data.song });
       } else {
         const errorData = await response.json();
@@ -115,6 +157,8 @@ const Songs = () => {
       console.error(t('error_adding_song'), error);
     }
   };
+  
+
 
   const handleDelete = async (id) => {
     const token = localStorage.getItem('token');

@@ -108,6 +108,8 @@
     "enter_band_email": "E-Mail",
     "vote_song": "VOTE SONG",
     "welcome_band": "Welcome",
-    "update": "Update"
+    "update": "Update",
+    "song_already_exists": "Song already exist." 
+
 
 }

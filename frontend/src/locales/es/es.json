@@ -109,5 +109,6 @@
     "enter_band_email": "Correo electrónico",
     "vote_song": "VOTE SONG",
     "welcome_band": "Hola",
-    "update": "Update"
+    "update": "Update",
+    "song_already_exists": "Esta canción ya ha sido agregada"
 }

@@ -109,5 +109,6 @@
     "enter_band_email": "E-Posta",
     "vote_song": "VOTE SONG",
     "welcome_band": "Hoşgeldin",
-    "update": "Güncelle"
+    "update": "Güncelle",
+    "song_already_exists": "Bu şarkı daha önce eklendi" 
 }
