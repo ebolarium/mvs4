@@ -110,5 +110,18 @@
     "vote_song": "VOTE SONG",
     "welcome_band": "Hoşgeldin",
     "update": "Güncelle",
-    "song_already_exists": "Bu şarkı daha önce eklendi" 
+    "song_already_exists": "Bu şarkı daha önce eklendi",
+    "no_request_songs": "Henüz İstek Yok.",
+    "request_songs": "İstek Şarkılar",
+    "vote": "Oy Ver",
+    "request_a_song": "Şarkı İste",
+    "vote_for_your_song": "Şarkına Oy Ver",
+    "seconds_to_next_vote": "Saniye Sonra Tekrar Oy Verebilirsin",
+    "enter_song_or_artist": "Sanatçı ya da Şarkı İsmi Girin",
+    "search": "Ara",
+    "request": "İste",
+    "close": "Kapat"
+
+
+
 }

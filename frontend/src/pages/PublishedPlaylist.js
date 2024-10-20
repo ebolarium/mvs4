@@ -1,17 +1,35 @@
 // src/pages/PublishedPlaylist.js
 
-import React, { useContext, useEffect, useState } from 'react'; // Ensure useState is imported
+import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Container, ListGroup, Button, Card } from 'react-bootstrap';
 import { GlobalStateContext } from '../context/GlobalStateProvider';
 import API_BASE_URL from '../config/apiConfig';
 import { useTranslation } from 'react-i18next';
+import SongRequestModal from './SongRequestModal';
 
 const PublishedPlaylist = () => {
   const { t } = useTranslation();
   const { playlistId } = useParams();
   const { state, dispatch, socket } = useContext(GlobalStateContext);
-  const [cooldown, setCooldown] = useState(0); // Declare cooldown state variable
+  const [cooldown, setCooldown] = useState(0);
+  const [showRequestModal, setShowRequestModal] = useState(false);
+
+  const handleRequest = (song) => {
+    console.log('Requested song:', song);
+
+    const songData = {
+      _id: song.id,
+      title: song.name,
+      artist: song.artists.map(artist => artist.name).join(', '),
+    };
+
+    if (socket && playlistId) {
+      socket.emit('songRequested', songData, playlistId);
+    }
+
+    setShowRequestModal(false);
+  };
 
   useEffect(() => {
     const storedCooldown = localStorage.getItem('cooldown');
@@ -65,9 +83,9 @@ const PublishedPlaylist = () => {
                 played: song.played || false,
               }))
               .sort((a, b) => {
-                if (a.played && !b.played) return 1;  // Çalınmış şarkıyı alta taşır
-                if (!a.played && b.played) return -1; // Çalınmamış şarkıyı üste taşır
-                return b.votecount - a.votecount; // Oy sayısına göre sıralar
+                if (a.played && !b.played) return 1;
+                if (!a.played && b.played) return -1;
+                return b.votecount - a.votecount;
               });
         
             dispatch({ type: 'SET_SONGS', payload: sortedSongs });
@@ -111,7 +129,6 @@ const PublishedPlaylist = () => {
 
     try {
       console.log(t('attempting_vote'), songId);
-      // Send a PUT request to vote for a song
       const response = await fetch(`${API_BASE_URL}/songs/vote/${songId}`, {
         method: 'PUT',
         headers: {
@@ -123,12 +140,10 @@ const PublishedPlaylist = () => {
       if (response.ok) {
         console.log(t('vote_successful'), songId);
 
-        // Set cooldown
-        const cooldownTime = 5 * 60 * 1000; // 5 minutes
+        const cooldownTime = 5 * 60 * 1000;
         localStorage.setItem('cooldown', Date.now() + cooldownTime);
         setCooldown(cooldownTime);
 
-        // Start countdown
         const timer = setInterval(() => {
           setCooldown((prev) => {
             if (prev <= 1000) {
@@ -164,17 +179,16 @@ const PublishedPlaylist = () => {
               src={state.playlist.band_id.band_image}
               alt={t('band_image')}
               style={{ width: '100%', height: '200px', objectFit: 'cover' }}
-              />
+            />
           )}
           <Card.Title style={{ fontSize: '2rem', fontWeight: 'bold' }}>
             {state.playlist.band_id.band_name || t('live_music')}
           </Card.Title>
           <Card.Text className="text-white" style={{ fontSize: '1.2rem' }}>
-          {t('vote_for_your_song')}
+            {t('vote_for_your_song')}
           </Card.Text>
         </Card.Body>
       </Card>
-
 
       {/* Cooldown Timer */}
       {cooldown > 0 && (
@@ -182,6 +196,18 @@ const PublishedPlaylist = () => {
           {Math.ceil(cooldown / 1000)} {t('seconds_to_next_vote')}
         </p>
       )}
+
+      {/* Request a Song Button */}
+      <Button variant="primary" onClick={() => setShowRequestModal(true)} style={{ marginBottom: '20px' }}>
+        {t('request_a_song')}
+      </Button>
+
+      {/* Song Search and Request Modal */}
+      <SongRequestModal
+        show={showRequestModal}
+        onClose={() => setShowRequestModal(false)}
+        onRequest={handleRequest}
+      />
 
       {/* Song List */}
       <ListGroup>
@@ -198,7 +224,7 @@ const PublishedPlaylist = () => {
             <Button
               style={{ backgroundColor: '#6c757d', color: 'white', borderColor: '#6c757d' }}
               onClick={() => handleVote(song._id)}
-              disabled={song.played || cooldown > 0} // Disable if played or in cooldown
+              disabled={song.played || cooldown > 0}
             >
               {song.played ? t('played') : t('vote')}
             </Button>

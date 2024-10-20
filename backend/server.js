@@ -14,6 +14,8 @@ const i18n = require('i18n'); // i18n kütüphanesini ekliyoruz
 const app = express();
 const server = http.createServer(app);
 const Playlist = require('./models/Playlist');
+const spotifyAuthRoutes = require('./routes/spotifyAuth');
+
 
 dotenv.config();
 
@@ -73,6 +75,10 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
 });
 
+app.use('/api/spotify', spotifyAuthRoutes);
+  
+
+
 // Socket.io connections
 io.on('connection', (socket) => {
   //console.log('A user connected:', socket.id);
@@ -87,10 +93,17 @@ io.on('connection', (socket) => {
     socket.leave(playlistId);
   });
 
+    // Yeni eklenen songRequested olayı burada olmalı
+    socket.on('songRequested', (song, playlistId) => {
+      socket.to(playlistId).emit('newSongRequest', song);
+    });
+
   socket.on('disconnect', () => {
    // console.log('A user disconnected:', socket.id);
   });
 });
+
+
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {

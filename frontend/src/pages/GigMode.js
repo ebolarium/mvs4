@@ -1,6 +1,6 @@
 // src/pages/GigMode.js
 
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Container, ListGroup, Button, Modal } from 'react-bootstrap';
 import { GlobalStateContext } from '../context/GlobalStateProvider';
 import { Fullscreen, FullscreenExit } from '@mui/icons-material';
@@ -11,6 +11,8 @@ const GigMode = ({ playlistId }) => {
   const { t } = useTranslation();
   const { state, dispatch, socket } = useContext(GlobalStateContext);
   const [showFullscreen, setShowFullscreen] = React.useState(false);
+  const [showRequestModal, setShowRequestModal] = useState(false);
+  const [requestSongs, setRequestSongs] = useState([]);
 
   useEffect(() => {
     if (!playlistId || !socket) {
@@ -100,6 +102,34 @@ const GigMode = ({ playlistId }) => {
     }
   };
 
+  useEffect(() => {
+    if (socket && playlistId) {
+      socket.on('newSongRequest', (newSong) => {
+        setRequestSongs((prevSongs) => [...prevSongs, newSong]);
+      });
+
+      return () => {
+        socket.off('newSongRequest');
+      };
+    }
+  }, [socket, playlistId]);
+
+  const renderRequestSongList = () => (
+    <ListGroup>
+      {requestSongs.length === 0 ? (
+        <p>{t('no_request_songs')}</p>
+      ) : (
+        requestSongs.map((song) => (
+          <ListGroup.Item key={song._id}>
+            <div>
+              <strong>{song.title}</strong> {t('by')} {song.artist}
+            </div>
+          </ListGroup.Item>
+        ))
+      )}
+    </ListGroup>
+  );
+
   const renderSongList = () => (
     <ListGroup>
       {state.songs.length === 0 ? (
@@ -141,6 +171,9 @@ const GigMode = ({ playlistId }) => {
         <Button variant="link" onClick={() => setShowFullscreen(true)}>
           <Fullscreen fontSize="large" />
         </Button>
+        <Button variant="primary" onClick={() => setShowRequestModal(true)}>
+          {t('request_songs')} ({requestSongs.length})
+        </Button>
       </div>
 
       {/* Main Content */}
@@ -163,6 +196,21 @@ const GigMode = ({ playlistId }) => {
             {renderSongList()}
           </div>
         </Modal.Body>
+      </Modal>
+
+      {/* Request Songs Modal */}
+      <Modal show={showRequestModal} onHide={() => setShowRequestModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>{t('requested_songs_list')}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {renderRequestSongList()}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowRequestModal(false)}>
+            {t('close')}
+          </Button>
+        </Modal.Footer>
       </Modal>
     </Container>
   );

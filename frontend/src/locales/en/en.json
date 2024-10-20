@@ -109,7 +109,18 @@
     "vote_song": "VOTE SONG",
     "welcome_band": "Welcome",
     "update": "Update",
-    "song_already_exists": "Song already exist." 
+    "song_already_exists": "Song already exist.",
+    "no_request_songs": "No Request Yet.",
+    "request_songs": "Request Songs",
+    "request_a_song": "Request Your Song",
+    "vote_for_your_song": "Vote For Your Song",
+    "seconds_to_next_vote": "Seconds to your next vote!",
+    "search": "Search",
+    "request": "Request",
+    "close": "Close"
+
+
+
 
 
 }
