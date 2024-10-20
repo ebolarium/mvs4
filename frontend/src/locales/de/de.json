@@ -53,7 +53,7 @@
     "band_profile": "Bandprofil",
     "no_image_uploaded": "Kein Bild hochgeladen",
     "select_image_to_upload": "Bild zum Hochladen auswählen",
-    "upload_image": "Bild hochladen",
+    "upload_image": "Bild",
     "no_songs_available_playlist": "Keine Songs in der aktuellen Playlist verfügbar.",
     "played": "Gespielt",
     "gig_mode_fullscreen": "Gig-Modus - Vollbild",
@@ -101,6 +101,15 @@
     "enter_artist_name": "Künstlernamen eingeben",
     "unpublish": "Veröffentlichung aufheben",
     "publish": "Veröffentlichen",
-    "play": "Abspielen"
+    "play": "Abspielen",
+    "enter_email": "E-Mail eingeben",
+    "enter_password": "Passwort eingeben",
+    "enter_band_name": "Band-Name eingeben",
+    "enter_band_email": "E-Mail der Band eingeben",
+    "vote_song": "VOTE SONG",
+    "welcome_band": "Hallo",
+    "update": "Update"
+
+
 
 }

@@ -110,4 +110,30 @@ const getBandProfile = async (req, res) => {
   }
 };
 
-module.exports = { registerBand, loginBand, uploadBandImage, getBandProfile };
+
+// Update band profile function
+const updateBandProfile = async (req, res) => {
+  const bandId = req.band_id;
+  const { band_name, band_email, band_password } = req.body;
+
+  try {
+    const updateData = {};
+    if (band_name) updateData.band_name = band_name;
+    if (band_email) updateData.band_email = band_email;
+    if (band_password) {
+      const salt = await bcrypt.genSalt(10);
+      updateData.band_password = await bcrypt.hash(band_password, salt);
+    }
+
+    const band = await Band.findByIdAndUpdate(bandId, updateData, { new: true });
+    if (!band) {
+      return res.status(404).json({ message: 'Band not found' });
+    }
+    res.status(200).json({ band });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating band profile', error });
+  }
+};
+
+module.exports = { registerBand, loginBand, uploadBandImage, getBandProfile, updateBandProfile };
+

@@ -75,20 +75,20 @@ app.get('*', (req, res) => {
 
 // Socket.io connections
 io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
+  //console.log('A user connected:', socket.id);
 
   socket.on('joinPlaylist', (playlistId) => {
-    console.log('User joined playlist room with ID:', playlistId);
+    //console.log('User joined playlist room with ID:', playlistId);
     socket.join(playlistId);
   });
 
   socket.on('leavePlaylist', (playlistId) => {
-    console.log('User left playlist room with ID:', playlistId);
+   // console.log('User left playlist room with ID:', playlistId);
     socket.leave(playlistId);
   });
 
   socket.on('disconnect', () => {
-    console.log('A user disconnected:', socket.id);
+   // console.log('A user disconnected:', socket.id);
   });
 });
 

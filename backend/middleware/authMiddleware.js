@@ -9,7 +9,7 @@ const protect = async (req, res, next) => {
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     try {
       token = req.headers.authorization.split(' ')[1];
-      console.log('Token received:', token);  // Log token to check if it is received properly
+      //console.log('Token received:', token);  // Log token to check if it is received properly
 
       if (!token) {
         console.error('No token provided after splitting authorization header');
@@ -18,7 +18,7 @@ const protect = async (req, res, next) => {
 
       // Verifying the token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log('Decoded Token:', decoded); // Log decoded token to see its contents
+     // console.log('Decoded Token:', decoded); // Log decoded token to see its contents
 
       if (!decoded || !decoded.id) {
         console.error('Invalid token structure, missing decoded id');
@@ -33,7 +33,7 @@ const protect = async (req, res, next) => {
       }
 
       req.band_id = band._id; // Use MongoDB ObjectId (_id) as band_id
-      console.log('Band found:', band._id); // Log band ID to verify the band was found
+      //console.log('Band found:', band._id); // Log band ID to verify the band was found
 
       // Adding extra validation to check if band_id is properly assigned
       if (!req.band_id) {
