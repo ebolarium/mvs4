@@ -13,6 +13,10 @@ const Playlists = () => {
   const [qrCodeUrl, setQrCodeUrl] = useState(null);
   const { state, dispatch, socket } = useContext(GlobalStateContext);
   const allSongs = state.allSongs || [];
+  const [searchAllSongsQuery, setSearchAllSongsQuery] = useState('');
+  const [searchPlaylistQuery, setSearchPlaylistQuery] = useState('');
+  const [isAllSongsAscending, setIsAllSongsAscending] = useState(true);
+  const [isPlaylistSongsAscending, setIsPlaylistSongsAscending] = useState(true);
 
   useEffect(() => {
     fetchSongs();
@@ -174,6 +178,34 @@ const Playlists = () => {
   
     fetchPlaylist();
   };
+
+
+  // Tüm şarkılar için sıralama fonksiyonu
+const sortAllSongs = () => {
+  const sortedSongs = [...allSongs].sort((a, b) =>
+    isAllSongsAscending
+      ? a.title.localeCompare(b.title)
+      : b.title.localeCompare(a.title)
+  );
+  dispatch({ type: 'SET_ALL_SONGS', payload: sortedSongs });
+  setIsAllSongsAscending(!isAllSongsAscending);
+};
+
+// Playlist şarkıları için sıralama fonksiyonu
+const sortPlaylistSongs = () => {
+  const sortedPlaylistSongs = [...state.songs].sort((a, b) =>
+    isPlaylistSongsAscending
+      ? a.title.localeCompare(b.title)
+      : b.title.localeCompare(a.title)
+  );
+  dispatch({ type: 'SET_SONGS', payload: sortedPlaylistSongs });
+  setIsPlaylistSongsAscending(!isPlaylistSongsAscending);
+};
+
+// Şarkı deposunda playlistte bulunan şarkıları filtrele
+const availableSongs = allSongs.filter(
+  (song) => !state.songs.some((playlistSong) => playlistSong._id === song._id)
+);
   
 
   return (
@@ -182,11 +214,26 @@ const Playlists = () => {
         <Col md={6}>
           <Card className="shadow">
             <Card.Body>
+            <div className="d-flex justify-content-between align-items-center mb-4">
               <h2 className="text-center mb-4">{t('song_repository')}</h2>
+              <div className="search-container">
+          <Button variant="outline-secondary" onClick={sortAllSongs}>
+            {isAllSongsAscending ? 'A-Z' : 'Z-A'}
+          </Button>
+          <input
+            type="text"
+            placeholder={t('search')}
+            value={searchAllSongsQuery}
+            onChange={(e) => setSearchAllSongsQuery(e.target.value)}
+          />
+        </div>
+      </div>
               <ListGroup style={{ maxHeight: '300px', overflowY: 'auto' }}>
-              {allSongs
-                  .filter((song) => !state.songs.some((p) => p._id === song._id))
-                  .map((song) => (
+              {availableSongs
+          .filter((song) =>
+            song.title.toLowerCase().includes(searchAllSongsQuery.toLowerCase())
+          )
+          .map((song) => (
                     <ListGroup.Item
                       key={song._id}
                       className="d-flex justify-content-between align-items-center"
@@ -215,12 +262,30 @@ const Playlists = () => {
         <Col md={6}>
           <Card className="shadow">
             <Card.Body>
+            <div className="d-flex justify-content-between align-items-center mb-4">
               <h2 className="text-center mb-4">{t('playlist')}</h2>
+              <div className="search-container">
+          <Button variant="outline-secondary" onClick={sortPlaylistSongs}>
+            {isPlaylistSongsAscending ? 'A-Z' : 'Z-A'}
+          </Button>
+          <input
+            type="text"
+            placeholder={t('search')}
+            value={searchPlaylistQuery}
+            onChange={(e) => setSearchPlaylistQuery(e.target.value)}
+          />
+        </div>
+        </div>
+      
               {playlist ? (
                 <>
                   <ListGroup style={{ maxHeight: '300px', overflowY: 'auto' }}>
                     {state.songs.length > 0 ? (
-                      state.songs.map((song, index) => (
+state.songs
+.filter((song) =>
+  song.title.toLowerCase().includes(searchPlaylistQuery.toLowerCase())
+)
+.map((song, index) => (
                         <ListGroup.Item
                           key={`${song._id}-${index}`}
                           className="d-flex justify-content-between align-items-center"

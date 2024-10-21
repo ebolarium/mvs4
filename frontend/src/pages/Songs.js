@@ -294,7 +294,7 @@ const Songs = () => {
     </Button>
     <input
       type="text"
-      placeholder="Search"
+      placeholder={t('search')}
       value={searchQuery}
       onChange={(e) => setSearchQuery(e.target.value)}
     />
