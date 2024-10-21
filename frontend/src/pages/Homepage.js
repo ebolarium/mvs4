@@ -8,6 +8,8 @@ import { MusicNote, PlaylistAdd, Headset } from '@mui/icons-material';
 import Login from './Login';
 import RegisterBand from './RegisterBand'; // Register bileşeni
 import { useTranslation } from 'react-i18next';
+import { HowItWorksSection, AboutUsSection } from './HowItWorksSection';
+
 
 const Homepage = () => {
   const { t } = useTranslation();
@@ -163,6 +165,9 @@ const Homepage = () => {
             </Card>
           </Grid>
         </Grid>
+        <Box sx={{ my: 4 }}></Box>
+        <HowItWorksSection /> <AboutUsSection />
+
       </Container>
     </Box>
   );
