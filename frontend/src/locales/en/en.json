@@ -117,7 +117,10 @@
     "seconds_to_next_vote": "Seconds to your next vote!",
     "search": "Search",
     "request": "Request",
-    "close": "Close"
+    "close": "Close",
+    "requested_songs_list": "Song Requests",
+    "session_expired": "Session expired. Login again. "
+
 
 
 

@@ -45,6 +45,7 @@ const GigMode = ({ playlistId }) => {
                 _id: song.song_id._id,
                 title: song.song_id.title,
                 artist: song.song_id.artist,
+                key: song.song_id.key || 'Tune', 
                 votecount: song.votecount,
                 played: song.played || false,
               }))
@@ -142,8 +143,10 @@ const GigMode = ({ playlistId }) => {
               song.played ? 'bg-secondary text-muted' : ''
             }`}
           >
-            <div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>
-              {song.title} {t('by')} {song.artist} - 👍 {song.votecount}
+            <div style={{ fontSize: '1.2rem', fontWeight: 'normal' }}>
+            <span style={{ color: 'black', fontSize: '1.4em' }}>{song.title} </span>{t('by')} {song.artist} /{'  '} {'  '} 
+              <span style={{ color: 'red', fontSize: '0.7em' }}>{song.key}</span>
+               👍 {song.votecount}
             </div>
             {!song.played ? (
               <Button

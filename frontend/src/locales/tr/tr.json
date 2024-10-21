@@ -79,7 +79,7 @@
     "add": "Ekle",
     "by": "-",
     "playlist": "Çalma Listesi",
-    "votes": "Oylar:",
+    "votes": "Oylar",
     "remove": "Kaldır",
     "no_songs_list": "Şarkı bulunamadı",
     "playlist_url": "Çalma Listesi URL'si",
@@ -120,7 +120,9 @@
     "enter_song_or_artist": "Sanatçı ya da Şarkı İsmi Girin",
     "search": "Ara",
     "request": "İste",
-    "close": "Kapat"
+    "close": "Kapat",
+    "requested_songs_list": "İstek Şarkılar",
+    "session_expired": "Oturum süresi doldu. Tekrar Giriş Yapın."
 
 
 

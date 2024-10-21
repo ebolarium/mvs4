@@ -39,3 +39,28 @@
   font-size: 18px;
   margin-left: 5px;
 }
+
+.btn-xs {
+  font-size: 0.2rem; /* Küçük yazı boyutu */
+  padding: 0.25rem; /* Küçük iç boşluk */
+  border-radius: 0.2rem; /* Daha küçük köşe yuvarlaması */
+}
+
+.search-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.search-container input {
+  width: 150px;
+  height: 30px;
+  font-size: 0.85rem;
+}
+
+.search-container button {
+  padding: 2px 6px;
+  font-size: 0.85rem;
+  height: 30px;
+}

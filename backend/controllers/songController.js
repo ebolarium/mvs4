@@ -5,17 +5,18 @@ const Song = require('../models/Song');
 
 // Add a new song
 const addSong = async (req, res) => {
-  const { title, artist } = req.body;
+  const { title, artist, key } = req.body; // 'key' değişkenini burada alıyoruz
   const band_id = req.band_id;
 
   try {
-    if (!band_id || !title || !artist) {
+    if (!band_id || !title || !artist || !key) { // 'key' kontrolünü ekledik
       return res.status(400).json({ message: 'All fields are required' });
     }
 
     const song = new Song({
       title,
       artist,
+      key, // Doğru şekilde 'key' ekledik
       band_id,
     });
 
@@ -26,6 +27,7 @@ const addSong = async (req, res) => {
     res.status(500).json({ message: 'Error adding song', error });
   }
 };
+
 
 // Delete a song (prevent deletion if song is in a playlist)
 const deleteSong = async (req, res) => {

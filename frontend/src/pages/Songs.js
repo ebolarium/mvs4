@@ -6,18 +6,21 @@ import { GlobalStateContext } from '../context/GlobalStateProvider';
 import API_BASE_URL from '../config/apiConfig';
 import { useTranslation } from 'react-i18next';
 import './Songs.css'; // CSS dosyasını içe aktardık
-import { levenshtein } from 'fast-levenshtein'; // Levenshtein mesafesi kütüphanesi ekleniyor
 
 
 const Songs = () => {
   const { t } = useTranslation();
   const [songs, setSongs] = useState([]);
-  const [formData, setFormData] = useState({ title: '', artist: '' });
+  const [formData, setFormData] = useState({ title: '', artist: '', key: 'Tune' });
   const [editSong, setEditSong] = useState(null); // Düzenlenecek şarkı bilgisi
   const [showEditModal, setShowEditModal] = useState(false); // Modal kontrolü
   const { state, dispatch } = useContext(GlobalStateContext);
+  const [isAscending, setIsAscending] = useState(true); // Varsayılan olarak A-Z
+  const [searchQuery, setSearchQuery] = useState(''); // Arama kutusundaki değer
 
-  const { title, artist } = formData;
+
+
+  const { title, artist, key } = formData;
 
   useEffect(() => {
     fetchSongs();
@@ -51,9 +54,12 @@ const Songs = () => {
 
   const handleEdit = (song) => {
     setEditSong(song);
-    setFormData({ title: song.title, artist: song.artist });
+    setFormData({ title: song.title, artist: song.artist, key: song.key || 'Tune', // Eğer key yoksa varsayılan olarak 'Tune'
+    });
     setShowEditModal(true);
   };
+
+
 
   const handleUpdate = async () => {
     const token = localStorage.getItem('token');
@@ -83,6 +89,24 @@ const Songs = () => {
     }
   };
 
+  const sortSongs = () => {
+    const sortedSongs = [...songs].sort((a, b) => {
+      if (isAscending) {
+        return a.title.localeCompare(b.title);
+      } else {
+        return b.title.localeCompare(a.title);
+      }
+    });
+  
+    setSongs(sortedSongs); // Sıralanmış şarkıları güncelle
+    setIsAscending(!isAscending); // Sıralama yönünü değiştir
+  };
+
+
+  const handleCloseEditModal = () => {
+    setFormData({ title: '', artist: '', key: 'Tune' }); // Formu sıfırlama
+    setShowEditModal(false); // Modal'ı kapatma
+  };
 
 
   function levenshteinDistance(a = '', b = '') {
@@ -113,9 +137,12 @@ const Songs = () => {
 
 
 
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
   
     const token = localStorage.getItem('token');
     if (!token) {
@@ -146,7 +173,7 @@ const Songs = () => {
         const data = await response.json();
         const updatedSongs = [...songs, data.song];
         setSongs(updatedSongs);
-        setFormData({ title: '', artist: '' });
+        setFormData({ title: '', artist: '', key: 'Tune' }); // Form sıfırlanırken key de resetlenir
   
         dispatch({ type: 'ADD_SONG', payload: data.song });
       } else {
@@ -156,6 +183,8 @@ const Songs = () => {
     } catch (error) {
       console.error(t('error_adding_song'), error);
     }
+  
+    setLoading(false);
   };
   
 
@@ -224,6 +253,25 @@ const Songs = () => {
                   />
                 </Form.Group>
 
+                <Form.Group className="mb-3" controlId="formKey">
+  <Form.Label>{t('song_key')}</Form.Label>
+  <Form.Select
+    name="key"
+    value={formData.key} // Formdaki key değerini kullanıyoruz
+    onChange={handleChange}
+  >
+    {[
+      'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B',
+      'Cm', 'C#m', 'Dm', 'D#m', 'Em', 'Fm', 'F#m', 'Gm', 'G#m', 'Am', 'A#m', 'Bm', 'Tune'
+    ].map((tone) => (
+      <option key={tone} value={tone}>
+        {tone}
+      </option>
+    ))}
+  </Form.Select>
+</Form.Group>
+
+
                 <Button variant="primary" type="submit" className="w-100">
                   {t('add_song')}
                 </Button>
@@ -235,61 +283,70 @@ const Songs = () => {
         <Col md={8}>
   <Card className="shadow">
     <Card.Body>
-      <h2 className="text-center mb-4">{t('song_repository')}</h2>
-      <ListGroup style={{ maxHeight: '300px', overflowY: 'auto' }}>
-        {songs.length > 0 ? (
-          songs.map((song) => (
-            <ListGroup.Item key={song._id} className="list-item-content">
-              <div className="row w-100">
-                {/* Sol kolon: Şarkı ve sanatçı ismi */}
-                <div className="col-8 d-flex align-items-center">
-                  <strong className="me-2">{song.title}</strong>
-                  <span className="me-2">{t('by')}</span>
-                  <span>{song.artist}</span>
-                </div>
-
-                {/* Sağ kolon: Emojiler ve butonlar */}
-                <div className="col-4 d-flex justify-content-end align-items-center icon-container">
-                  <div className="d-flex align-items-center me-3">
-                    <span className="emoji">👍</span>
-                    <span className="count">{song.totalvotecount || 0}</span>
-                  </div>
-
-                  <div className="d-flex align-items-center me-3">
-                    <span className="emoji">▶</span>
-                    <span className="count">{song.playcount || 0}</span>
-                  </div>
-
-                  <button
-                    className="icon-button emoji-button"
-                    onClick={() => handleEdit(song)}
-                  >
-                    ✏️
-                  </button>
-
-                  <button
-                    className="icon-button emoji-button"
-                    onClick={() => handleDelete(song._id)}
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </div>
-            </ListGroup.Item>
-          ))
-        ) : (
-          <p>{t('no_songs_available')}</p>
-        )}
-      </ListGroup>
-    </Card.Body>
+    <div className="d-flex justify-content-between align-items-center mb-4">
+  <h2 className="text-center">{t('song_repository')}</h2>
+  <div className="search-container">
+    <Button 
+      variant="outline-secondary" 
+      onClick={sortSongs}
+    >
+      {isAscending ? 'A-Z' : 'Z-A'}
+    </Button>
+    <input
+      type="text"
+      placeholder="Search"
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+    />
+  </div>
+</div>
+<ListGroup style={{ maxHeight: '300px', overflowY: 'auto' }}>
+  {songs
+    .filter((song) =>
+      song.title.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .map((song) => (
+      <ListGroup.Item key={song._id} className="list-item-content">
+        <div className="row w-100">
+          <div className="col-8 d-flex align-items-center">
+            <strong className="me-2">{song.title}</strong>
+            <span className="me-2">{t('by')}</span>
+            <span>{song.artist}</span>
+          </div>
+          <div className="col-4 d-flex justify-content-end align-items-center icon-container">
+            <div className="d-flex align-items-center me-3">
+              <span className="emoji">👍</span>
+              <span className="count">{song.totalvotecount || 0}</span>
+            </div>
+            <div className="d-flex align-items-center me-3">
+              <span className="emoji">▶</span>
+              <span className="count">{song.playcount || 0}</span>
+            </div>
+            <button
+              className="icon-button emoji-button"
+              onClick={() => handleEdit(song)}
+            >
+              ✏️
+            </button>
+            <button
+              className="icon-button emoji-button"
+              onClick={() => handleDelete(song._id)}
+            >
+              🗑️
+            </button>
+          </div>
+        </div>
+      </ListGroup.Item>
+    ))}
+</ListGroup>    </Card.Body>
   </Card>
 </Col>
 
 
 
       </Row>
-      <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
-        <Modal.Header closeButton>
+      <Modal show={showEditModal} onHide={handleCloseEditModal}>
+      <Modal.Header closeButton>
           <Modal.Title>{t('edit_song')}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -314,6 +371,26 @@ const Songs = () => {
                 required
               />
             </Form.Group>
+
+            <Form.Group className="mb-3" controlId="formKey">
+        <Form.Label>{t('song_key')}</Form.Label>
+        <Form.Select
+          name="key"
+          value={key}
+          onChange={handleChange}
+        >
+          {[
+            'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B',
+            'Cm', 'C#m', 'Dm', 'D#m', 'Em', 'Fm', 'F#m', 'Gm', 'G#m', 'Am', 'A#m', 'Bm', 'Tune'
+          ].map((tone) => (
+            <option key={tone} value={tone}>
+              {tone}
+            </option>
+          ))}
+        </Form.Select>
+      </Form.Group>
+
+
             <Button variant="primary" onClick={handleUpdate}>
               {t('save_changes')}
             </Button>

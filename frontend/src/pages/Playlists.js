@@ -109,6 +109,7 @@ const Playlists = () => {
           _id: song.song_id._id,
           title: song.song_id.title,
           artist: song.song_id.artist,
+          key: song.song_id.key || 'Tune', // Eğer key yoksa 'Tune' kullan
           votecount: song.votecount,
           played: song.played || false,
         }))
@@ -190,9 +191,13 @@ const Playlists = () => {
                       key={song._id}
                       className="d-flex justify-content-between align-items-center"
                     >
-                      <div>
-                        {song.title} {t('by')} {song.artist}
-                      </div>
+                    <div>
+                      {song.title} {t('by')} {song.artist} /{' '}
+                      <span style={{ color: 'red', fontSize: '0.9em' }}>
+                        {song.key || 'Tune'}
+                      </span>
+                    </div>
+
                       <Button
                         variant="primary"
                         onClick={() => handleSongAction(song._id, 'add')}
