@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { Modal, Button, Form, ListGroup } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
+import { FaSpotify } from 'react-icons/fa'; // İkonu import et
+
 
 
 const SongRequestModal = ({ show, onClose, onRequest }) => {
@@ -72,7 +74,7 @@ const SongRequestModal = ({ show, onClose, onRequest }) => {
     <Modal show={show} onHide={onClose}>
       <Modal.Header closeButton>
         <Modal.Title>
-        {t('request_a_song')}
+        {t('request_a_song')}<FaSpotify style={{ marginLeft: '8px' }} />
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
