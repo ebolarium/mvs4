@@ -6,6 +6,11 @@ const jwt = require('jsonwebtoken');
 const Playlist = require('../models/Playlist');
 const multer = require('multer');
 const path = require('path');
+const nodemailer = require('nodemailer');
+const dotenv = require('dotenv');
+
+require('dotenv').config();
+
 
 // Login function
 const loginBand = async (req, res) => {
@@ -26,10 +31,14 @@ const loginBand = async (req, res) => {
       expiresIn: '1h',
     });
 
-    res.json({ token });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
-  }
+ // is_verified alanını yanıt olarak döndürüyoruz
+ res.json({
+  token,
+  is_verified: band.is_verified,
+});
+} catch (error) {
+res.status(500).json({ message: 'Server error', error });
+}
 };
 
 // Register function
@@ -38,13 +47,21 @@ const registerBand = async (req, res) => {
 
   try {
     // Create band record
-    const band = new Band({
-      band_name,
+    const band = new Band({ band_name,
       band_email,
       band_password,
     });
 
     await band.save();
+
+
+    // Doğrulama token'ı oluştur
+    const verificationToken = jwt.sign({ band_email }, process.env.JWT_SECRET, {
+      expiresIn: '1d',
+    });
+
+      // E-posta gönder
+    await sendVerificationEmail(band_email, verificationToken);
 
     // Create default playlist for the band
     const playlist = new Playlist({
@@ -59,6 +76,38 @@ const registerBand = async (req, res) => {
     res.status(400).json({ message: 'Error registering band', error });
   }
 };
+
+
+const transporter = nodemailer.createTransport({
+  host: 'smtpout.secureserver.net',
+  port: 465,
+  secure: true, // SSL kullanılıyor
+  auth: {
+    user: process.env.EMAIL_USER, // .env dosyasından kullanıcı adı
+    pass: process.env.EMAIL_PASSWORD, // Şifrenizi .env dosyanızdan alın
+  },
+});
+
+const sendVerificationEmail = async (email, verificationToken) => {
+  const verificationUrl = `http://localhost:3000/verify/${verificationToken}`;
+  
+  const mailOptions = {
+    from: '"VoteSong Support" <support@votesong.live>',
+    to: email,
+    subject: 'Verify Your Email Address',
+    html: `<p>Please verify your email by clicking the link below:</p>
+           <a href="${verificationUrl}">${verificationUrl}</a>`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Verification email sent to:', email);
+  } catch (error) {
+    console.error('Error sending email:', error);
+  }
+};
+
+
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {

@@ -311,7 +311,9 @@ const Songs = () => {
           <div className="col-8 d-flex align-items-center">
             <strong className="me-2">{song.title}</strong>
             <span className="me-2">{t('by')}</span>
-            <span>{song.artist}</span>
+            <span>{song.artist}</span>/{' '}
+            <span style={{ color: 'red', fontSize: '0.8em' }}>{song.key}</span>
+
           </div>
           <div className="col-4 d-flex justify-content-end align-items-center icon-container">
             <div className="d-flex align-items-center me-3">

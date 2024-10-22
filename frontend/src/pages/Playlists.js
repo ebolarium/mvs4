@@ -113,7 +113,7 @@ const Playlists = () => {
           _id: song.song_id._id,
           title: song.song_id.title,
           artist: song.song_id.artist,
-          key: song.song_id.key || 'Tune', // Eğer key yoksa 'Tune' kullan
+          key: song.song_id.key || t('no_key_info'), // Eğer key yoksa 'Tune' kullan
           votecount: song.votecount,
           played: song.played || false,
         }))
@@ -290,7 +290,17 @@ state.songs
                           key={`${song._id}-${index}`}
                           className="d-flex justify-content-between align-items-center"
                         >
-                          {song.title} {t('by')} {song.artist} - {t('votes')}: {song.votecount}
+                          <span style={{ fontWeight: 'bold', fontSize: '1.0em' }}>{song.title}</span>       
+                          {t('by')} 
+                          {song.artist} 
+                          
+                          
+                          <span style={{ color: 'red', fontSize: '0.8em' }}>{song.key}</span>
+                          
+                          
+                          
+                            - {t('votes')}: {song.votecount}
+                          
                           <Button
                             variant="danger"
                             className="ms-3"

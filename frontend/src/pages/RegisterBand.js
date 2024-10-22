@@ -1,22 +1,20 @@
 import React, { useState } from 'react';
 import { Form, Button, Card } from 'react-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
-import { useNavigate } from 'react-router-dom';
 import API_BASE_URL from '../config/apiConfig';
 import { useTranslation } from 'react-i18next';
 
-const RegisterBand = () => {
+const RegisterBand = ({ onRegisterSuccess }) => {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
     band_name: '',
     band_email: '',
     band_password: '',
-    band_confirm_password: ''
+    band_confirm_password: '',
   });
 
   const { band_name, band_email, band_password, band_confirm_password } = formData;
   const [errorMessage, setErrorMessage] = useState('');
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -42,23 +40,20 @@ const RegisterBand = () => {
           band_id,
           band_name,
           band_email,
-          band_password
+          band_password,
         }),
       });
 
       const data = await response.json();
       if (response.ok) {
-        // Token'ı localStorage'a kaydet ve dashboard'a yönlendir
-        localStorage.setItem('token', data.token);
-        alert(t('band_registered_successfully'));
         setFormData({
           band_name: '',
           band_email: '',
           band_password: '',
-          band_confirm_password: ''
+          band_confirm_password: '',
         });
         setErrorMessage('');
-        navigate('/'); // Kullanıcıyı dashboard'a yönlendir
+        onRegisterSuccess(); // Başarılı kayıt sonrası ana bileşene bilgi ver
       } else {
         setErrorMessage(`Error: ${t(data.message)}`);
       }

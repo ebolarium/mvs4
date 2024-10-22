@@ -60,7 +60,7 @@ const getSongs = async (req, res) => {
   const band_id = req.band_id;
 
   try {
-    const songs = await Song.find({ band_id });
+    const songs = await Song.find({ band_id }, 'title artist key'); // 'key' eklenmiş
     res.json({ songs });
   } catch (error) {
     res.status(500).json({ message: 'Error fetching songs', error });

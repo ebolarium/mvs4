@@ -10,6 +10,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { GlobalStateProvider } from './context/GlobalStateProvider';
 import BandProfile from './pages/BandProfile';
 import './i18n'; // i18n dosyamızı buraya ekliyoruz
+import VerificationPage from './pages/VerificationPage';
+
 
 
 function App() {
@@ -32,6 +34,8 @@ function App() {
           <Route path="/dashboard" element={<BandDashboard />} />
           <Route path="/playlist/:playlistId" element={<PublishedPlaylist />} />
           <Route path="/profile" element={<BandProfile />} />
+          <Route path="/verify/:token" element={<VerificationPage />} />
+
         </Routes>
       </Router>
     </GlobalStateProvider>

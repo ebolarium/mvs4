@@ -1,24 +1,26 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, Paper, ClickAwayListener, Container, Grid, Card, CardContent, IconButton } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close'; // Close ikonu
+import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../assets/VoteSong_Logo.gif';
 import StockImage from '../assets/vote_song_background.png';
 import { MusicNote, PlaylistAdd, Headset } from '@mui/icons-material';
 import Login from './Login';
-import RegisterBand from './RegisterBand'; // Register bileşeni
+import RegisterBand from './RegisterBand';
 import { useTranslation } from 'react-i18next';
 import { HowItWorksSection, AboutUsSection } from './HowItWorksSection';
-
+import VerificationModal from './VerificationModal';
 
 const Homepage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [loginOpen, setLoginOpen] = useState(false);
-  const [registerOpen, setRegisterOpen] = useState(false); // Register modal state
+  const [registerOpen, setRegisterOpen] = useState(false);
   const anchorRef = useRef(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
 
+  // Kullanıcı giriş yapmış mı kontrol eder
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -26,8 +28,9 @@ const Homepage = () => {
     }
   }, []);
 
+  // Login ve Register modal açma/kapatma işlevleri
   const handleLoginToggle = () => setLoginOpen((prev) => !prev);
-  const handleRegisterToggle = () => setRegisterOpen((prev) => !prev); // Register toggle
+  const handleRegisterToggle = () => setRegisterOpen((prev) => !prev);
 
   const handleLoginClose = (event) => {
     if (anchorRef.current && anchorRef.current.contains(event.target)) {
@@ -36,14 +39,22 @@ const Homepage = () => {
     setLoginOpen(false);
   };
 
-  const handleRegisterClose = () => {
-    setRegisterOpen(false); // Register modal kapatma
-  };
+  const handleRegisterClose = () => setRegisterOpen(false);
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
     setLoginOpen(false);
     navigate('/dashboard');
+  };
+
+  const handleRegisterSuccess = () => {
+    setRegisterOpen(false);
+    setShowVerificationModal(true);
+  };
+
+  const handleVerificationModalClose = () => {
+    setShowVerificationModal(false);
+    navigate('/');
   };
 
   return (
@@ -121,7 +132,7 @@ const Homepage = () => {
           >
             <CloseIcon />
           </IconButton>
-          <RegisterBand />
+          <RegisterBand onRegisterSuccess={handleRegisterSuccess} />
         </Box>
       )}
 
@@ -165,10 +176,14 @@ const Homepage = () => {
             </Card>
           </Grid>
         </Grid>
-        <Box sx={{ my: 4 }}></Box>
         <HowItWorksSection /> <AboutUsSection />
-
       </Container>
+
+      <VerificationModal
+        show={showVerificationModal}
+        onClose={handleVerificationModalClose}
+        message="Thank you for registering! Please verify your email."
+      />
     </Box>
   );
 };

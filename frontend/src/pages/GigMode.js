@@ -45,7 +45,7 @@ const GigMode = ({ playlistId }) => {
                 _id: song.song_id._id,
                 title: song.song_id.title,
                 artist: song.song_id.artist,
-                key: song.song_id.key || 'Tune', 
+                key: song.song_id.key || t('no_key_info'), 
                 votecount: song.votecount,
                 played: song.played || false,
               }))

@@ -29,7 +29,7 @@ const createPlaylist = async (req, res) => {
 const updatePlaylistSongs = async (req, res) => {
   const { song_id, action } = req.body;
   const band_id = req.band_id;
-  const playlist = await Playlist.findOne({ band_id }).populate('songs.song_id', 'title artist');
+  const playlist = await Playlist.findOne({ band_id }).populate('songs.song_id', 'title artist key');
 
   if (!playlist) {
     return res.status(404).json({ message: 'Playlist not found' });
@@ -106,7 +106,7 @@ const publishPlaylist = async (req, res) => {
 const getPlaylist = async (req, res) => {
   const band_id = req.band_id;
   try {
-    const playlist = await Playlist.findOne({ band_id }).populate('songs.song_id', 'title artist');
+    const playlist = await Playlist.findOne({ band_id }).populate('songs.song_id', 'title artist key');
     if (!playlist) {
       return res.status(404).json({ message: 'Playlist not found' });
     }
@@ -141,8 +141,8 @@ const getPublishedPlaylist = async (req, res) => {
   const { id } = req.params;
   try {
     const playlist = await Playlist.findById(id)
-      .populate('songs.song_id', 'title artist')
-      .populate('band_id', 'band_name band_image'); // Ensure band_image is included
+    .populate('songs.song_id', 'title artist') // 'key' alanını ekledik
+    .populate('band_id', 'band_name band_image'); // Ensure band_image is included
 
     if (!playlist || !playlist.published) {
       return res.status(404).json({ message: 'No playlist available' });
