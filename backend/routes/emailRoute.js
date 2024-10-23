@@ -4,37 +4,34 @@ const router = express.Router();
 require('dotenv').config();
 
 const transporter = nodemailer.createTransport({
-    host: 'smtpout.secureserver.net', // GoDaddy SMTP sunucusu
-    port: 465, // SSL için kullanılan port
-    secure: true, // SSL kullanımı
-    auth: {
-      user: process.env.EMAIL_USER, // Gönderici e-posta adresiniz
-      pass: process.env.EMAIL_PASSWORD, // SMTP şifreniz
-    },
-  });
-
+  host: 'smtpout.secureserver.net',
+  port: 465,
+  secure: true, // SSL kullanımı
+  auth: {
+    user: process.env.EMAIL_USER, // .env dosyasından kullanıcı adı
+    pass: process.env.EMAIL_PASSWORD, // Şifrenizi .env dosyasından alın
+  },
+});
 
 // POST endpoint: E-posta gönderimi
-router.post('/send-email', (req, res) => {
+router.post('/send-email', async (req, res) => {
   const { name, email, message } = req.body;
 
   const mailOptions = {
-    from: email,
-    to: 'support@votesong.live',
+    from: '"VoteSong Support" <support@votesong.live>', // Gönderen adı ve adresi
+    to: 'support@votesong.live', // Alıcı adresi
     subject: `New Message from ${name}`,
     text: `You have received a new message:\n\nName: ${name}\nEmail: ${email}\nMessage: ${message}`,
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-
-    console.error('Error sending email:', error);
-    return res.status(500).json({ message: 'Email sending failed.', error: error.message });
-
-    }
-    console.log('Email sent: ' + info.response);
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully to:', email);
     res.status(200).json({ message: 'Email sent successfully!' });
-  });
+  } catch (error) {
+    console.error('Error sending email:', error);
+    res.status(500).json({ message: 'Email sending failed.', error: error.message });
+  }
 });
 
 module.exports = router;
