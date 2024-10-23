@@ -49,7 +49,7 @@ app.use(express.json());
 // CORS Middleware
 app.use(
   cors({
-    origin: ['http://localhost:3000', 'https://mvs4.onrender.com'], // izin verilen kaynaklar
+    origin: ['http://localhost:3000', 'https://votesong.live'], // izin verilen kaynaklar
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   })
