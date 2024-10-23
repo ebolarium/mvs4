@@ -4,12 +4,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../assets/VoteSong_Logo.gif';
 import StockImage from '../assets/vote_song_background.png';
-import { MusicNote, PlaylistAdd, Headset } from '@mui/icons-material';
 import Login from './Login';
 import RegisterBand from './RegisterBand';
 import { useTranslation } from 'react-i18next';
 import { HowItWorksSection, AboutUsSection } from './HowItWorksSection';
 import VerificationModal from './VerificationModal';
+import ContactForm from './ContactForm'; // ContactForm'u içeri aktarıyoruz
+
 
 const Homepage = () => {
   const { t } = useTranslation();
@@ -184,6 +185,10 @@ const Homepage = () => {
         onClose={handleVerificationModalClose}
         message="Thank you for registering! Please verify your email."
       />
+
+    <ContactForm />
+
+
     </Box>
   );
 };

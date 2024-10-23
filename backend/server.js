@@ -15,6 +15,8 @@ const app = express();
 const server = http.createServer(app);
 const Playlist = require('./models/Playlist');
 const spotifyAuthRoutes = require('./routes/spotifyAuth');
+const emailRoute = require('./routes/emailRoute'); // Eğer ayrı routes klasöründeyse
+
 
 
 dotenv.config();
@@ -63,6 +65,9 @@ mongoose
 app.use('/api/bands', bandRoutes);
 app.use('/api/songs', songRoutes);
 app.use('/api/playlist', playlistRoutes);
+app.use('/api', emailRoute); // Route'u dahil et
+
+
 
 // Serve frontend files
 app.use(express.static(path.join(__dirname, '../frontend/build')));
