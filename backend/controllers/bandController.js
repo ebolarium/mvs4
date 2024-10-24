@@ -134,7 +134,7 @@ const uploadBandImage = [
         return res.status(400).json({ message: 'No file uploaded' });
       }
 
-      const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+      const imageUrl = `/uploads/${req.file.filename}`;
 
       // Update the band's image URL in the database
       await Band.findByIdAndUpdate(bandId, { band_image: imageUrl });
