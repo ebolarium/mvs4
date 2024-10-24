@@ -5,6 +5,8 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const Band = require('../models/Band'); // Eksik olan import düzeltildi
 const authenticateToken = require('../middleware/authMiddleware');
+const bandController = require('../controllers/bandController');
+
 
 
 
