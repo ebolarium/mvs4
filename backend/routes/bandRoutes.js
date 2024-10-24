@@ -12,6 +12,8 @@ router.post('/login', loginBand); // Login rotası eklendi
 router.post('/upload-image', protect, uploadBandImage);
 router.get('/profile', protect, getBandProfile);
 router.put('/profile', protect, updateBandProfile);
+router.post('/upload-image', authenticateToken, bandController.uploadBandImage);
+
 
 router.get('/verify/:token', async (req, res) => {
   const { token } = req.params;
