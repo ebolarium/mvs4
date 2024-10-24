@@ -1,4 +1,4 @@
-// bandController.js - Updated Version
+// bandController.js
 
 const Band = require('../models/Band');
 const bcrypt = require('bcryptjs');

@@ -16,6 +16,8 @@ const server = http.createServer(app);
 const Playlist = require('./models/Playlist');
 const spotifyAuthRoutes = require('./routes/spotifyAuth');
 const emailRoute = require('./routes/emailRoute'); // Eğer ayrı routes klasöründeyse
+const fs = require('fs');
+
 
 
 
@@ -72,8 +74,19 @@ app.use('/api', emailRoute); // Route'u dahil et
 // Serve frontend files
 app.use(express.static(path.join(__dirname, '../frontend/build')));
 
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, 'uploads');
+
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
+
+
 // Serve uploaded images
 app.use('/uploads', cors(), express.static(path.join(__dirname, 'uploads')));
+
+
+
 
 // Wildcard route for frontend
 app.get('*', (req, res) => {
