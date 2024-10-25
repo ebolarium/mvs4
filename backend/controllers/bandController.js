@@ -4,13 +4,25 @@ const Band = require('../models/Band');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Playlist = require('../models/Playlist');
-const multer = require('multer');
-const path = require('path');
 const nodemailer = require('nodemailer');
-const dotenv = require('dotenv');
+const { initializeApp } = require("firebase/app");
+const { getStorage, ref, uploadBytes, getDownloadURL } = require("firebase/storage");
+const fs = require('fs');
 
-require('dotenv').config();
+// Firebase SDK Configuration (without .env)
+const firebaseConfig = {
+  apiKey: "AIzaSyBafFSa_fM47WlepENcL_qZpED0b4G9w3w",
+  authDomain: "votesong-50a22.firebaseapp.com",
+  projectId: "votesong-50a22",
+  storageBucket: "votesong-50a22.appspot.com",
+  messagingSenderId: "731744813937",
+  appId: "1:731744813937:web:b9bc94b7b42378ea43acd0",
+  measurementId: "G-2ET6CP37CH"
+};
 
+// Firebase Initialization
+const firebaseApp = initializeApp(firebaseConfig);
+const storage = getStorage(firebaseApp);
 
 // Login function
 const loginBand = async (req, res) => {
@@ -31,14 +43,13 @@ const loginBand = async (req, res) => {
       expiresIn: '1h',
     });
 
- // is_verified alanını yanıt olarak döndürüyoruz
- res.json({
-  token,
-  is_verified: band.is_verified,
-});
-} catch (error) {
-res.status(500).json({ message: 'Server error', error });
-}
+    res.json({
+      token,
+      is_verified: band.is_verified,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
 };
 
 // Register function
@@ -47,20 +58,15 @@ const registerBand = async (req, res) => {
 
   try {
     // Create band record
-    const band = new Band({ band_name,
-      band_email,
-      band_password,
-    });
-
+    const band = new Band({ band_name, band_email, band_password });
     await band.save();
 
-
-    // Doğrulama token'ı oluştur
+    // Create verification token
     const verificationToken = jwt.sign({ band_email }, process.env.JWT_SECRET, {
       expiresIn: '1d',
     });
 
-      // E-posta gönder
+    // Send verification email
     await sendVerificationEmail(band_email, verificationToken);
 
     // Create default playlist for the band
@@ -68,7 +74,6 @@ const registerBand = async (req, res) => {
       band_id: band._id,
       songs: [],
     });
-
     await playlist.save();
 
     res.status(201).json({ message: 'Band registered successfully!' });
@@ -77,14 +82,14 @@ const registerBand = async (req, res) => {
   }
 };
 
-
+// Nodemailer configuration for sending verification emails
 const transporter = nodemailer.createTransport({
   host: 'smtpout.secureserver.net',
   port: 465,
   secure: true, // SSL kullanılıyor
   auth: {
-    user: process.env.EMAIL_USER, // .env dosyasından kullanıcı adı
-    pass: process.env.EMAIL_PASSWORD, // Şifrenizi .env dosyanızdan alın
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
   },
 });
 
@@ -92,7 +97,6 @@ const sendVerificationEmail = async (email, verificationToken) => {
   const frontendbaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
   const verificationUrl = `${frontendbaseUrl}/verify/${verificationToken}`;
 
-  
   const mailOptions = {
     from: '"VoteSong Support" <support@votesong.live>',
     to: email,
@@ -109,43 +113,42 @@ const sendVerificationEmail = async (email, verificationToken) => {
   }
 };
 
+// Upload band image function with Firebase without Multer
+const uploadBandImage = async (req, res) => {
+  const bandId = req.band_id;
+  const file = req.files ? req.files.band_image : null;
+  if (!file) {
+    return res.status(400).json({ message: 'No file uploaded' });
+  }
 
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/'); // Folder to store uploaded images
-  },
-  filename: function (req, file, cb) {
-    const bandId = req.band_id;
-    const ext = path.extname(file.originalname);
-    cb(null, `band_${bandId}${ext}`);
-  },
-});
-
-const upload = multer({ storage: storage });
-
-// Upload band image function
-const uploadBandImage = [
-  upload.single('band_image'),
-  async (req, res) => {
-    const bandId = req.band_id;
-    try {
-      if (!req.file) {
-        return res.status(400).json({ message: 'No file uploaded' });
-      }
-
-      const imageUrl = `/uploads/${req.file.filename}`;
-
-      // Update the band's image URL in the database
-      await Band.findByIdAndUpdate(bandId, { band_image: imageUrl });
-
-      res.status(200).json({ message: 'Image uploaded successfully', imageUrl });
-    } catch (error) {
-      console.error('Error uploading band image:', error);
-      res.status(500).json({ message: error.message });
+  const tempPath = `./uploads/${file.name}`;
+  fs.writeFile(tempPath, file.data, async (err) => {
+    if (err) {
+      console.error('Error writing file:', err);
+      return res.status(500).json({ message: 'Error saving file' });
     }
-  },
-];
+
+    try {
+      const storageRef = ref(storage, `band_images/${bandId}_${file.name}`);
+      const metadata = {
+        contentType: file.mimetype,
+      };
+      await uploadBytes(storageRef, fs.readFileSync(tempPath), metadata);
+
+      const downloadURL = await getDownloadURL(storageRef);
+      await Band.findByIdAndUpdate(bandId, { band_image: downloadURL });
+
+      res.status(200).json({ message: 'Image uploaded successfully', imageUrl: downloadURL });
+
+      fs.unlink(tempPath, (unlinkErr) => {
+        if (unlinkErr) console.error('Error deleting temp file:', unlinkErr);
+      });
+    } catch (error) {
+      console.error('Error uploading to Firebase:', error);
+      res.status(500).json({ message: 'Error uploading to Firebase' });
+    }
+  });
+};
 
 // Get band profile
 const getBandProfile = async (req, res) => {
@@ -160,7 +163,6 @@ const getBandProfile = async (req, res) => {
     res.status(500).json({ message: 'Error fetching band profile', error });
   }
 };
-
 
 // Update band profile function
 const updateBandProfile = async (req, res) => {
@@ -187,4 +189,3 @@ const updateBandProfile = async (req, res) => {
 };
 
 module.exports = { registerBand, loginBand, uploadBandImage, getBandProfile, updateBandProfile };
-

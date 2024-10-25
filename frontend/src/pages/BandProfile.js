@@ -56,6 +56,11 @@ const BandProfile = () => {
   const handleImageUpload = (e) => {
     e.preventDefault();
 
+    if (!selectedFile) {
+      alert(t('please_select_a_file'));
+      return;
+    }
+
     const token = localStorage.getItem('token');
     if (!token) {
       alert(t('login_required'));
@@ -74,6 +79,10 @@ const BandProfile = () => {
       body: formData,
     })
       .then((response) => {
+        if (response.status === 401) {
+          alert(t('unauthorized_access'));
+          throw new Error(t('unauthorized_access'));
+        }
         if (!response.ok) {
           throw new Error(t('failed_to_upload_image'));
         }
@@ -85,6 +94,7 @@ const BandProfile = () => {
       })
       .catch((error) => {
         console.error(t('failed_to_upload_image'), error);
+        alert(t('failed_to_upload_image'));
       });
   };
 

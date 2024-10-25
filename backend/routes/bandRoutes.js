@@ -6,18 +6,15 @@ const jwt = require('jsonwebtoken');
 const Band = require('../models/Band'); // Eksik olan import düzeltildi
 const authenticateToken = require('../middleware/authMiddleware');
 const bandController = require('../controllers/bandController');
+const fileUpload = require('express-fileupload');
 
-
-
-
-
+router.use(fileUpload());
 
 router.post('/register', registerBand);
 router.post('/login', loginBand); // Login rotası eklendi
-router.post('/upload-image', protect, ...bandController.uploadBandImage);
 router.get('/profile', protect, getBandProfile);
 router.put('/profile', protect, updateBandProfile);
-
+router.post('/upload-image', protect, uploadBandImage);
 
 router.get('/verify/:token', async (req, res) => {
   const { token } = req.params;
@@ -40,8 +37,5 @@ router.get('/verify/:token', async (req, res) => {
     res.status(400).json({ message: 'Invalid or expired token', error: error.message });
   }
 });
-
-
-
 
 module.exports = router;
