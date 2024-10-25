@@ -2,7 +2,7 @@
 
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Container, ListGroup, Button, Card } from 'react-bootstrap';
+import { Container, ListGroup, Button, Card, Modal } from 'react-bootstrap';
 import { GlobalStateContext } from '../context/GlobalStateProvider';
 import API_BASE_URL from '../config/apiConfig';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +14,8 @@ const PublishedPlaylist = () => {
   const { state, dispatch, socket } = useContext(GlobalStateContext);
   const [cooldown, setCooldown] = useState(0);
   const [showRequestModal, setShowRequestModal] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false); // Yeni state tanımlaması
+
 
   const handleRequest = (song) => {
     console.log('Requested song:', song);
@@ -29,6 +31,8 @@ const PublishedPlaylist = () => {
     }
 
     setShowRequestModal(false);
+    setShowConfirmationModal(true); // İstekten sonra onay modalını aç
+
   };
 
   useEffect(() => {
@@ -208,6 +212,19 @@ const PublishedPlaylist = () => {
         onClose={() => setShowRequestModal(false)}
         onRequest={handleRequest}
       />
+
+          {/* Confirmation Modal */}
+          <Modal show={showConfirmationModal} onHide={() => setShowConfirmationModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>{t('request_confirmed')}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{t('your_request_has_been_sent')}</Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={() => setShowConfirmationModal(false)}>
+            {t('close')}
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       {/* Song List */}
       <ListGroup>

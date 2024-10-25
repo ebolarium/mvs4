@@ -122,7 +122,9 @@
     "request": "İste",
     "close": "Kapat",
     "requested_songs_list": "İstek Şarkılar",
-    "session_expired": "Oturum süresi doldu. Tekrar Giriş Yapın."
+    "session_expired": "Oturum süresi doldu. Tekrar Giriş Yapın.",
+    "request_confirmed": "İstek Başarılı 🎉",
+    "your_request_has_been_sent": "İstek şarkınız iletildi.😍 Eğer mevcut repertuvarımızda varsa çalacağız. Yoksa da belki bir sonraki programa kadar öğreniriz "
 
 
 
