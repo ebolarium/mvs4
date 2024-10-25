@@ -16,6 +16,40 @@ const PublishedPlaylist = () => {
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false); // Yeni state tanımlaması
 
+  useEffect(() => {
+    const updateCooldown = () => {
+      const voteCooldownMinutes = parseInt(localStorage.getItem('voteCooldown'), 10) || 5; // Get the cooldown value set by the admin
+      const cooldownTime = voteCooldownMinutes * 60 * 1000;
+      
+      const storedCooldown = localStorage.getItem('cooldown');
+      if (storedCooldown) {
+        const timeLeft = parseInt(storedCooldown) - Date.now();
+        if (timeLeft > 0) {
+          setCooldown(timeLeft);
+          const timer = setInterval(() => {
+            setCooldown((prev) => {
+              if (prev <= 1000) {
+                clearInterval(timer);
+                localStorage.removeItem('cooldown');
+                return 0;
+              }
+              return prev - 1000;
+            });
+          }, 1000);
+        } else {
+          localStorage.removeItem('cooldown');
+        }
+      }
+    };
+    
+    // Süreyi güncellemek için bir fonksiyon çağırıyoruz
+    updateCooldown();
+  }, [playlistId]);
+
+  
+  
+
+
 
   const handleRequest = (song) => {
     console.log('Requested song:', song);
@@ -35,27 +69,7 @@ const PublishedPlaylist = () => {
 
   };
 
-  useEffect(() => {
-    const storedCooldown = localStorage.getItem('cooldown');
-    if (storedCooldown) {
-      const timeLeft = parseInt(storedCooldown) - Date.now();
-      if (timeLeft > 0) {
-        setCooldown(timeLeft);
-        const timer = setInterval(() => {
-          setCooldown((prev) => {
-            if (prev <= 1000) {
-              clearInterval(timer);
-              localStorage.removeItem('cooldown');
-              return 0;
-            }
-            return prev - 1000;
-          });
-        }, 1000);
-      } else {
-        localStorage.removeItem('cooldown');
-      }
-    }
-  }, []);
+ 
 
   useEffect(() => {
     const fetchPlaylistData = () => {
@@ -130,7 +144,7 @@ const PublishedPlaylist = () => {
 
   const handleVote = async (songId) => {
     if (cooldown > 0) return;
-
+  
     try {
       console.log(t('attempting_vote'), songId);
       const response = await fetch(`${API_BASE_URL}/songs/vote/${songId}`, {
@@ -140,14 +154,15 @@ const PublishedPlaylist = () => {
         },
         body: JSON.stringify({ playlistId }),
       });
-
+  
       if (response.ok) {
         console.log(t('vote_successful'), songId);
-
-        const cooldownTime = 5 * 60 * 1000;
+  
+        const voteCooldownMinutes = parseInt(localStorage.getItem('voteCooldown'), 10) || 5; // Get the cooldown value set by the admin
+        const cooldownTime = voteCooldownMinutes * 60 * 1000;
         localStorage.setItem('cooldown', Date.now() + cooldownTime);
         setCooldown(cooldownTime);
-
+  
         const timer = setInterval(() => {
           setCooldown((prev) => {
             if (prev <= 1000) {
@@ -165,6 +180,14 @@ const PublishedPlaylist = () => {
       console.error(t('error_voting_song'), error);
     }
   };
+
+  const formatCooldown = (milliseconds) => {
+    const totalSeconds = Math.ceil(milliseconds / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  };
+
 
   if (!state.playlist || !state.playlist.published) {
     return <p style={{ color: 'white' }}>{t('no_active_playlist')}</p>;
@@ -197,7 +220,7 @@ const PublishedPlaylist = () => {
       {/* Cooldown Timer */}
       {cooldown > 0 && (
         <p className="text-center">
-          {Math.ceil(cooldown / 1000)} {t('seconds_to_next_vote')}
+          {formatCooldown(cooldown)} {t('time_to_next_vote')}
         </p>
       )}
 

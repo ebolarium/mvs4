@@ -52,7 +52,7 @@
     "return_to_dashboard": "Return to Dashboard",
     "band_profile": "Band Profile",
     "no_image_uploaded": "No image uploaded",
-    "select_image_to_upload": "Select an image to upload",
+    "select_image_to_upload": "Select an image to upload. (Max Height: 200px)",
     "upload_image": "Upload",
     "no_songs_available_playlist": "No songs available in the current playlist.",
     "played": "Played",
@@ -119,7 +119,11 @@
     "request": "Request",
     "close": "Close",
     "requested_songs_list": "Song Requests",
-    "session_expired": "Session expired. Login again. "
+    "session_expired": "Session expired. Login again. ",
+    "profile_updated_successfully": "Profile Updated Successfully!",
+    "time_to_next_vote": "Time to next vote!"
+
+
 
 
 

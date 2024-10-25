@@ -52,7 +52,7 @@
     "return_to_dashboard": "Panoya Dön",
     "band_profile": "Grup Profili",
     "no_image_uploaded": "Yüklenmiş resim yok",
-    "select_image_to_upload": "Yüklemek için bir resim seçin",
+    "select_image_to_upload": "Yüklemek için bir resim seçin (Max Height: 200px)",
     "upload_image": "Yükle",
     "no_songs_available_playlist": "Mevcut çalma listesinde şarkı yok.",
     "played": "Çalındı",
@@ -124,7 +124,9 @@
     "requested_songs_list": "İstek Şarkılar",
     "session_expired": "Oturum süresi doldu. Tekrar Giriş Yapın.",
     "request_confirmed": "İstek Başarılı 🎉",
-    "your_request_has_been_sent": "İstek şarkınız iletildi.😍 Eğer mevcut repertuvarımızda varsa çalacağız. Yoksa da belki bir sonraki programa kadar öğreniriz "
+    "your_request_has_been_sent": "İstek şarkınız iletildi.😍 Eğer mevcut repertuvarımızda varsa çalacağız. Yoksa da belki bir sonraki programa kadar öğreniriz ",
+    "profile_updated_successfully": "Profil Güncellendi",
+    "time_to_next_vote": "Sonraki Oy İçin Kalan Süre"
 
 
 

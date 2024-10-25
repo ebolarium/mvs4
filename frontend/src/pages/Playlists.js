@@ -1,10 +1,12 @@
 // src/pages/Playlists.js
 
 import React, { useState, useEffect, useContext } from 'react';
-import { Container, Row, Col, Button, Card, ListGroup } from 'react-bootstrap';
+import { Container, Row, Col, Button, Card, ListGroup, Modal, Form } from 'react-bootstrap';
 import { GlobalStateContext } from '../context/GlobalStateProvider';
 import API_BASE_URL from '../config/apiConfig';
 import { useTranslation } from 'react-i18next';
+import { FaCog } from 'react-icons/fa'; // Dişli çark iconunu eklemek için
+
 
 const Playlists = () => {
   const { t } = useTranslation();
@@ -17,6 +19,8 @@ const Playlists = () => {
   const [searchPlaylistQuery, setSearchPlaylistQuery] = useState('');
   const [isAllSongsAscending, setIsAllSongsAscending] = useState(true);
   const [isPlaylistSongsAscending, setIsPlaylistSongsAscending] = useState(true);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [voteCooldown, setVoteCooldown] = useState(5);
 
   useEffect(() => {
     fetchSongs();
@@ -132,6 +136,15 @@ const Playlists = () => {
       console.error(t('error_fetching_playlist'), error);
     }
   };
+
+  const handleSettingsClick = () => {
+    setShowSettingsModal(true);
+  };
+
+  const handleSaveSettings = () => {
+    setShowSettingsModal(false);
+    localStorage.setItem('voteCooldown', voteCooldown); // Yeni voteCooldown değerini kaydet
+  };
   
 
   const handleSongAction = async (song_id, action) => {
@@ -206,6 +219,7 @@ const sortPlaylistSongs = () => {
 const availableSongs = allSongs.filter(
   (song) => !state.songs.some((playlistSong) => playlistSong._id === song._id)
 );
+
   
 
   return (
@@ -226,6 +240,7 @@ const availableSongs = allSongs.filter(
             value={searchAllSongsQuery}
             onChange={(e) => setSearchAllSongsQuery(e.target.value)}
           />
+
         </div>
       </div>
               <ListGroup style={{ maxHeight: '300px', overflowY: 'auto' }}>
@@ -264,10 +279,15 @@ const availableSongs = allSongs.filter(
             <Card.Body>
             <div className="d-flex justify-content-between align-items-center mb-4">
               <h2 className="text-center mb-4">{t('playlist')}</h2>
+<Button variant="link" style={{ marginLeft: '10px' }} onClick={handleSettingsClick} disabled={isPublished}>
+<FaCog size={24} />
+</Button>
               <div className="search-container">
+
           <Button variant="outline-secondary" onClick={sortPlaylistSongs}>
             {isPlaylistSongsAscending ? 'A-Z' : 'Z-A'}
           </Button>
+
           <input
             type="text"
             placeholder={t('search')}
@@ -286,30 +306,37 @@ state.songs
   song.title.toLowerCase().includes(searchPlaylistQuery.toLowerCase())
 )
 .map((song, index) => (
-                        <ListGroup.Item
-                          key={`${song._id}-${index}`}
-                          className="d-flex justify-content-between align-items-center"
-                        >
-                          <span style={{ fontWeight: 'bold', fontSize: '1.0em' }}>{song.title}</span>       
-                          {t('by')} 
-                          {song.artist} 
-                          
-                          
-                          <span style={{ color: 'red', fontSize: '0.8em' }}>{song.key}</span>
-                          
-                          
-                          
-                            - {t('votes')}: {song.votecount}
-                          
-                          <Button
-                            variant="danger"
-                            className="ms-3"
-                            onClick={() => handleSongAction(song._id, 'remove')}
-                            disabled={isPublished} // Disable when published
-                          >
-                            {t('remove')}
-                          </Button>
-                        </ListGroup.Item>
+<ListGroup.Item
+  key={`${song._id}-${index}`}
+  className="d-flex justify-content-between align-items-center"
+>
+  <div className="w-100">
+    <Row className="align-items-center">
+      <Col xs={3} className="fw-bold" style={{ fontSize: '1.0em' }}>
+        {song.title}
+      </Col>
+      <Col xs={3} className="text-muted">
+        {t('by')} {song.artist}
+      </Col>
+      <Col xs={2} className="text-danger" style={{ fontSize: '0.9em' }}>
+        {song.key || 'Tune'}
+      </Col>
+      <Col xs={2} className="text-muted">
+        {t('votes')}: {song.votecount}
+      </Col>
+      <Col xs={2} className="text-end">
+        <Button
+          variant="danger"
+          className="ms-3"
+          onClick={() => handleSongAction(song._id, 'remove')}
+          disabled={isPublished} // Yayınlandıysa deaktif et
+        >
+          {t('remove')}
+        </Button>
+      </Col>
+    </Row>
+  </div>
+</ListGroup.Item>
                       ))
                     ) : (
                       <p>{t('no_songs_available')}</p>
@@ -345,6 +372,39 @@ state.songs
           </Card>
         </Col>
       </Row>
+
+            {/* Settings Modal */}
+            <Modal show={showSettingsModal} onHide={() => setShowSettingsModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>{t('settings')}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group controlId="voteCooldownSelect">
+              <Form.Label>{t('select_vote_cooldown')}</Form.Label>
+              <Form.Control
+                as="select"
+                value={voteCooldown}
+                onChange={(e) => setVoteCooldown(Number(e.target.value))}
+              >
+                {[...Array(10).keys()].map((i) => (
+                  <option key={i + 1} value={i + 1}>
+                    {i + 1} {t('minutes')}
+                  </option>
+                ))}
+              </Form.Control>
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowSettingsModal(false)}>
+            {t('close')}
+          </Button>
+          <Button variant="primary" onClick={handleSaveSettings}>
+            {t('save_changes')}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };
