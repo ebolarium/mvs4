@@ -16,7 +16,7 @@ const addSong = async (req, res) => {
     const song = new Song({
       title,
       artist,
-      key, // Doğru şekilde 'key' ekledik
+      key: key || 'Tune', // Eğer 'key' belirtilmezse varsayılan olarak 'Tune' atanacak
       band_id,
     });
 
