@@ -102,9 +102,7 @@ const sendVerificationEmail = async (email, verificationToken) => {
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log('Verification email sent to:', email);
   } catch (error) {
-    console.error('Error sending email:', error);
   }
 };
 
@@ -148,7 +146,7 @@ const uploadBandImage = async (req, res) => {
 const getBandProfile = async (req, res) => {
   const bandId = req.band_id;
   try {
-    const band = await Band.findById(bandId).select('band_name band_image');
+    const band = await Band.findById(bandId).select('band_name band_email band_image'); // band_email eklendi
     if (!band) {
       return res.status(404).json({ message: 'Band not found' });
     }

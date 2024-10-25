@@ -1,6 +1,6 @@
 // Updated BandDashboard.js
 import React, { useEffect, useState, useContext } from 'react';
-import { Container, Row, Col, Tab, Nav, Card, Button } from 'react-bootstrap';
+import { Container, Row, Col, Tab, Nav, Card, Button, Modal, Form, Alert } from 'react-bootstrap';
 import { useNavigate, Link } from 'react-router-dom';
 import Songs from './Songs';
 import Playlists from './Playlists';
@@ -23,6 +23,12 @@ const BandDashboard = () => {
   const [loading, setLoading] = useState(true);
   const { state } = useContext(GlobalStateContext);
   const [bandName, setBandName] = useState(''); // Kullanıcı adı için state
+  const [showModal, setShowModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(''); // Hata mesajı için state
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [successMessage, setSuccessMessage] = useState('');
+  const [bandEmail, setBandEmail] = useState('');
+
 
 
   useEffect(() => {
@@ -92,9 +98,66 @@ const BandDashboard = () => {
     navigate('/');
   };
 
+  const handleOpenModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/send-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          name: bandName, 
+          email: bandEmail, 
+          message: formData.message 
+        }),
+      });
+
+      if (response.ok) {
+        setSuccessMessage('Hata bildiriminiz başarıyla gönderildi.');
+        setFormData({ message: '' });
+      } else {
+        setErrorMessage('Hata bildirimi gönderilemedi.');
+      }
+    } catch (error) {
+      setErrorMessage('Sunucu hatası: ' + error.message);
+    }
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert(t('login_required'));
+      navigate('/');
+    } else {
+      // Kullanıcı bilgilerini çek
+      fetch(`${API_BASE_URL}/bands/profile`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setBandName(data.band.band_name);
+          setBandEmail(data.band.band_email);
+        })
+        .catch((err) => console.error(err));
+    }
+  }, [navigate, t]);
+
   if (loading) {
     return <Loader />;
   }
+
 
   return (
     <>
@@ -115,11 +178,41 @@ const BandDashboard = () => {
           <Button variant="info" as={Link} to="/profile" className="me-2">
             {t('edit_profile')}
           </Button>
+          <Button variant="warning" onClick={handleOpenModal}>
+            Hata Bildir
+          </Button>
           <Button variant="danger" onClick={handleLogout}>
             {t('logout')}
           </Button>
+
         </div>
       </div>
+
+      <Modal show={showModal} onHide={handleCloseModal} size="sm" centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Hata Bildir</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form onSubmit={handleSubmit}>
+            <Form.Group controlId="message">
+              <Form.Label>Mesaj</Form.Label>
+              <Form.Control
+                as="textarea"
+                name="message"
+                rows={3}
+                value={formData.message}
+                onChange={handleChange}
+                required
+              />
+            </Form.Group>
+            <Button type="submit" variant="primary" className="mt-3 w-100">
+              Gönder
+            </Button>
+          </Form>
+          {errorMessage && <Alert variant="danger" className="mt-3">{errorMessage}</Alert>}
+          {successMessage && <Alert variant="success" className="mt-3">{successMessage}</Alert>}
+        </Modal.Body>
+      </Modal>
 
       <Container className="mt-5">
         <Row>
