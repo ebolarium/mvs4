@@ -7,6 +7,25 @@ import API_BASE_URL from '../config/apiConfig';
 import { useTranslation } from 'react-i18next';
 import './BandProfile.css';
 
+
+import { initializeApp } from "firebase/app";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBafFSa_fM47WlepENcL_qZpED0b4G9w3w",
+  authDomain: "votesong-50a22.firebaseapp.com",
+  projectId: "votesong-50a22",
+  storageBucket: "votesong-50a22.appspot.com",
+  messagingSenderId: "731744813937",
+  appId: "1:731744813937:web:b9bc94b7b42378ea43acd0",
+  measurementId: "G-2ET6CP37CH"
+};
+
+// Firebase'i başlat
+const firebaseApp = initializeApp(firebaseConfig);
+const storage = getStorage(firebaseApp);
+
+
 const BandProfile = () => {
   const { t } = useTranslation();
   const [bandInfo, setBandInfo] = useState({
@@ -53,50 +72,34 @@ const BandProfile = () => {
     setSelectedFile(e.target.files[0]);
   };
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     e.preventDefault();
-
+  
     if (!selectedFile) {
       alert(t('please_select_a_file'));
       return;
     }
-
-    const token = localStorage.getItem('token');
-    if (!token) {
-      alert(t('login_required'));
-      window.location.href = '/';
-      return;
+  
+    try {
+      // Firebase Storage üzerinde bir referans oluştur
+      const storageRef = ref(storage, `band_images/${selectedFile.name}`);
+  
+      // Dosyayı Firebase Storage'a yükle
+      await uploadBytes(storageRef, selectedFile);
+  
+      // Yüklenen dosyanın URL'sini al
+      const downloadURL = await getDownloadURL(storageRef);
+  
+      // BandInfo'yu güncelle
+      setBandInfo({ ...bandInfo, band_image: downloadURL });
+      alert(t('image_uploaded_successfully'));
+  
+    } catch (error) {
+      console.error('failed_to_upload_image', error);
+      alert(t('failed_to_upload_image'));
     }
-
-    const formData = new FormData();
-    formData.append('band_image', selectedFile);
-
-    fetch(`${API_BASE_URL}/bands/upload-image`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    })
-      .then((response) => {
-        if (response.status === 401) {
-          alert(t('unauthorized_access'));
-          throw new Error(t('unauthorized_access'));
-        }
-        if (!response.ok) {
-          throw new Error(t('failed_to_upload_image'));
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setBandInfo({ ...bandInfo, band_image: data.imageUrl });
-        alert(t('image_uploaded_successfully'));
-      })
-      .catch((error) => {
-        console.error(t('failed_to_upload_image'), error);
-        alert(t('failed_to_upload_image'));
-      });
   };
+  
 
   const handleProfileUpdate = (e) => {
     e.preventDefault();
@@ -117,6 +120,8 @@ const BandProfile = () => {
       band_name: bandInfo.band_name || '',
       band_email: bandInfo.band_email || '',
       band_password: bandPassword,
+      band_image: bandInfo.band_image || '', // Bu satırı ekleyin
+
     };
 
     fetch(`${API_BASE_URL}/bands/profile`, {

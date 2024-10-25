@@ -5,24 +5,19 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Playlist = require('../models/Playlist');
 const nodemailer = require('nodemailer');
-const { initializeApp } = require("firebase/app");
-const { getStorage, ref, uploadBytes, getDownloadURL } = require("firebase/storage");
+const admin = require('firebase-admin');
 const fs = require('fs');
+const path = require('path');
 
-// Firebase SDK Configuration (without .env)
-const firebaseConfig = {
-  apiKey: "AIzaSyBafFSa_fM47WlepENcL_qZpED0b4G9w3w",
-  authDomain: "votesong-50a22.firebaseapp.com",
-  projectId: "votesong-50a22",
-  storageBucket: "votesong-50a22.appspot.com",
-  messagingSenderId: "731744813937",
-  appId: "1:731744813937:web:b9bc94b7b42378ea43acd0",
-  measurementId: "G-2ET6CP37CH"
-};
+// Firebase Admin SDK Configuration
+const serviceAccount = require('../config/serviceAccountKey.json'); // Firebase servis hesabı JSON dosyası
 
-// Firebase Initialization
-const firebaseApp = initializeApp(firebaseConfig);
-const storage = getStorage(firebaseApp);
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  storageBucket: 'votesong-50a22.appspot.com',
+});
+
+const bucket = admin.storage().bucket();
 
 // Login function
 const loginBand = async (req, res) => {
@@ -86,7 +81,7 @@ const registerBand = async (req, res) => {
 const transporter = nodemailer.createTransport({
   host: 'smtpout.secureserver.net',
   port: 465,
-  secure: true, // SSL kullanılıyor
+  secure: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASSWORD,
@@ -113,41 +108,40 @@ const sendVerificationEmail = async (email, verificationToken) => {
   }
 };
 
-// Upload band image function with Firebase without Multer
+// Upload band image function with Firebase Admin SDK
 const uploadBandImage = async (req, res) => {
   const bandId = req.band_id;
   const file = req.files ? req.files.band_image : null;
+
   if (!file) {
     return res.status(400).json({ message: 'No file uploaded' });
   }
 
-  const tempPath = `./uploads/${file.name}`;
-  fs.writeFile(tempPath, file.data, async (err) => {
-    if (err) {
-      console.error('Error writing file:', err);
-      return res.status(500).json({ message: 'Error saving file' });
-    }
-
-    try {
-      const storageRef = ref(storage, `band_images/${bandId}_${file.name}`);
-      const metadata = {
+  try {
+    const fileName = `band_images/${Date.now()}_${file.name}`;
+    const blob = bucket.file(fileName);
+    const blobStream = blob.createWriteStream({
+      metadata: {
         contentType: file.mimetype,
-      };
-      await uploadBytes(storageRef, fs.readFileSync(tempPath), metadata);
-
-      const downloadURL = await getDownloadURL(storageRef);
-      await Band.findByIdAndUpdate(bandId, { band_image: downloadURL });
-
-      res.status(200).json({ message: 'Image uploaded successfully', imageUrl: downloadURL });
-
-      fs.unlink(tempPath, (unlinkErr) => {
-        if (unlinkErr) console.error('Error deleting temp file:', unlinkErr);
-      });
-    } catch (error) {
-      console.error('Error uploading to Firebase:', error);
-      res.status(500).json({ message: 'Error uploading to Firebase' });
-    }
-  });
+      },
+    });
+  
+    blobStream.on('error', (err) => {
+      console.error('Error uploading file:', err);
+      return res.status(500).json({ message: 'Failed to upload file', error: err.message });
+    });
+  
+    blobStream.on('finish', async () => {
+      const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+      await Band.findByIdAndUpdate(bandId, { band_image: publicUrl });
+      return res.status(200).json({ message: 'Image uploaded successfully', imageUrl: publicUrl });
+    });
+  
+    blobStream.end(file.data);
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    res.status(500).json({ message: 'Error uploading to Firebase', error: error.message });
+  }
 };
 
 // Get band profile
@@ -167,7 +161,7 @@ const getBandProfile = async (req, res) => {
 // Update band profile function
 const updateBandProfile = async (req, res) => {
   const bandId = req.band_id;
-  const { band_name, band_email, band_password } = req.body;
+  const { band_name, band_email, band_password, band_image } = req.body; // band_image eklenmeli
 
   try {
     const updateData = {};
@@ -177,6 +171,9 @@ const updateBandProfile = async (req, res) => {
       const salt = await bcrypt.genSalt(10);
       updateData.band_password = await bcrypt.hash(band_password, salt);
     }
+
+    if (band_image) updateData.band_image = band_image; // band_image eklenmeli
+
 
     const band = await Band.findByIdAndUpdate(bandId, updateData, { new: true });
     if (!band) {
