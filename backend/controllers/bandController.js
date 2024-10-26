@@ -64,6 +64,9 @@ const registerBand = async (req, res) => {
     // Send verification email
     await sendVerificationEmail(band_email, verificationToken);
 
+    await sendRegistrationNotification(band_name, band_email); // Bildirim gönderimi
+
+
     // Create default playlist for the band
     const playlist = new Playlist({
       band_id: band._id,
@@ -105,6 +108,26 @@ const sendVerificationEmail = async (email, verificationToken) => {
   } catch (error) {
   }
 };
+
+
+const sendRegistrationNotification = async (band_name, band_email) => {
+  const mailOptions = {
+    from: '"VoteSong Support" <support@votesong.live>',
+    to: 'support@votesong.live', // Destek ekibine e-posta gönderilecek
+    subject: 'New Band Registration',
+    text: `A new band has registered:\n\nName: ${band_name}\nEmail: ${band_email}`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Registration notification email sent successfully.');
+  } catch (error) {
+    console.error('Error sending registration notification:', error);
+  }
+};
+
+
+
 
 // Upload band image function with Firebase Admin SDK
 const uploadBandImage = async (req, res) => {
