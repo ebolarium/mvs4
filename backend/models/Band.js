@@ -19,6 +19,10 @@ const bandSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  is_premium: { 
+    type: Boolean,
+    default: false,
+  },
   band_song_count: {
     type: Number,
     default: 0

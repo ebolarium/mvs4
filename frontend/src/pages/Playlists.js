@@ -6,6 +6,8 @@ import { GlobalStateContext } from '../context/GlobalStateProvider';
 import API_BASE_URL from '../config/apiConfig';
 import { useTranslation } from 'react-i18next';
 import { FaCog } from 'react-icons/fa'; // Dişli çark iconunu eklemek için
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+
 
 
 const Playlists = () => {
@@ -21,6 +23,8 @@ const Playlists = () => {
   const [isPlaylistSongsAscending, setIsPlaylistSongsAscending] = useState(true);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [voteCooldown, setVoteCooldown] = useState(5);
+  const [isPremium, setIsPremium] = useState(false); // Premium kontrolü için state
+
 
   useEffect(() => {
     fetchSongs();
@@ -39,6 +43,24 @@ const Playlists = () => {
       }
     };
   }, [playlist, socket]);
+
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    // Kullanıcı profilini al ve is_premium bilgisini set et
+    fetch(`${API_BASE_URL}/bands/profile`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => setIsPremium(data.band.is_premium))
+      .catch((error) => console.error('Error fetching profile:', error));
+  }, []);
+
 
   const fetchSongs = async () => {
     const token = localStorage.getItem('token');
@@ -165,6 +187,11 @@ const Playlists = () => {
   };
 
   const handlePublish = async () => {
+      if (!isPremium) {
+        alert(t('only_premium_can_publish'));
+        return;
+      }
+
     const token = localStorage.getItem('token');
     if (!token) {
       return alert(t('login_required'));
@@ -221,6 +248,14 @@ const availableSongs = allSongs.filter(
 );
 
   
+
+const renderTooltip = (props) => (
+  <Tooltip id="button-tooltip" {...props}>
+    Premium Only
+  </Tooltip>
+);
+
+
 
   return (
     <Container className="mt-5">
@@ -342,14 +377,23 @@ state.songs
                       <p>{t('no_songs_available')}</p>
                     )}
                   </ListGroup>
-                  <Button
-                    className="mt-4"
-                    variant={isPublished ? 'danger' : 'success'}
-                    onClick={handlePublish}
-                    disabled={state.songs.length === 0 && !isPublished} // Disable if empty and not published
-                  >
-                    {isPublished ? t('unpublish') : t('publish')}
-                  </Button>
+<OverlayTrigger
+placement="top"
+overlay={!isPremium ? renderTooltip : <></>} // Premium değilse tooltip göster
+>
+<span>
+<Button
+className="mt-4"
+variant={isPublished ? 'danger' : 'success'}
+onClick={handlePublish}
+disabled={!isPremium || (state.songs.length === 0 && !isPublished)} // Premium değilse veya liste boşsa pasif
+>
+{isPublished ? t('unpublish') : t('publish')}
+</Button>
+</span>
+</OverlayTrigger>
+
+
                   {isPublished && (
                     <>
                       <p className="mt-3">

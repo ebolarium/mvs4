@@ -169,7 +169,7 @@ const uploadBandImage = async (req, res) => {
 const getBandProfile = async (req, res) => {
   const bandId = req.band_id;
   try {
-    const band = await Band.findById(bandId).select('band_name band_email band_image'); // band_email eklendi
+    const band = await Band.findById(bandId).select('band_name band_email band_image is_premium');
     if (!band) {
       return res.status(404).json({ message: 'Band not found' });
     }
