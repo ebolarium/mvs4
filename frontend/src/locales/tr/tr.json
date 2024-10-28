@@ -130,5 +130,45 @@
     "accept_terms": "Hüküm ve Koşullar",
     "terms_content": "Hüküm ve Koşullar\n1. Kabul ve Koşulların Bağlayıcılığı\nBu platforma erişerek ve hizmetlerimizi kullanarak, bu hüküm ve koşulları kabul etmiş sayılırsınız. Hüküm ve koşulları kabul etmiyorsanız, lütfen platformumuzu kullanmayın.\n\n2. Hizmet Tanımı\nBu platform, müzik gruplarının etkinliklerde kullanılmak üzere şarkı listeleri oluşturmasına ve dinleyicilerin bu listeler üzerinden oy vermesine olanak sağlar. Kullanıcılar anonim olarak oy verebilir.\n\n3. Kullanıcı Sorumluluğu\nKullanıcı, platformda yanlış, yanıltıcı veya yasa dışı içerik paylaşmayacağını kabul eder.\nKullanıcı, grup bilgilerini ve şifrelerini gizli tutmakla sorumludur. Şifrenin izinsiz kullanımından doğabilecek sonuçlar kullanıcının sorumluluğundadır.\n\n4. Veri Gizliliği ve Güvenliği\nKullanıcı bilgileri, Gizlilik Politikamızda belirtildiği şekilde işlenir.\nŞifreler ve kişisel bilgiler üçüncü şahıslarla paylaşılmaz.\n\n5. Ücretlendirme ve İptal\nPlatformun bazı hizmetleri ücretli olabilir. Ücretlendirme ve ödeme koşulları, ilgili planların açıklamalarında belirtilmiştir. Ücretli hizmetlerin iptali durumunda, ödemeler iade edilmeyebilir.\n\n6. Fikri Mülkiyet Hakları\nPlatformda yer alan tüm içerikler ve yazılımlar, platformun veya lisans sahiplerinin mülkiyetindedir. İzinsiz kopyalama veya çoğaltma yasaktır.\n\n7. Hizmetlerin Değiştirilmesi\nPlatform, herhangi bir hizmeti önceden haber vermeksizin değiştirme veya sonlandırma hakkını saklı tutar.\n\n8. Sorumluluğun Sınırlandırılması\nPlatform, hizmetlerin kesintisiz veya hatasız çalışmasını garanti etmez. Kullanıcılar, platformda yaşanacak teknik aksaklıklar nedeniyle oluşabilecek kayıplardan platformun sorumlu tutulamayacağını kabul eder.\n\n9. Üçüncü Taraf Bağlantılar\nPlatform, üçüncü taraf sitelere bağlantılar içerebilir. Bu sitelerin içerikleri veya gizlilik uygulamaları konusunda sorumluluk kabul edilmez.\n\n10. Değişiklik ve Güncellemeler\nPlatform, bu hüküm ve koşullarda değişiklik yapma hakkını saklı tutar. Değişiklikler platformda yayımlandığı andan itibaren geçerli olacaktır. Kullanıcılar, hizmetleri kullanmaya devam ederek güncellenmiş koşulları kabul etmiş sayılır.\n\n11. İletişim\nHerhangi bir soru veya endişeniz olması durumunda bizimle info@example.com adresinden iletişime geçebilirsiniz.",
     "terms_and_conditions": "Hüküm ve Koşullar",
-    "view_terms": "Görüntüle"
+    "view_terms": "Görüntüle",
+
+    
+        "terms_and_conditions": "Hüküm ve Koşullar",
+        "terms_content": {
+          "section_1_title": "1. Kabul ve Koşulların Bağlayıcılığı",
+          "section_1_body": "Bu platforma erişerek ve hizmetlerimizi kullanarak, bu hüküm ve koşulları kabul etmiş sayılırsınız. Hüküm ve koşulları kabul etmiyorsanız, lütfen platformumuzu kullanmayın.",
+          
+          "section_2_title": "2. Hizmet Tanımı",
+          "section_2_body": "Bu platform, müzik gruplarının etkinliklerde kullanılmak üzere şarkı listeleri oluşturmasına ve dinleyicilerin bu listeler üzerinden oy vermesine olanak sağlar. Kullanıcılar anonim olarak oy verebilir.",
+      
+          "section_3_title": "3. Kullanıcı Sorumluluğu",
+          "section_3_body": "Kullanıcı, platformda yanlış, yanıltıcı veya yasa dışı içerik paylaşmayacağını kabul eder. Kullanıcı, grup bilgilerini ve şifrelerini gizli tutmakla sorumludur. Şifrenin izinsiz kullanımından doğabilecek sonuçlar kullanıcının sorumluluğundadır.",
+      
+          "section_4_title": "4. Veri Gizliliği ve Güvenliği",
+          "section_4_body": "Kullanıcı bilgileri, Gizlilik Politikamızda belirtildiği şekilde işlenir. Şifreler ve kişisel bilgiler üçüncü şahıslarla paylaşılmaz.",
+      
+          "section_5_title": "5. Ücretlendirme ve İptal",
+          "section_5_body": "Platformun bazı hizmetleri ücretli olabilir. Ücretlendirme ve ödeme koşulları, ilgili planların açıklamalarında belirtilmiştir. Ücretli hizmetlerin iptali durumunda, ödemeler iade edilmeyebilir.",
+      
+          "section_6_title": "6. Fikri Mülkiyet Hakları",
+          "section_6_body": "Platformda yer alan tüm içerikler ve yazılımlar, platformun veya lisans sahiplerinin mülkiyetindedir. İzinsiz kopyalama veya çoğaltma yasaktır.",
+      
+          "section_7_title": "7. Hizmetlerin Değiştirilmesi",
+          "section_7_body": "Platform, herhangi bir hizmeti önceden haber vermeksizin değiştirme veya sonlandırma hakkını saklı tutar.",
+      
+          "section_8_title": "8. Sorumluluğun Sınırlandırılması",
+          "section_8_body": "Platform, hizmetlerin kesintisiz veya hatasız çalışmasını garanti etmez. Kullanıcılar, platformda yaşanacak teknik aksaklıklar nedeniyle oluşabilecek kayıplardan platformun sorumlu tutulamayacağını kabul eder.",
+      
+          "section_9_title": "9. Üçüncü Taraf Bağlantılar",
+          "section_9_body": "Platform, üçüncü taraf sitelere bağlantılar içerebilir. Bu sitelerin içerikleri veya gizlilik uygulamaları konusunda sorumluluk kabul edilmez.",
+      
+          "section_10_title": "10. Değişiklik ve Güncellemeler",
+          "section_10_body": "Platform, bu hüküm ve koşullarda değişiklik yapma hakkını saklı tutar. Değişiklikler platformda yayımlandığı andan itibaren geçerli olacaktır. Kullanıcılar, hizmetleri kullanmaya devam ederek güncellenmiş koşulları kabul etmiş sayılır.",
+      
+          "section_11_title": "11. İletişim",
+          "section_11_body": "Herhangi bir soru veya endişeniz olması durumunda bizimle info@example.com adresinden iletişime geçebilirsiniz."
+        
+      }
+      
+
 }
