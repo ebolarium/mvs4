@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { AppBar, Toolbar, Typography, Button, Box, Paper, ClickAwayListener, Container, Grid, Card, CardContent, IconButton } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box, Paper, ClickAwayListener, Link, Container, Grid, Card, CardContent, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../assets/VoteSong_Logo.gif';
@@ -156,10 +156,39 @@ const Homepage = () => {
       />
 
     <ContactForm />
+    <Footer /> {/* Footer bileşenini ekliyoruz */}
 
 
     </Box>
   );
 };
+
+
+const Footer = () => (
+  <Box sx={{ backgroundColor: '#1c1c1c', color: '#fff', py: 3, mt: 4 }}>
+    <Container maxWidth="lg">
+      <Grid container spacing={2} justifyContent="center">
+        <Grid item>
+          <Link href="/terms-of-service" color="inherit" underline="hover">
+            Terms of Service
+          </Link>
+        </Grid>
+        <Grid item>
+          <Link href="/privacy-policy" color="inherit" underline="hover">
+            Privacy Policy
+          </Link>
+        </Grid>
+        <Grid item>
+          <Link href="/refund-policy" color="inherit" underline="hover">
+            Refund Policy
+          </Link>
+        </Grid>
+      </Grid>
+      <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+        © 2024 VoteSong. All rights reserved.
+      </Typography>
+    </Container>
+  </Box>
+);
 
 export default Homepage;

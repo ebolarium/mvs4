@@ -12,6 +12,9 @@ import BandProfile from './pages/BandProfile';
 import './i18n'; // i18n dosyamızı buraya ekliyoruz
 import VerificationPage from './pages/VerificationPage';
 import TermsAndConditions from './pages/TermsAndConditions';
+import TermsOfService from './pages/TermsOfService';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import RefundPolicy from './pages/RefundPolicy';
 
 
 
@@ -37,6 +40,9 @@ function App() {
           <Route path="/playlist/:playlistId" element={<PublishedPlaylist />} />
           <Route path="/profile" element={<BandProfile />} />
           <Route path="/verify/:token" element={<VerificationPage />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/refund-policy" element={<RefundPolicy />} />
 
         </Routes>
       </Router>
