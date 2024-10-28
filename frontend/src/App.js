@@ -11,6 +11,7 @@ import { GlobalStateProvider } from './context/GlobalStateProvider';
 import BandProfile from './pages/BandProfile';
 import './i18n'; // i18n dosyamızı buraya ekliyoruz
 import VerificationPage from './pages/VerificationPage';
+import TermsAndConditions from './pages/TermsAndConditions';
 
 
 
@@ -29,6 +30,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Homepage />} />
+          <Route path="/terms" element={<TermsAndConditions />} />
           <Route path="/register" element={<RegisterBand />} />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<BandDashboard />} />

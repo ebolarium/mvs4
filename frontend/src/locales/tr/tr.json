@@ -91,7 +91,7 @@
     "band_registration": "Grup Kaydı",
     "band_name": "Grup Adı",
     "band_email": "Grup E-postası",
-    "confirm_password": "Parolayı Onayla",
+    "confirm_password": "Şifreyi Tekrar Girin",
     "add_new_song": "Yeni Şarkı Ekle",
     "save_changes": "Değişiklikleri Kaydet",
     "edit_song": "Şarkıyı Düzenle",
@@ -126,8 +126,9 @@
     "request_confirmed": "İstek Başarılı 🎉",
     "your_request_has_been_sent": "İstek şarkınız iletildi.😍 Eğer mevcut repertuvarımızda varsa çalacağız. Yoksa da belki bir sonraki programa kadar öğreniriz ",
     "profile_updated_successfully": "Profil Güncellendi",
-    "time_to_next_vote": "Sonraki Oy İçin Kalan Süre"
-
-
-
+    "time_to_next_vote": "Sonraki Oy İçin Kalan Süre",
+    "accept_terms": "Hüküm ve Koşullar",
+    "terms_content": "Hüküm ve Koşullar\n1. Kabul ve Koşulların Bağlayıcılığı\nBu platforma erişerek ve hizmetlerimizi kullanarak, bu hüküm ve koşulları kabul etmiş sayılırsınız. Hüküm ve koşulları kabul etmiyorsanız, lütfen platformumuzu kullanmayın.\n\n2. Hizmet Tanımı\nBu platform, müzik gruplarının etkinliklerde kullanılmak üzere şarkı listeleri oluşturmasına ve dinleyicilerin bu listeler üzerinden oy vermesine olanak sağlar. Kullanıcılar anonim olarak oy verebilir.\n\n3. Kullanıcı Sorumluluğu\nKullanıcı, platformda yanlış, yanıltıcı veya yasa dışı içerik paylaşmayacağını kabul eder.\nKullanıcı, grup bilgilerini ve şifrelerini gizli tutmakla sorumludur. Şifrenin izinsiz kullanımından doğabilecek sonuçlar kullanıcının sorumluluğundadır.\n\n4. Veri Gizliliği ve Güvenliği\nKullanıcı bilgileri, Gizlilik Politikamızda belirtildiği şekilde işlenir.\nŞifreler ve kişisel bilgiler üçüncü şahıslarla paylaşılmaz.\n\n5. Ücretlendirme ve İptal\nPlatformun bazı hizmetleri ücretli olabilir. Ücretlendirme ve ödeme koşulları, ilgili planların açıklamalarında belirtilmiştir. Ücretli hizmetlerin iptali durumunda, ödemeler iade edilmeyebilir.\n\n6. Fikri Mülkiyet Hakları\nPlatformda yer alan tüm içerikler ve yazılımlar, platformun veya lisans sahiplerinin mülkiyetindedir. İzinsiz kopyalama veya çoğaltma yasaktır.\n\n7. Hizmetlerin Değiştirilmesi\nPlatform, herhangi bir hizmeti önceden haber vermeksizin değiştirme veya sonlandırma hakkını saklı tutar.\n\n8. Sorumluluğun Sınırlandırılması\nPlatform, hizmetlerin kesintisiz veya hatasız çalışmasını garanti etmez. Kullanıcılar, platformda yaşanacak teknik aksaklıklar nedeniyle oluşabilecek kayıplardan platformun sorumlu tutulamayacağını kabul eder.\n\n9. Üçüncü Taraf Bağlantılar\nPlatform, üçüncü taraf sitelere bağlantılar içerebilir. Bu sitelerin içerikleri veya gizlilik uygulamaları konusunda sorumluluk kabul edilmez.\n\n10. Değişiklik ve Güncellemeler\nPlatform, bu hüküm ve koşullarda değişiklik yapma hakkını saklı tutar. Değişiklikler platformda yayımlandığı andan itibaren geçerli olacaktır. Kullanıcılar, hizmetleri kullanmaya devam ederek güncellenmiş koşulları kabul etmiş sayılır.\n\n11. İletişim\nHerhangi bir soru veya endişeniz olması durumunda bizimle info@example.com adresinden iletişime geçebilirsiniz.",
+    "terms_and_conditions": "Hüküm ve Koşullar",
+    "view_terms": "Görüntüle"
 }

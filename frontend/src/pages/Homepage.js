@@ -7,7 +7,7 @@ import StockImage from '../assets/vote_song_background.png';
 import Login from './Login';
 import RegisterBand from './RegisterBand';
 import { useTranslation } from 'react-i18next';
-import { HowItWorksSection, AboutUsSection } from './HowItWorksSection';
+import { HowItWorksSection, AboutUsSection, PricesSection } from './HowItWorksSection';
 import VerificationModal from './VerificationModal';
 import ContactForm from './ContactForm'; // ContactForm'u içeri aktarıyoruz
 
@@ -144,40 +144,9 @@ const Homepage = () => {
       </Box>
 
       <Container maxWidth="lg" sx={{ py: 10 }}>
-        <Grid container spacing={4} justifyContent="center">
-          <Grid item xs={12} md={6}>
-            <Card sx={{ backgroundColor: '#ffffffcc', borderRadius: '16px' }}>
-              <CardContent>
-                <Typography variant="h5" align="center">{t('basic_plan')}</Typography>
-                <ul>
-                  <li>{t('one_playlist')}</li>
-                  <li>{t('ten_songs_limit')}</li>
-                  <li>{t('five_dollars_month')}</li>
-                </ul>
-                <Button variant="outlined" color="primary" fullWidth>
-                  {t('choose_basic')}
-                </Button>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Card sx={{ backgroundColor: '#ffffffcc', borderRadius: '16px' }}>
-              <CardContent>
-                <Typography variant="h5" align="center">{t('pro_plan')}</Typography>
-                <ul>
-                  <li>{t('unlimited_playlists')}</li>
-                  <li>{t('unlimited_songs')}</li>
-                  <li>{t('additional_features')}</li>
-                  <li>{t('ten_dollars_month')}</li>
-                </ul>
-                <Button variant="outlined" color="secondary" fullWidth>
-                  {t('choose_pro')}
-                </Button>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-        <HowItWorksSection /> <AboutUsSection />
+      <HowItWorksSection /> 
+      <PricesSection />
+      <AboutUsSection />
       </Container>
 
       <VerificationModal
