@@ -1,3 +1,4 @@
+//Homepage.js
 import React, { useState, useRef, useEffect } from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, Paper, ClickAwayListener, Link, Container, Grid, Card, CardContent, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -7,7 +8,10 @@ import StockImage from '../assets/vote_song_background.png';
 import Login from './Login';
 import RegisterBand from './RegisterBand';
 import { useTranslation } from 'react-i18next';
-import { HowItWorksSection, AboutUsSection, PricesSection } from './HowItWorksSection';
+import { HowItWorksSection } from './HowItWorksSection';
+import { AboutUsSection } from './AboutUsSection';
+import { PricesSection } from './PricesSection';
+
 import VerificationModal from './VerificationModal';
 import ContactForm from './ContactForm';
 
@@ -48,25 +52,7 @@ const Homepage = () => {
     };
   }, []);
 
-  const initiateCheckout = () => {
-    if (window.Paddle) {
-      window.Paddle.Checkout.open({
-        product: 'pro_01jbcra0n260dk8mtj7w02myc8',
-        successCallback: (data) => {
-          console.log('Payment Successful:', data);
-        },
-        closeCallback: () => {
-          console.warn('Checkout was closed.');
-        },
-        errorCallback: (error) => {
-          console.error('Checkout Error:', error);
-        },
-        passthrough: 'live_fc1e0defb6165bb3c844fc0177b', // Token eklemek gerekiyorsa buraya ekleyin
-      });
-    } else {
-      console.error('Paddle is not initialized');
-    }
-  };
+
 
   const handleLoginToggle = () => setLoginOpen((prev) => !prev);
   const handleRegisterToggle = () => setRegisterOpen((prev) => !prev);
@@ -168,24 +154,7 @@ const Homepage = () => {
         <Typography variant="h5">{t('engage_audience')}</Typography>
       </Box>
 
-      <Container maxWidth="lg" sx={{ py: 10 }}>
-        <Grid container spacing={2} justifyContent="center">
-          <Grid item>
-            <Card onClick={() => initiateCheckout('pro_01jbcra0n260dk8mtj7w02myc8')}>
-              <CardContent>
-                <Typography variant="h5">Aylık Abonelik</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item>
-            <Card onClick={() => initiateCheckout('YEARLY_PLAN_ID')}>
-              <CardContent>
-                <Typography variant="h5">Yıllık Abonelik</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-
+      <Container maxWidth="lg" sx={{ py: 10 }}> 
         <HowItWorksSection />
         <PricesSection />
         <AboutUsSection />
