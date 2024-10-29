@@ -48,13 +48,20 @@ const Homepage = () => {
     };
   }, []);
 
-  const initiateCheckout = (planId) => {
+  const initiateCheckout = () => {
     if (window.Paddle) {
       window.Paddle.Checkout.open({
-        product: planId,
+        product: 'pro_01jbcra0n260dk8mtj7w02myc8',
         successCallback: (data) => {
           console.log('Payment Successful:', data);
         },
+        closeCallback: () => {
+          console.warn('Checkout was closed.');
+        },
+        errorCallback: (error) => {
+          console.error('Checkout Error:', error);
+        },
+        passthrough: 'live_fc1e0defb6165bb3c844fc0177b', // Token eklemek gerekiyorsa buraya ekleyin
       });
     } else {
       console.error('Paddle is not initialized');
