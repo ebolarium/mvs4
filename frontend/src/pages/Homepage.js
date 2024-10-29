@@ -164,7 +164,7 @@ const Homepage = () => {
       <Container maxWidth="lg" sx={{ py: 10 }}>
         <Grid container spacing={2} justifyContent="center">
           <Grid item>
-            <Card onClick={() => initiateCheckout('pri_01jbcrbmwd7tp7fncje2q7fy3k')}>
+            <Card onClick={() => initiateCheckout('pro_01jbcra0n260dk8mtj7w02myc8')}>
               <CardContent>
                 <Typography variant="h5">Aylık Abonelik</Typography>
               </CardContent>
