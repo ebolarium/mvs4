@@ -48,6 +48,7 @@ const CheckoutPage = () => {
     if (window.Paddle) {
       window.Paddle.Checkout.open({
         product: productId,
+        locale: 'en',
         // Optional: Pass user email and passthrough data if available
         // email: userEmail,
         // passthrough: JSON.stringify({ userId: userId }),

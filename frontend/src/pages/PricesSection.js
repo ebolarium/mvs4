@@ -24,6 +24,8 @@ const PricesSection = ({ isLoggedIn, openLoginModal }) => {
           errorCallback: (error) => {
             console.error('Checkout Error:', error);
           },
+          locale: 'en',
+
         });
       } else {
         console.error('Paddle is not initialized');
