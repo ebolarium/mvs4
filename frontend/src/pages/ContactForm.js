@@ -35,7 +35,7 @@ const ContactForm = () => {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ py: 5 }}>
+    <Container maxWidth="sm" sx={{ py: 0 }}>
       <Card sx={{ backgroundColor: '#ffffffcc', boxShadow: 3, borderRadius: 2 }}>
         <CardContent>
           <Typography variant="h4" align="center" gutterBottom>

@@ -11,7 +11,6 @@ import { useTranslation } from 'react-i18next';
 import { HowItWorksSection } from './HowItWorksSection';
 import { AboutUsSection } from './AboutUsSection';
 import { PricesSection } from './PricesSection';
-
 import VerificationModal from './VerificationModal';
 import ContactForm from './ContactForm';
 
@@ -31,7 +30,6 @@ const Homepage = () => {
     }
   }, []);
 
-  
   // Paddle.js yüklenir ve Paddle.Setup() garanti edilir
   useEffect(() => {
     const script = document.createElement('script');
@@ -52,8 +50,6 @@ const Homepage = () => {
     };
   }, []);
 
-
-
   const handleLoginToggle = () => setLoginOpen((prev) => !prev);
   const handleRegisterToggle = () => setRegisterOpen((prev) => !prev);
   const handleLoginClose = (event) => {
@@ -65,7 +61,6 @@ const Homepage = () => {
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
     setLoginOpen(false);
-    navigate('/dashboard');
   };
 
   const handleRegisterSuccess = () => {
@@ -75,7 +70,15 @@ const Homepage = () => {
 
   const handleVerificationModalClose = () => {
     setShowVerificationModal(false);
-    navigate('/');
+  };
+
+  const initiatePlanSelection = () => {
+    if (!isLoggedIn) {
+      // Kullanıcı giriş yapmadıysa giriş modalını açalım
+      alert(t('login_required_to_select_plan')); // Uyarı mesajı
+      setLoginOpen(true); // Giriş modalını aç
+    }
+    // Kullanıcı giriş yaptıysa zaten PricesSection bileşeninde planı seçebilecektir
   };
 
   return (
@@ -148,16 +151,16 @@ const Homepage = () => {
         </Box>
       )}
 
-      <Box sx={{ color: '#fff', textAlign: 'center', py: 8 }}>
+      <Box sx={{ color: '#fff', textAlign: 'center', py: 5 }}>
         <img src={Logo} alt={t('vote_song_logo')} width={200} style={{ marginBottom: '1rem' }} />
         <Typography variant="h2" gutterBottom>{t('elevate_music')}</Typography>
         <Typography variant="h5">{t('engage_audience')}</Typography>
       </Box>
 
-      <Container maxWidth="lg" sx={{ py: 10 }}> 
+      <Container maxWidth="lg" sx={{ py: 0 }}>
+        <PricesSection isLoggedIn={isLoggedIn} openLoginModal={handleLoginToggle} initiatePlanSelection={initiatePlanSelection} />
         <HowItWorksSection />
-        <PricesSection />
-        <AboutUsSection />
+        <AboutUsSection /> 
       </Container>
 
       <VerificationModal
