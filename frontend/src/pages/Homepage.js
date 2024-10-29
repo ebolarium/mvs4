@@ -9,8 +9,7 @@ import RegisterBand from './RegisterBand';
 import { useTranslation } from 'react-i18next';
 import { HowItWorksSection, AboutUsSection, PricesSection } from './HowItWorksSection';
 import VerificationModal from './VerificationModal';
-import ContactForm from './ContactForm'; // ContactForm'u içeri aktarıyoruz
-
+import ContactForm from './ContactForm';
 
 const Homepage = () => {
   const { t } = useTranslation();
@@ -21,7 +20,6 @@ const Homepage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
 
-  // Kullanıcı giriş yapmış mı kontrol eder
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -29,17 +27,46 @@ const Homepage = () => {
     }
   }, []);
 
-  // Login ve Register modal açma/kapatma işlevleri
-  const handleLoginToggle = () => setLoginOpen((prev) => !prev);
-  const handleRegisterToggle = () => setRegisterOpen((prev) => !prev);
+  
+  // Paddle.js yüklenir ve Paddle.Setup() garanti edilir
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.paddle.com/paddle/paddle.js';
+    script.async = true;
+    script.onload = () => {
+      if (window.Paddle) {
+        window.Paddle.Setup({ vendor: 207125 }); // Satıcı ID'nizi ekleyin
+        console.log('Paddle.js successfully set up');
+      } else {
+        console.error('Paddle is not available');
+      }
+    };
+    document.body.appendChild(script);
 
-  const handleLoginClose = (event) => {
-    if (anchorRef.current && anchorRef.current.contains(event.target)) {
-      return;
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  const initiateCheckout = (planId) => {
+    if (window.Paddle) {
+      window.Paddle.Checkout.open({
+        product: planId,
+        successCallback: (data) => {
+          console.log('Payment Successful:', data);
+        },
+      });
+    } else {
+      console.error('Paddle is not initialized');
     }
-    setLoginOpen(false);
   };
 
+  const handleLoginToggle = () => setLoginOpen((prev) => !prev);
+  const handleRegisterToggle = () => setRegisterOpen((prev) => !prev);
+  const handleLoginClose = (event) => {
+    if (anchorRef.current && anchorRef.current.contains(event.target)) return;
+    setLoginOpen(false);
+  };
   const handleRegisterClose = () => setRegisterOpen(false);
 
   const handleLoginSuccess = () => {
@@ -76,17 +103,11 @@ const Homepage = () => {
           </Box>
           <Box>
             {isLoggedIn ? (
-              <Button color="inherit" onClick={() => navigate('/dashboard')}>
-                {t('dashboard')}
-              </Button>
+              <Button color="inherit" onClick={() => navigate('/dashboard')}>{t('dashboard')}</Button>
             ) : (
               <>
-                <Button ref={anchorRef} color="inherit" onClick={handleLoginToggle}>
-                  {t('login')}
-                </Button>
-                <Button color="inherit" onClick={handleRegisterToggle}>
-                  {t('register')}
-                </Button>
+                <Button ref={anchorRef} color="inherit" onClick={handleLoginToggle}>{t('login')}</Button>
+                <Button color="inherit" onClick={handleRegisterToggle}>{t('register')}</Button>
               </>
             )}
           </Box>
@@ -127,10 +148,7 @@ const Homepage = () => {
             width: 400,
           }}
         >
-          <IconButton
-            onClick={handleRegisterClose}
-            sx={{ position: 'absolute', top: 8, right: 8 }}
-          >
+          <IconButton onClick={handleRegisterClose} sx={{ position: 'absolute', top: 8, right: 8 }}>
             <CloseIcon />
           </IconButton>
           <RegisterBand onRegisterSuccess={handleRegisterSuccess} />
@@ -144,9 +162,26 @@ const Homepage = () => {
       </Box>
 
       <Container maxWidth="lg" sx={{ py: 10 }}>
-      <HowItWorksSection /> 
-      <PricesSection />
-      <AboutUsSection />
+        <Grid container spacing={2} justifyContent="center">
+          <Grid item>
+            <Card onClick={() => initiateCheckout('pri_01jbcrbmwd7tp7fncje2q7fy3k')}>
+              <CardContent>
+                <Typography variant="h5">Aylık Abonelik</Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item>
+            <Card onClick={() => initiateCheckout('YEARLY_PLAN_ID')}>
+              <CardContent>
+                <Typography variant="h5">Yıllık Abonelik</Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+
+        <HowItWorksSection />
+        <PricesSection />
+        <AboutUsSection />
       </Container>
 
       <VerificationModal
@@ -154,39 +189,27 @@ const Homepage = () => {
         onClose={handleVerificationModalClose}
         message="Thank you for registering! Please verify your email."
       />
-
-    <ContactForm />
-    <Footer /> {/* Footer bileşenini ekliyoruz */}
-
-
+      <ContactForm />
+      <Footer />
     </Box>
   );
 };
-
 
 const Footer = () => (
   <Box sx={{ backgroundColor: '#1c1c1c', color: '#fff', py: 3, mt: 4 }}>
     <Container maxWidth="lg">
       <Grid container spacing={2} justifyContent="center">
         <Grid item>
-          <Link href="/terms-of-service" color="inherit" underline="hover">
-            Terms of Service
-          </Link>
+          <Link href="/terms-of-service" color="inherit" underline="hover">Terms of Service</Link>
         </Grid>
         <Grid item>
-          <Link href="/privacy-policy" color="inherit" underline="hover">
-            Privacy Policy
-          </Link>
+          <Link href="/privacy-policy" color="inherit" underline="hover">Privacy Policy</Link>
         </Grid>
         <Grid item>
-          <Link href="/refund-policy" color="inherit" underline="hover">
-            Refund Policy
-          </Link>
+          <Link href="/refund-policy" color="inherit" underline="hover">Refund Policy</Link>
         </Grid>
       </Grid>
-      <Typography variant="body2" align="center" sx={{ mt: 2 }}>
-        © 2024 VoteSong. All rights reserved.
-      </Typography>
+      <Typography variant="body2" align="center" sx={{ mt: 2 }}>© 2024 VoteSong. All rights reserved.</Typography>
     </Container>
   </Box>
 );

@@ -26,7 +26,7 @@ i18n
         translation: translationEs,
       },
     },
-    lng: 'tr', // Varsayılan dil
+    lng: 'en', // Varsayılan dil
 //  lng: navigator.language || 'en', // Varsayılan dili tarayıcı dili yapmak için bunu aç, üsttekini kapat.
 
     fallbackLng: 'en', // Belirli bir dil bulunamazsa kullanılacak dil

@@ -35,8 +35,8 @@ const RefundPolicy = () => {
         </Typography>
         <Typography paragraph>
           To request a refund, please contact us at{' '}
-          <Link href="mailto:info@example.com" underline="hover">
-            info@example.com
+          <Link href="mailto:support@votesong.live" underline="hover">
+            support@votesong.live
           </Link>{' '}
           with your payment details.
         </Typography>
