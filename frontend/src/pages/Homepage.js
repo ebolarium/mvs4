@@ -39,7 +39,7 @@ const Homepage = () => {
       if (window.Paddle) {
         // Set Paddle to Sandbox environment
         window.Paddle.Environment.set('sandbox');
-        window.Paddle.Setup({ vendor: '24248' });
+        window.Paddle.Setup({ vendor: 24248 });
         console.log('Paddle.js successfully set up');
       } else {
         console.error('Paddle is not available');
