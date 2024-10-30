@@ -5,7 +5,7 @@ const router = express.Router();
 // productsProxy.js
 router.get('/products', async (req, res) => {
     try {
-      const response = await fetch('https://sandbox-api.paddle.com/prices', {
+      const response = await fetch('https://sandbox-api.paddle.com/products', {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer 0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19', // Özel token bilgisi
