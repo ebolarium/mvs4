@@ -73,6 +73,7 @@ const Homepage = () => {
   
     fetchProducts();
   }, []);
+  
 
 
 

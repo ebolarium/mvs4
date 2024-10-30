@@ -1,4 +1,3 @@
-//PricesSections.js
 import React from 'react';
 import { Box, Container, Grid, Card, CardContent, Typography, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +15,7 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
       if (window.Paddle) {
           window.Paddle.Checkout.open({
               product: productId,
-              vendor: 24248, // Vendor ID'yi burada belirtmek önemli.
+              vendor: 24248, // Vendor ID ekleniyor
               successCallback: (data) => {
                   console.log('Payment Successful:', data);
               },
@@ -54,7 +53,7 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
                                       {product.name}
                                   </Typography>
                                   <Typography variant="h6" align="center" color="primary" gutterBottom>
-                                      {/* Ürün fiyatını dinamik göstermek isterseniz burada eklemelisiniz */}
+                                      {`Price: ${product.price ? product.price : 'N/A'}`} {/* Ürün fiyatını dinamik göstermek isterseniz burada */}
                                   </Typography>
                                   <Typography variant="body1" align="center" sx={{ mb: 2 }}>
                                       {product.description}
@@ -71,6 +70,5 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
       </Box>
   );
 };
-
 
 export { PricesSection };
