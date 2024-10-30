@@ -7,31 +7,31 @@ const PricesSection = ({ isLoggedIn, openLoginModal }) => {
     const { t } = useTranslation();
 
     const initiateCheckout = (productId) => {
-      if (!isLoggedIn) {
-        alert(t('login_required_to_purchase')); // Kullanıcıya uyarı ver
-        openLoginModal(); // Giriş modalını aç
-        return;
-      }
-
-      if (window.Paddle) {
-        window.Paddle.Checkout.open({
-          product: productId,
-          successCallback: (data) => {
-            console.log('Payment Successful:', data);
-          },
-          closeCallback: () => {
-            console.warn('Checkout was closed.');
-          },
-          errorCallback: (error) => {
-            console.error('Checkout Error:', error);
-          },
-          locale: 'en',
-
-        });
-      } else {
-        console.error('Paddle is not initialized');
-      }
-    };
+        if (!isLoggedIn) {
+          alert(t('login_required_to_purchase'));
+          openLoginModal();
+          return;
+        }
+      
+        if (window.Paddle) {
+          window.Paddle.Checkout.open({
+            product: productId, // Ürün ID'si
+            successCallback: (data) => {
+              console.log('Payment Successful:', data);
+            },
+            closeCallback: () => {
+              console.warn('Checkout was closed.');
+            },
+            errorCallback: (error) => {
+              console.error('Checkout Error:', error);
+            },
+            locale: 'en',
+          });
+        } else {
+          console.error('Paddle is not initialized');
+        }
+      };
+      
 
     return (
       <Box sx={{ py: 2, backgroundColor: 'rgba(255, 255, 255, 0.8)' }}> 
