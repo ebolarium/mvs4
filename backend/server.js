@@ -15,7 +15,9 @@ const fs = require('fs');
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const spotifyAuthRoutes = require('./routes/spotifyAuth');
-const emailRoute = require('./routes/emailRoute'); // If in a separate routes folder
+const emailRoute = require('./routes/emailRoute');
+
+const Band = require('./models/Band'); // Import the Band model
 
 const app = express();
 const server = http.createServer(app);
@@ -35,7 +37,7 @@ app.use(i18n.init);
 
 // Middleware
 app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true })); // For handling URL-encoded data
+app.use(bodyParser.urlencoded({ extended: false })); // For handling URL-encoded data
 
 // CORS Middleware
 app.use(
@@ -65,7 +67,7 @@ app.use('/api/spotify', spotifyAuthRoutes);
 app.use('/api', emailRoute); // Include the email route
 
 // Paddle Webhook Endpoint
-app.post('/paddle/webhook', (req, res) => {
+app.post('/paddle/webhook', async (req, res) => {
   const { p_signature, ...fields } = req.body;
 
   // Convert fields to correct data types
@@ -90,41 +92,72 @@ app.post('/paddle/webhook', (req, res) => {
     sorted[key] = fields[key];
   });
 
-  // Serialize the sorted object to a string
-  const serialized = sortedKeys
-    .map((key) => {
-      if (typeof sorted[key] === 'object') {
-        return JSON.stringify(sorted[key]);
-      }
-      return sorted[key];
-    })
-    .join('');
+  // Serialize the sorted object to JSON string
+  const serialized = JSON.stringify(sorted);
 
   // Prepare the public key
   let publicKey = process.env.PADDLE_PUBLIC_KEY.replace(/\\n/g, '\n');
-  publicKey = `-----BEGIN PUBLIC KEY-----\n${publicKey}\n-----END PUBLIC KEY-----`;
+  publicKey = `-----BEGIN PUBLIC KEY-----
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA4cr8bsSkSWHf4l/anMa6
+Kca3ldITgBKv0yWJvK/o0jJHUYF3itSaLSJHH+XE/KieE99MqgvMIDLb69LhiK0i
+77Rz85asEjawP7woDkQmq6qi1qBV28rXJiTMGuzshnp6Y5lodgM8vEoEXrJLWyPZ
+tkjFZbr7bs+5HiJxdEaRmbqJ585jmTLielMuZUPH4hyH9qFjzADJDiaSsSaRuhBj
+81P92XWOoq9HRZgWAkotowx14pTTtmu4USAznJwWkVVSSnSswzlP7qYFhxrKI1c8
+9SflSIxl06CPPmxF5wgaJoALZyUfA7SFAPD4fnVkBYnMoCBjeFuZNhD4o9zsHfnh
+1UlsiypwayKh4tV0tuBcljQYpzgXTQei6AntFLsV/zWPMchqE/1mPyy2g2Ljt8rC
+oC8vS5XXKJkLrpC4lvAep57+XiVCGc/wSOSWVXeL/ssOfYtysB8HHQic9f0aPWzm
+lNT4DuZ366t1PMFcxSs+R2EqRSuwHDzVj6Aqo0Ok0osdP+wP+u1hS3+Cied4C5Bo
+XdBZ2BDajxvW9UA0kqEtJ+b2xgNkViUSU6VIq/smJFMF3lhkRUZ9BQV3S1njvsqb
+XhItJqwfXBfNMS9669K42oUtU8wGPnWGCVCdUV1F5/zJ2fXfcitfpT/FSybOSLaU
+3v48COcsOJFKLP6bY4YlIjMCAwEAAQ==
+-----END PUBLIC KEY-----`;
 
   // Verify the signature
-  const verifier = crypto.createVerify('RSA-SHA1');
+  const verifier = crypto.createVerify('sha1');
   verifier.update(serialized);
-  const isValid = verifier.verify(publicKey, p_signature, 'base64');
+  const isValid = verifier.verify(publicKey, Buffer.from(p_signature, 'base64'));
 
   if (isValid) {
     const alertName = fields.alert_name;
+    const email = fields.email; // Customer's email from Paddle webhook
 
-    switch (alertName) {
-      case 'subscription_created':
-        // Update user's subscription status in your database
-        break;
-      case 'subscription_cancelled':
-        // Update user's subscription status in your database
-        break;
-      // Handle other events as needed
-      default:
-        break;
+    try {
+      // Find the band by email
+      const band = await Band.findOne({ band_email: email });
+
+      if (!band) {
+        console.error(`Band with email ${email} not found.`);
+        return res.sendStatus(200); // Respond 200 to Paddle
+      }
+
+      switch (alertName) {
+        case 'subscription_created':
+        case 'subscription_updated':
+        case 'subscription_payment_succeeded':
+          // Set is_premium to true
+          band.is_premium = true;
+          await band.save();
+          console.log(`Band ${email} upgraded to premium.`);
+          break;
+
+        case 'subscription_cancelled':
+        case 'subscription_payment_failed':
+          // Set is_premium to false
+          band.is_premium = false;
+          await band.save();
+          console.log(`Band ${email} downgraded from premium.`);
+          break;
+
+        default:
+          console.log(`Unhandled alert: ${alertName}`);
+          break;
+      }
+
+      res.sendStatus(200); // Respond 200 to Paddle
+    } catch (error) {
+      console.error('Error handling webhook:', error);
+      res.sendStatus(500);
     }
-
-    res.sendStatus(200);
   } else {
     console.error('Invalid Paddle webhook signature');
     res.sendStatus(403); // Forbidden

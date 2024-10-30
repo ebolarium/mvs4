@@ -45,7 +45,7 @@ const PricesSection = ({ isLoggedIn, openLoginModal }) => {
             <Grid item xs={12} md={6}>
               <Card
                 sx={{ backgroundColor: '#ffffffcc', borderRadius: '16px', transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}
-                onClick={() => initiateCheckout('pro_01jbcra0n260dk8mtj7w02myc8')}
+                onClick={() => initiateCheckout('pri_01jbedvwaxzpn2q69p88e9yd96')}
               >
                 <CardContent>
                   <Typography variant="h5" align="center" gutterBottom>
@@ -67,7 +67,7 @@ const PricesSection = ({ isLoggedIn, openLoginModal }) => {
             <Grid item xs={12} md={6}>
               <Card
                 sx={{ backgroundColor: '#ffffffcc', borderRadius: '16px', transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}
-                onClick={() => initiateCheckout('pri_01jbcz80fzsbcsx54styqtfme0')}
+                onClick={() => initiateCheckout('pri_01jbedwnj09vd7hr99xyhddbsg')}
               >
                 <CardContent>
                   <Typography variant="h5" align="center" gutterBottom>
