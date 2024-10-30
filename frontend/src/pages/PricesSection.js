@@ -5,75 +5,72 @@ import { useTranslation } from 'react-i18next';
 const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
   const { t } = useTranslation();
 
-  const initiateCheckout = (productId) => {
-      if (!isLoggedIn) {
-          alert(t('login_required_to_purchase'));
-          openLoginModal();
-          return;
-      }
+  const initiateCheckout = (priceId) => {
+    if (!isLoggedIn) {
+      alert(t('login_required_to_purchase'));
+      openLoginModal();
+      return;
+    }
 
-      if (window.Paddle) {
-          window.Paddle.Checkout.open({
-              product: productId,
-              vendor: 24248, // Vendor ID ekleniyor
-              successCallback: (data) => {
-                  console.log('Payment Successful:', data);
-              },
-              closeCallback: () => {
-                  console.warn('Checkout was closed.');
-              },
-              errorCallback: (error) => {
-                  console.error('Checkout Error:', error);
-              },
-              locale: 'en',
-          });
-      } else {
-          console.error('Paddle is not initialized');
-      }
+    if (window.Paddle) {
+      window.Paddle.Checkout.open({
+        product: priceId,
+        vendor: 24248,
+        successCallback: (data) => {
+          console.log('Payment Successful:', data);
+        },
+        closeCallback: () => {
+          console.warn('Checkout was closed.');
+        },
+        errorCallback: (error) => {
+          console.error('Checkout Error:', error);
+        },
+        locale: 'en',
+      });
+    } else {
+      console.error('Paddle is not initialized');
+    }
   };
 
   return (
-      <Box sx={{ py: 2, backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
-          <Container maxWidth="md">
-              <Typography variant="h4" align="center" gutterBottom>
-                  {t('pricing.title')}
-              </Typography>
-              <Typography variant="body1" align="center" gutterBottom sx={{ mb: 4 }}>
-                  {t('pricing.subtitle')}
-              </Typography>
-  
-              <Grid container spacing={4} justifyContent="center">
-    {products.map((product) => (
-        product.prices.map((price) => (
-            <Grid item xs={12} md={6} key={price.id}>
+    <Box sx={{ py: 2, backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
+      <Container maxWidth="md">
+        <Typography variant="h4" align="center" gutterBottom>
+          {t('pricing.title')}
+        </Typography>
+        <Typography variant="body1" align="center" gutterBottom sx={{ mb: 4 }}>
+          {t('pricing.subtitle')}
+        </Typography>
+
+        <Grid container spacing={4} justifyContent="center">
+          {products.map((product) =>
+            product.prices.map((price) => (
+              <Grid item xs={12} md={6} key={price.id}>
                 <Card
-                    sx={{ backgroundColor: '#ffffffcc', borderRadius: '16px', transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}
-                    onClick={() => initiateCheckout(price.id)}
+                  sx={{ backgroundColor: '#ffffffcc', borderRadius: '16px', transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}
+                  onClick={() => initiateCheckout(price.id)}
                 >
-                    <CardContent>
-                        <Typography variant="h5" align="center" gutterBottom>
-                            {product.name}
-                        </Typography>
-                        <Typography variant="h6" align="center" color="primary" gutterBottom>
-                            {`Price: $${price.amount}`} {/* Burada her fiyat için ayrı bir kart */}
-                        </Typography>
-                        <Typography variant="body1" align="center" sx={{ mb: 2 }}>
-                            {product.description}
-                        </Typography>
-                        <Button variant="contained" color="primary" fullWidth>
-                            {t('pricing.purchase_button')}
-                        </Button>
-                    </CardContent>
+                  <CardContent>
+                    <Typography variant="h5" align="center" gutterBottom>
+                      {product.name}
+                    </Typography>
+                    <Typography variant="h6" align="center" color="primary" gutterBottom>
+                      {`Price: $${price.amount || "N/A"}`} {/* Burada her fiyat için ayrı bir kart */}
+                    </Typography>
+                    <Typography variant="body1" align="center" sx={{ mb: 2 }}>
+                      {product.description}
+                    </Typography>
+                    <Button variant="contained" color="primary" fullWidth>
+                      {t('pricing.purchase_button')}
+                    </Button>
+                  </CardContent>
                 </Card>
-            </Grid>
-        ))
-    ))}
-</Grid>
-
-
-
-          </Container>
-      </Box>
+              </Grid>
+            ))
+          )}
+        </Grid>
+      </Container>
+    </Box>
   );
 };
 
