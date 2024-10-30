@@ -16,7 +16,7 @@ const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const spotifyAuthRoutes = require('./routes/spotifyAuth');
 const emailRoute = require('./routes/emailRoute');
-
+const productsProxyRoutes = require('./routes/productsProxy'); // En üstte import et
 const Band = require('./models/Band'); // Import the Band model
 
 const app = express();
@@ -65,6 +65,9 @@ app.use('/api/songs', songRoutes);
 app.use('/api/playlist', playlistRoutes);
 app.use('/api/spotify', spotifyAuthRoutes);
 app.use('/api', emailRoute); // Include the email route
+app.use('/api', productsProxyRoutes); // Routes kısmında ekle
+
+
 
 const querystring = require('querystring'); // Add this at the top
 

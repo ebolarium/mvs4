@@ -59,14 +59,7 @@ const Homepage = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('https://sandbox-api.paddle.com/products', {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer 0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19`,
-            'Vendor-Id': '24248'
-          }
-        });
-  
+        const response = await fetch('/api/products'); // Proxy endpoint'ine istek yap
         const data = await response.json();
         if (data.data) {
           setProducts(data.data);
