@@ -16,6 +16,7 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
       if (window.Paddle) {
           window.Paddle.Checkout.open({
               product: productId,
+              vendor: 24248, // Vendor ID'yi burada belirtmek önemli.
               successCallback: (data) => {
                   console.log('Payment Successful:', data);
               },
