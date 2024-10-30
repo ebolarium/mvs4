@@ -39,7 +39,7 @@ const Homepage = () => {
       if (window.Paddle) {
         // Set Paddle to Sandbox environment
         window.Paddle.Environment.set('sandbox');
-        window.Paddle.Setup({ vendor: YOUR_SANDBOX_VENDOR_ID });
+        window.Paddle.Setup({ vendor: '24248' });
         console.log('Paddle.js successfully set up');
       } else {
         console.error('Paddle is not available');
@@ -51,7 +51,7 @@ const Homepage = () => {
       document.body.removeChild(script);
     };
   }, []);
-  
+
   const handleLoginToggle = () => setLoginOpen((prev) => !prev);
   const handleRegisterToggle = () => setRegisterOpen((prev) => !prev);
   const handleLoginClose = (event) => {
