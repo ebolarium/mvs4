@@ -1,4 +1,4 @@
-//Homepage.js
+// Homepage.js
 import React, { useState, useRef, useEffect } from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, Paper, ClickAwayListener, Link, Container, Grid, Card, CardContent, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -14,7 +14,6 @@ import { PricesSection } from './PricesSection';
 import VerificationModal from './VerificationModal';
 import ContactForm from './ContactForm';
 
-
 const Homepage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -25,7 +24,7 @@ const Homepage = () => {
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [products, setProducts] = useState([]);
 
-
+  // Kullanıcı giriş durumunu kontrol etme
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -33,14 +32,13 @@ const Homepage = () => {
     }
   }, []);
 
-  // Paddle.js yüklenir ve Paddle.Setup() garanti edilir
+  // Paddle.js yükleme ve Paddle.Setup() işlemi
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://cdn.paddle.com/paddle/paddle.js';
     script.async = true;
     script.onload = () => {
       if (window.Paddle) {
-        // Set Paddle to Sandbox environment
         window.Paddle.Environment.set('sandbox');
         window.Paddle.Setup({ vendor: 24248 });
         console.log('Paddle.js successfully set up');
@@ -49,35 +47,47 @@ const Homepage = () => {
       }
     };
     document.body.appendChild(script);
-  
+
     return () => {
       document.body.removeChild(script);
     };
   }, []);
 
-
+  // Ürünleri Paddle API'den çekme
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchProductPrices = async (productId) => {
       try {
-        const response = await fetch('/api/products'); // Proxy endpoint'ine istek yap
+        const response = await fetch(`/api/products/${productId}/prices`);
         const data = await response.json();
-        if (data.data) {
-          setProducts(data.data);
-        } else {
-          console.error("Failed to fetch products: ", data.error);
-        }
+        return data.prices; // Fiyat bilgilerini döner
+      } catch (error) {
+        console.error("Error fetching product prices: ", error);
+        return [];
+      }
+    };
+
+    const fetchProductsWithPrices = async () => {
+      try {
+        const response = await fetch('/api/products'); // Ürünleri çekiyoruz
+        const productsData = await response.json();
+
+        // Ürünlerin fiyatlarını çekiyoruz
+        const productsWithPrices = await Promise.all(productsData.data.map(async (product) => {
+          const prices = await fetchProductPrices(product.id);
+          return {
+            ...product,
+            prices,
+          };
+        }));
+
+        setProducts(productsWithPrices);
       } catch (error) {
         console.error("Error fetching products: ", error);
       }
     };
-  
-    fetchProducts();
+
+    fetchProductsWithPrices();
   }, []);
-  
-
-
-
-
 
   const handleLoginToggle = () => setLoginOpen((prev) => !prev);
   const handleRegisterToggle = () => setRegisterOpen((prev) => !prev);
@@ -103,11 +113,9 @@ const Homepage = () => {
 
   const initiatePlanSelection = () => {
     if (!isLoggedIn) {
-      // Kullanıcı giriş yapmadıysa giriş modalını açalım
-      alert(t('login_required_to_select_plan')); // Uyarı mesajı
+      alert(t('login_required_to_select_plan')); // Kullanıcı giriş yapmadıysa uyarı mesajı
       setLoginOpen(true); // Giriş modalını aç
     }
-    // Kullanıcı giriş yaptıysa zaten PricesSection bileşeninde planı seçebilecektir
   };
 
   return (
@@ -187,9 +195,14 @@ const Homepage = () => {
       </Box>
 
       <Container maxWidth="lg" sx={{ py: 0 }}>
-      <PricesSection isLoggedIn={isLoggedIn} openLoginModal={handleLoginToggle} initiatePlanSelection={initiatePlanSelection} products={products} />
-      <HowItWorksSection />
-        <AboutUsSection /> 
+        <PricesSection
+          isLoggedIn={isLoggedIn}
+          openLoginModal={handleLoginToggle}
+          initiatePlanSelection={initiatePlanSelection}
+          products={products}
+        />
+        <HowItWorksSection />
+        <AboutUsSection />
       </Container>
 
       <VerificationModal
