@@ -55,29 +55,27 @@ const Homepage = () => {
 
   // Ürünleri Paddle API'den çekme
   useEffect(() => {
-    const fetchProductPrices = async (productId) => {
-      try {
-        const response = await fetch(`/api/products/${productId}/prices`);
-        const data = await response.json();
-        return data.prices; // Fiyat bilgilerini döner
-      } catch (error) {
-        console.error("Error fetching product prices: ", error);
-        return [];
-      }
-    };
-
     const fetchProductsWithPrices = async () => {
       try {
-        const response = await fetch('/api/products'); // Ürünleri çekiyoruz
+        const response = await fetch('/api/products');
         const productsData = await response.json();
 
         // Ürünlerin fiyatlarını çekiyoruz
         const productsWithPrices = await Promise.all(productsData.data.map(async (product) => {
-          const prices = await fetchProductPrices(product.id);
-          return {
-            ...product,
-            prices,
-          };
+          try {
+            const response = await fetch(`/api/products/${product.id}/prices`);
+            const priceData = await response.json();
+            return {
+              ...product,
+              prices: priceData.prices,
+            };
+          } catch (error) {
+            console.error("Error fetching product prices: ", error);
+            return {
+              ...product,
+              prices: [],
+            };
+          }
         }));
 
         setProducts(productsWithPrices);
