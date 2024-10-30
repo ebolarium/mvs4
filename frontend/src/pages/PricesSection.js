@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
   const { t } = useTranslation();
 
-  const initiateCheckout = (priceId) => {
+  const initiateCheckout = (productId) => {
     if (!isLoggedIn) {
       alert(t('login_required_to_purchase'));
       openLoginModal();
@@ -14,7 +14,7 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
 
     if (window.Paddle) {
       window.Paddle.Checkout.open({
-        product: priceId,
+        product: productId,
         vendor: 24248,
         successCallback: (data) => {
           console.log('Payment Successful:', data);
@@ -43,31 +43,29 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
         </Typography>
 
         <Grid container spacing={4} justifyContent="center">
-          {products.map((product) =>
-            product.prices.map((price) => (
-              <Grid item xs={12} md={6} key={price.id}>
-                <Card
-                  sx={{ backgroundColor: '#ffffffcc', borderRadius: '16px', transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}
-                  onClick={() => initiateCheckout(price.id)}
-                >
-                  <CardContent>
-                    <Typography variant="h5" align="center" gutterBottom>
-                      {product.name}
-                    </Typography>
-                    <Typography variant="h6" align="center" color="primary" gutterBottom>
-                      {`Price: $${price.amount || "N/A"}`} {/* Burada her fiyat için ayrı bir kart */}
-                    </Typography>
-                    <Typography variant="body1" align="center" sx={{ mb: 2 }}>
-                      {product.description}
-                    </Typography>
-                    <Button variant="contained" color="primary" fullWidth>
-                      {t('pricing.purchase_button')}
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))
-          )}
+          {products.map((product) => (
+            <Grid item xs={12} md={6} key={product.id}>
+              <Card
+                sx={{ backgroundColor: '#ffffffcc', borderRadius: '16px', transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}
+                onClick={() => initiateCheckout(product.id)}
+              >
+                <CardContent>
+                  <Typography variant="h5" align="center" gutterBottom>
+                    {product.name}
+                  </Typography>
+                  <Typography variant="h6" align="center" color="primary" gutterBottom>
+                    {`Price: $${product.price} ${product.currency}`} 
+                  </Typography>
+                  <Typography variant="body1" align="center" sx={{ mb: 2 }}>
+                    {product.description}
+                  </Typography>
+                  <Button variant="contained" color="primary" fullWidth>
+                    {t('pricing.purchase_button')}
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
         </Grid>
       </Container>
     </Box>

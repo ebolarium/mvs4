@@ -54,39 +54,22 @@ const Homepage = () => {
   }, []);
 
   // Ürünleri Paddle API'den çekme
+  
+
   useEffect(() => {
-    const fetchProductsWithPrices = async () => {
+    const fetchProducts = async () => {
       try {
         const response = await fetch('/api/products');
-        const productsData = await response.json();
-
-        // Ürünlerin fiyatlarını çekiyoruz
-        const productsWithPrices = await Promise.all(productsData.data.map(async (product) => {
-          try {
-            const response = await fetch(`/api/products/${product.id}/prices`);
-            const priceData = await response.json();
-            return {
-              ...product,
-              prices: priceData.prices,
-            };
-          } catch (error) {
-            console.error("Error fetching product prices: ", error);
-            return {
-              ...product,
-              prices: [],
-            };
-          }
-        }));
-
-        setProducts(productsWithPrices);
+        const data = await response.json();
+  
+        setProducts(data);
       } catch (error) {
         console.error("Error fetching products: ", error);
       }
     };
-
-    fetchProductsWithPrices();
+  
+    fetchProducts();
   }, []);
-
   const handleLoginToggle = () => setLoginOpen((prev) => !prev);
   const handleRegisterToggle = () => setRegisterOpen((prev) => !prev);
   const handleLoginClose = (event) => {
