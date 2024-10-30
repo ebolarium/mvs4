@@ -1,3 +1,4 @@
+//PricesSections.js
 import React from 'react';
 import { Box, Container, Grid, Card, CardContent, Typography, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';

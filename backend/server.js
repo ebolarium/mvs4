@@ -66,6 +66,8 @@ app.use('/api/playlist', playlistRoutes);
 app.use('/api/spotify', spotifyAuthRoutes);
 app.use('/api', emailRoute); // Include the email route
 
+const querystring = require('querystring'); // Add this at the top
+
 // Paddle Webhook Endpoint
 app.post('/paddle/webhook', async (req, res) => {
   const { p_signature, ...fields } = req.body;
@@ -92,12 +94,13 @@ app.post('/paddle/webhook', async (req, res) => {
     sorted[key] = fields[key];
   });
 
-  // Serialize the sorted object to JSON string
-  const serialized = JSON.stringify(sorted);
+  // Serialize the sorted object to query string format without URL encoding
+  const serialized = querystring.stringify(sorted, '&', '=', {
+    encodeURIComponent: (str) => str,
+  });
 
   // Prepare the public key
-  let publicKey = process.env.PADDLE_PUBLIC_KEY.replace(/\\n/g, '\n');
-  publicKey = `-----BEGIN PUBLIC KEY-----
+  let publicKey = `-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA4cr8bsSkSWHf4l/anMa6
 Kca3ldITgBKv0yWJvK/o0jJHUYF3itSaLSJHH+XE/KieE99MqgvMIDLb69LhiK0i
 77Rz85asEjawP7woDkQmq6qi1qBV28rXJiTMGuzshnp6Y5lodgM8vEoEXrJLWyPZ
