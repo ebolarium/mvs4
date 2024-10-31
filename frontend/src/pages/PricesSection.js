@@ -6,26 +6,26 @@ import { useTranslation } from 'react-i18next';
 const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId }) => {
   const { t } = useTranslation();
 
-  const initiateCheckout = (priceId) => {
-    console.log('Initiating checkout with priceId:', priceId);
+  const initiateCheckout = (productId) => {
+    console.log('Initiating checkout with productId:', productId);
     console.log('Logged In User ID:', loggedInUserId);
-  
+
     if (!isLoggedIn) {
       alert(t('login_required_to_purchase'));
       openLoginModal();
       return;
     }
-  
+
     if (!loggedInUserId) {
       console.error('loggedInUserId is null or undefined');
       alert(t('user_id_missing'));
       return;
     }
-  
+
     if (window.Paddle) {
       window.Paddle.Checkout.open({
-        product: priceId, // Paddle ürün kimliği
-        passthrough: JSON.stringify({ userId: loggedInUserId }), // Kullanıcı kimliğini geçiriyoruz
+        product: productId, // Paddle product ID (integer)
+        passthrough: JSON.stringify({ userId: loggedInUserId }),
         successCallback: (data) => {
           console.log('Payment Successful:', data);
           window.location.href = '/tesekkurler';
@@ -42,7 +42,6 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
       console.error('Paddle is not initialized');
     }
   };
-  
 
   return (
     <Box sx={{ py: 2, backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
@@ -56,9 +55,9 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
 
         <Grid container spacing={4} justifyContent="center">
           {products.map((product) => {
-            const priceId = product.id;  // 'pri_...' formatında priceId
+            const productId = product.id; // Paddle product ID (integer)
             return (
-              <Grid item xs={12} md={6} key={priceId}>
+              <Grid item xs={12} md={6} key={productId}>
                 <Card
                   sx={{ backgroundColor: '#ffffffcc', borderRadius: '16px', transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}
                 >
@@ -67,7 +66,7 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
                       {product.name}
                     </Typography>
                     <Typography variant="h6" align="center" color="primary" gutterBottom>
-                      {`Price: $${(product.price / 100).toFixed(2)} ${product.currency}`}
+                      {`Price: $${product.price} ${product.currency}`}
                     </Typography>
                     <Typography variant="body1" align="center" sx={{ mb: 2 }}>
                       {product.description}
@@ -76,7 +75,7 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
                       variant="contained" 
                       color="primary" 
                       fullWidth 
-                      onClick={() => initiateCheckout(priceId)} // Butona tıklama işlevini ekliyoruz
+                      onClick={() => initiateCheckout(productId)} // Use the correct product ID
                     >
                       {t('pricing.purchase_button')}
                     </Button>

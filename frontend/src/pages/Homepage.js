@@ -86,19 +86,30 @@ const Homepage = () => {
         return;
       }
   
-      const response = await fetch('/api/user', {
+      const response = await fetch('/bands/profile', {
         headers: {
           'Authorization': `Bearer ${token}`, 
         },
       });
   
+      if (!response.ok) {
+        console.error('Error fetching user data:', response.statusText);
+        return;
+      }
+  
       if (response.headers.get("content-type")?.includes("application/json")) {
         const data = await response.json();
+        console.log('Fetched user data:', data);
+  
+        // Adjust based on the actual field returned by your API
         if (data._id) {
-          setLoggedInUserId(data._id); // `_id` alanını loggedInUserId olarak ayarlıyoruz
+          setLoggedInUserId(data._id);
           console.log("User ID fetched successfully:", data._id);
+        } else if (data.id) {
+          setLoggedInUserId(data.id);
+          console.log("User ID fetched successfully:", data.id);
         } else {
-          console.error('Error: `_id` is missing in the response:', data);
+          console.error('Error: User ID is missing in the response:', data);
         }
       } else {
         console.error('Error: Response is not in JSON format');
@@ -106,8 +117,7 @@ const Homepage = () => {
     } catch (error) {
       console.error('An error occurred while fetching user data:', error);
     }
-  };
-  
+  };  
   
   const handleLoginToggle = () => setLoginOpen((prev) => !prev);
   const handleRegisterToggle = () => setRegisterOpen((prev) => !prev);
@@ -217,12 +227,12 @@ const Homepage = () => {
       </Box>
 
       <Container maxWidth="lg" sx={{ py: 0 }}>
-        <PricesSection
-          isLoggedIn={isLoggedIn}
-          openLoginModal={handleLoginToggle}
-          products={products}
-          loggedInUserId={loggedInUserId} // Kullanıcı kimliğini PricesSection bileşenine geçiriyoruz
-        />
+      <PricesSection
+      isLoggedIn={isLoggedIn}
+      openLoginModal={handleLoginToggle}
+      products={products}
+      loggedInUserId={loggedInUserId} // Pass the loggedInUserId
+    />
         <HowItWorksSection />
         <AboutUsSection />
       </Container>
