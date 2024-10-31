@@ -44,8 +44,8 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
 
         <Grid container spacing={4} justifyContent="center">
           {products.map((product) => {
-            // Log the price to check if it's an object or a direct number
-            console.log(product.price);
+            // Tüm product nesnesini konsola yazdır
+            console.log("Product Details:", product);
 
             return (
               <Grid item xs={12} md={6} key={product.id}>
@@ -58,9 +58,7 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
                       {product.name}
                     </Typography>
                     <Typography variant="h6" align="center" color="primary" gutterBottom>
-                      {product.price.amount !== undefined 
-                        ? `Price: $${product.price.amount} ${product.currency}` 
-                        : `Price: $${product.price} ${product.currency}`}
+                      {`Price: $${(product.price / 100).toFixed(2)} ${product.currency}`}
                     </Typography>
                     <Typography variant="body1" align="center" sx={{ mb: 2 }}>
                       {product.description}
