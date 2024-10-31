@@ -14,18 +14,19 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
 
     if (window.Paddle) {
       window.Paddle.Checkout.open({
-        product: productId,
-        vendor: 24248,
+        product: 'pri_01jbedvwaxzpn2q69p88e9yd96',  // Doğru ürün kimliği
+        vendor: 24248,  // Satıcı kimliği
+        passthrough: JSON.stringify({ userId: loggedInUserId }),  // Kullanıcı bilgisi (isteğe bağlı)
         successCallback: (data) => {
-          console.log('Payment Successful:', data);
+          console.log('Payment Successful:', data);  // Ödeme başarılı olduğunda tetiklenir
         },
         closeCallback: () => {
-          console.warn('Checkout was closed.');
+          console.warn('Checkout was closed.');  // Ödeme penceresi kapatıldığında tetiklenir
         },
         errorCallback: (error) => {
-          console.error('Checkout Error:', error);
+          console.error('Checkout Error:', error);  // Ödeme sırasında hata oluşursa tetiklenir
         },
-        locale: 'en',
+        locale: 'en',  // Dil ayarı
       });
     } else {
       console.error('Paddle is not initialized');
