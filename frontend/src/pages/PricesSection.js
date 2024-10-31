@@ -1,3 +1,4 @@
+// PricesSection.js
 import React from 'react';
 import { Box, Container, Grid, Card, CardContent, Typography, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
@@ -5,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
   const { t } = useTranslation();
 
-  const initiateCheckout = (priceId) => {
+  const initiateCheckout = (productId, priceId) => {
     if (!isLoggedIn) {
       alert(t('login_required_to_purchase'));
       openLoginModal();
@@ -13,8 +14,12 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
     }
 
     if (window.Paddle) {
+      console.log('Initiating checkout with Product ID:', productId);
+      console.log('Using Price ID:', priceId);
+
       window.Paddle.Checkout.open({
-        product: priceId,       // priceId'yi product parametresi olarak kullanıyoruz
+        product: productId, // Ürün ID'si (pro_... şeklinde)
+        override: priceId,  // Fiyat ID'si (pri_... şeklinde)
         successCallback: (data) => {
           console.log('Payment Successful:', data);
         },
@@ -31,7 +36,8 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
     }
   };
 
-  console.log("All Products:", products);
+  // Tüm ürün listesini konsola yazdır
+  console.log('All Products:', products);
 
   return (
     <Box sx={{ py: 2, backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
@@ -44,29 +50,40 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
         </Typography>
 
         <Grid container spacing={4} justifyContent="center">
-          {products.map((product) => (
-            <Grid item xs={12} md={6} key={product.id}>
-              <Card
-                sx={{ backgroundColor: '#ffffffcc', borderRadius: '16px', transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}
-                onClick={() => initiateCheckout(product.id)}  // priceId'yi burada kullanıyoruz
-              >
-                <CardContent>
-                  <Typography variant="h5" align="center" gutterBottom>
-                    {product.name}
-                  </Typography>
-                  <Typography variant="h6" align="center" color="primary" gutterBottom>
-                    {`Price: $${(product.price / 100).toFixed(2)} ${product.currency}`}
-                  </Typography>
-                  <Typography variant="body1" align="center" sx={{ mb: 2 }}>
-                    {product.description}
-                  </Typography>
-                  <Button variant="contained" color="primary" fullWidth>
-                    {t('pricing.purchase_button')}
-                  </Button>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
+          {products.map((product) => {
+            console.log('Product ID:', product.id);
+            console.log('Price ID:', product.price_id);
+            console.log('Product Details:', product);
+
+            return (
+              <Grid item xs={12} md={6} key={product.id}>
+                <Card
+                  sx={{
+                    backgroundColor: '#ffffffcc',
+                    borderRadius: '16px',
+                    transition: 'transform 0.3s',
+                    '&:hover': { transform: 'scale(1.05)' },
+                  }}
+                  onClick={() => initiateCheckout(product.id, product.price_id)}
+                >
+                  <CardContent>
+                    <Typography variant="h5" align="center" gutterBottom>
+                      {product.name}
+                    </Typography>
+                    <Typography variant="h6" align="center" color="primary" gutterBottom>
+                      {`Price: $${product.price} ${product.currency}`}
+                    </Typography>
+                    <Typography variant="body1" align="center" sx={{ mb: 2 }}>
+                      {product.description}
+                    </Typography>
+                    <Button variant="contained" color="primary" fullWidth>
+                      {t('pricing.purchase_button')}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Grid>
+            );
+          })}
         </Grid>
       </Container>
     </Box>
