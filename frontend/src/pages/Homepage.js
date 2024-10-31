@@ -74,12 +74,13 @@ const Homepage = () => {
   const fetchUserData = async () => {
     try {
       const response = await fetch('/api/user');
-      if (response.ok) {
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
         const data = await response.json();
         setLoggedInUserId(data.userId); // Kullanıcı kimliğini ayarla
         console.log('User Data:', data);
       } else {
-        console.error('Error fetching user data:', response.statusText);
+        console.error('Error: Response is not in JSON format:', contentType);
       }
     } catch (error) {
       console.error('An error occurred while fetching user data:', error);
