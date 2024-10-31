@@ -80,39 +80,33 @@ const Homepage = () => {
   // Kullanıcı verisini alma fonksiyonu
   const fetchUserData = async () => {
     try {
-      const token = localStorage.getItem('token'); // Token alınıyor
-      console.log('Fetched token in fetchUserData:', token);
+      const token = localStorage.getItem('token'); 
       if (!token) {
         console.error('No token found');
         return;
       }
-
+  
       const response = await fetch('/api/user', {
         headers: {
-          'Authorization': `Bearer ${token}`, // Token ile yetkilendirme başlığı ekliyoruz
+          'Authorization': `Bearer ${token}`, 
         },
       });
-
-      console.log('Response status:', response.status);
-      const contentType = response.headers.get("content-type");
-      console.log('Response content-type:', contentType);
-      if (contentType && contentType.includes("application/json")) {
+  
+      if (response.headers.get("content-type")?.includes("application/json")) {
         const data = await response.json();
-        console.log('Fetched user data:', data);
-        if (data.userId) {
-          setLoggedInUserId(data.userId); // Kullanıcı kimliğini ayarla
+        if (data._id) {
+          setLoggedInUserId(data._id); // `_id` alanını loggedInUserId olarak ayarlıyoruz
         } else {
-          console.error('Error: userId is missing in the response:', data);
+          console.error('Error: `_id` is missing in the response:', data);
         }
       } else {
-        const text = await response.text();
-        console.error('Error: Response is not in JSON format:', text);
+        console.error('Error: Response is not in JSON format');
       }
     } catch (error) {
       console.error('An error occurred while fetching user data:', error);
     }
   };
-
+  
   const handleLoginToggle = () => setLoginOpen((prev) => !prev);
   const handleRegisterToggle = () => setRegisterOpen((prev) => !prev);
   const handleLoginClose = (event) => {
