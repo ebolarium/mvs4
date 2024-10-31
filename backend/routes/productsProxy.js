@@ -1,8 +1,9 @@
+// productsProxy.js
+
 const express = require('express');
 const fetch = require('node-fetch');
 const router = express.Router();
 
-// productsProxy.js
 router.get('/products', async (req, res) => {
     try {
       const response = await fetch('https://sandbox-api.paddle.com/prices', {

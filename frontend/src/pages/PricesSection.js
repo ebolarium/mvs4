@@ -7,6 +7,8 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
   const { t } = useTranslation();
 
   const initiateCheckout = (priceId) => {
+    console.log('Initiating checkout with priceId:', priceId);
+
     if (!isLoggedIn) {
       alert(t('login_required_to_purchase'));
       openLoginModal();
@@ -15,9 +17,8 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
 
     if (window.Paddle) {
       window.Paddle.Checkout.open({
-        product: priceId,  // Ürün kimliğini burada geçiyoruz
-        vendor: 24248,
-        passthrough: JSON.stringify({ userId: loggedInUserId }),  // Kullanıcı kimliğini geçiyoruz
+        price: priceId, // 'price' parametresini kullanıyoruz
+        passthrough: JSON.stringify({ userId: loggedInUserId }),
         successCallback: (data) => {
           console.log('Payment Successful:', data);
         },
@@ -51,7 +52,6 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
               <Grid item xs={12} md={6} key={priceId}>
                 <Card
                   sx={{ backgroundColor: '#ffffffcc', borderRadius: '16px', transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}
-                  onClick={() => initiateCheckout(priceId)} // Burada priceId'yi kullanarak checkout başlatıyoruz
                 >
                   <CardContent>
                     <Typography variant="h5" align="center" gutterBottom>
@@ -63,7 +63,12 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
                     <Typography variant="body1" align="center" sx={{ mb: 2 }}>
                       {product.description}
                     </Typography>
-                    <Button variant="contained" color="primary" fullWidth>
+                    <Button 
+                      variant="contained" 
+                      color="primary" 
+                      fullWidth 
+                      onClick={() => initiateCheckout(priceId)} // Butona tıklama işlevini ekliyoruz
+                    >
                       {t('pricing.purchase_button')}
                     </Button>
                   </CardContent>
