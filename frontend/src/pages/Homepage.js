@@ -23,12 +23,14 @@ const Homepage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [products, setProducts] = useState([]);
+  const [loggedInUserId, setLoggedInUserId] = useState(null);
 
   // Kullanıcı giriş durumunu kontrol etme
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
       setIsLoggedIn(true);
+      fetchUserData(); // Giriş yapılmışsa kullanıcı verisini alıyoruz
     }
   }, []);
 
@@ -54,23 +56,19 @@ const Homepage = () => {
   }, []);
 
   // Ürünleri Paddle API'den çekme
-  
-
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await fetch('/api/products');
         const data = await response.json();
-  
         setProducts(data);
       } catch (error) {
         console.error("Error fetching products: ", error);
       }
     };
-  
+
     fetchProducts();
   }, []);
-
 
   // Kullanıcı verisini alma fonksiyonu
   const fetchUserData = async () => {
@@ -88,9 +86,6 @@ const Homepage = () => {
     }
   };
 
-
-
-
   const handleLoginToggle = () => setLoginOpen((prev) => !prev);
   const handleRegisterToggle = () => setRegisterOpen((prev) => !prev);
   const handleLoginClose = (event) => {
@@ -99,12 +94,10 @@ const Homepage = () => {
   };
   const handleRegisterClose = () => setRegisterOpen(false);
 
-  const handleLoginSuccess = () => {
-    
+  const handleLoginSuccess = (userData) => {
     setIsLoggedIn(true);
     setLoginOpen(false);
     fetchUserData(); // Giriş başarılı olduğunda kullanıcı verisini alıyoruz
-
   };
 
   const handleRegisterSuccess = () => {
@@ -203,8 +196,8 @@ const Homepage = () => {
         <PricesSection
           isLoggedIn={isLoggedIn}
           openLoginModal={handleLoginToggle}
-          initiatePlanSelection={initiatePlanSelection}
           products={products}
+          loggedInUserId={loggedInUserId} // Kullanıcı kimliğini PricesSection bileşenine geçiriyoruz
         />
         <HowItWorksSection />
         <AboutUsSection />
