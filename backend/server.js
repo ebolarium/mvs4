@@ -12,8 +12,7 @@ const cors = require('cors');
 const path = require('path');
 const i18n = require('i18n');
 const fs = require('fs');
-const productsProxyRoutes = require('./routes/productsProxy'); // Import productsProxyRoutes
-const userRoutes = require('./routes/userRoutes'); // Import userRoutes
+const productsProxyRoutes = require('./routes/productsProxy'); // En üstte import et
 
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
@@ -62,16 +61,18 @@ mongoose
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.log(err));
 
-// Mount specific routes first
-app.use('/api/products', productsProxyRoutes); // Mount /api/products
-app.use('/api/user', userRoutes); // Mount /api/user
-
-// Mount other /api routes
+// Routes
 app.use('/api/bands', bandRoutes);
 app.use('/api/songs', songRoutes);
 app.use('/api/playlist', playlistRoutes);
 app.use('/api/spotify', spotifyAuthRoutes);
 app.use('/api', emailRoute); // Include the email route
+app.use('/api', productsProxyRoutes); // Doğru şekilde middleware olarak kullanma
+
+
+
+
+const querystring = require('querystring'); // Add this at the top
 
 // Paddle Webhook Endpoint
 app.post('/paddle/webhook', async (req, res) => {
@@ -100,13 +101,12 @@ app.post('/paddle/webhook', async (req, res) => {
   });
 
   // Serialize the sorted object to query string format without URL encoding
-  const querystring = require('querystring');
   const serialized = querystring.stringify(sorted, '&', '=', {
     encodeURIComponent: (str) => str,
   });
 
   // Prepare the public key
-  const publicKey = `-----BEGIN PUBLIC KEY-----
+  let publicKey = `-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA4cr8bsSkSWHf4l/anMa6
 Kca3ldITgBKv0yWJvK/o0jJHUYF3itSaLSJHH+XE/KieE99MqgvMIDLb69LhiK0i
 77Rz85asEjawP7woDkQmq6qi1qBV28rXJiTMGuzshnp6Y5lodgM8vEoEXrJLWyPZ
@@ -135,7 +135,7 @@ XhItJqwfXBfNMS9669K42oUtU8wGPnWGCVCdUV1F5/zJ2fXfcitfpT/FSybOSLaU
       const band = await Band.findOne({ band_email: email });
 
       if (!band) {
-        console.error(`Band with email ${email} not found.`);
+        console.error(`Band with email ${email} not found tho.`);
         return res.sendStatus(200); // Respond 200 to Paddle
       }
 
@@ -185,7 +185,7 @@ if (!fs.existsSync(uploadsDir)) {
 // Serve uploaded images
 app.use('/uploads', cors(), express.static(path.join(__dirname, 'uploads')));
 
-// Wildcard route for frontend (should be last)
+// Wildcard route for frontend
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
 });
@@ -193,7 +193,7 @@ app.get('*', (req, res) => {
 // Socket.io setup
 const io = new Server(server, {
   cors: {
-    origin: 'https://votesong.live', // Replace with your frontend URL if different
+    origin: process.env.FRONTEND_URL,
     methods: ['GET', 'POST'],
     credentials: true,
   },
@@ -203,15 +203,15 @@ app.set('io', io);
 
 // Socket.io connections
 io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
+  //console.log('A user connected:', socket.id);
 
   socket.on('joinPlaylist', (playlistId) => {
-    console.log('User joined playlist room with ID:', playlistId);
+    //console.log('User joined playlist room with ID:', playlistId);
     socket.join(playlistId);
   });
 
   socket.on('leavePlaylist', (playlistId) => {
-    console.log('User left playlist room with ID:', playlistId);
+    //console.log('User left playlist room with ID:', playlistId);
     socket.leave(playlistId);
   });
 
@@ -221,7 +221,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    console.log('A user disconnected:', socket.id);
+    //console.log('A user disconnected:', socket.id);
   });
 });
 
