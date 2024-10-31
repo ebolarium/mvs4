@@ -18,7 +18,7 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
     if (window.Paddle) {
       window.Paddle.Checkout.open({
         price: priceId, // 'price' parametresini kullanıyoruz
-        passthrough: JSON.stringify({ userId: loggedInUserId }),
+     //   passthrough: JSON.stringify({ userId: loggedInUserId }),
         successCallback: (data) => {
           console.log('Payment Successful:', data);
         },
