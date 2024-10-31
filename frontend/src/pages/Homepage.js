@@ -37,22 +37,31 @@ const Homepage = () => {
 
   // Paddle.js yükleme ve Paddle.Setup() işlemi
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.paddle.com/paddle/paddle.js';
-    script.async = true;
-    script.onload = () => {
-      if (window.Paddle) {
-        window.Paddle.Environment.set('sandbox'); // Sandbox ortamını kullanıyorsanız
-        window.Paddle.Setup({ vendor: 24248 });
-        console.log('Paddle.js successfully set up');
-      } else {
-        console.error('Paddle is not available');
-      }
-    };
-    document.body.appendChild(script);
+    const scriptId = 'paddle-js';
+    if (!document.getElementById(scriptId)) {
+      const script = document.createElement('script');
+      script.id = scriptId;
+      script.src = 'https://cdn.paddle.com/paddle/paddle.js';
+      script.async = true;
+      script.onload = () => {
+        if (window.Paddle) {
+          window.Paddle.Environment.set('sandbox'); // Sandbox ortamını kullanıyorsanız
+          window.Paddle.Setup({ vendor: 24248 });
+          console.log('Paddle.js successfully set up');
+        } else {
+          console.error('Paddle is not available');
+        }
+      };
+      document.body.appendChild(script);
+    } else {
+      console.log('Paddle.js is already loaded');
+    }
 
     return () => {
-      document.body.removeChild(script);
+      const script = document.getElementById(scriptId);
+      if (script) {
+        document.body.removeChild(script);
+      }
     };
   }, []);
 

@@ -67,12 +67,9 @@ app.use('/api/songs', songRoutes);
 app.use('/api/playlist', playlistRoutes);
 app.use('/api/spotify', spotifyAuthRoutes);
 app.use('/api', emailRoute); // Include the email route
-app.use('/api', productsProxyRoutes); // Doğru şekilde middleware olarak kullanma
 
-
-
-
-const querystring = require('querystring'); // Add this at the top
+// Mount productsProxyRoutes before other /api routes to avoid conflicts
+app.use('/api/products', productsProxyRoutes); // Correctly mount on /api/products
 
 // Paddle Webhook Endpoint
 app.post('/paddle/webhook', async (req, res) => {
@@ -101,12 +98,13 @@ app.post('/paddle/webhook', async (req, res) => {
   });
 
   // Serialize the sorted object to query string format without URL encoding
+  const querystring = require('querystring');
   const serialized = querystring.stringify(sorted, '&', '=', {
     encodeURIComponent: (str) => str,
   });
 
   // Prepare the public key
-  let publicKey = `-----BEGIN PUBLIC KEY-----
+  const publicKey = `-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA4cr8bsSkSWHf4l/anMa6
 Kca3ldITgBKv0yWJvK/o0jJHUYF3itSaLSJHH+XE/KieE99MqgvMIDLb69LhiK0i
 77Rz85asEjawP7woDkQmq6qi1qBV28rXJiTMGuzshnp6Y5lodgM8vEoEXrJLWyPZ
@@ -135,7 +133,7 @@ XhItJqwfXBfNMS9669K42oUtU8wGPnWGCVCdUV1F5/zJ2fXfcitfpT/FSybOSLaU
       const band = await Band.findOne({ band_email: email });
 
       if (!band) {
-        console.error(`Band with email ${email} not found tho.`);
+        console.error(`Band with email ${email} not found.`);
         return res.sendStatus(200); // Respond 200 to Paddle
       }
 
