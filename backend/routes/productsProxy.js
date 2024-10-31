@@ -9,7 +9,7 @@ router.get('/products', async (req, res) => {
   try {
     const params = {
       vendor_id: '24248', // Kendi Vendor ID'nizi buraya yazın
-      vendor_auth_code: 'SENİN_VENDOR_AUTH_CODE', // Kendi Vendor Auth Code'unuzu buraya yazın
+      vendor_auth_code: '0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19', // Kendi Vendor Auth Code'unuzu buraya yazın
     };
 
     const response = await fetch('https://sandbox-vendors.paddle.com/api/2.0/subscription/plans', {
