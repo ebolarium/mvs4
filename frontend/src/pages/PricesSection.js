@@ -28,7 +28,6 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
         passthrough: JSON.stringify({ userId: loggedInUserId }), // Kullanıcı kimliğini geçiriyoruz
         successCallback: (data) => {
           console.log('Payment Successful:', data);
-          // Başarılı ödeme sonrası yönlendirme
           window.location.href = '/tesekkurler';
         },
         closeCallback: () => {

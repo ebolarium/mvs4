@@ -96,6 +96,7 @@ const Homepage = () => {
         const data = await response.json();
         if (data._id) {
           setLoggedInUserId(data._id); // `_id` alanını loggedInUserId olarak ayarlıyoruz
+          console.log("User ID fetched successfully:", data._id);
         } else {
           console.error('Error: `_id` is missing in the response:', data);
         }
@@ -106,6 +107,7 @@ const Homepage = () => {
       console.error('An error occurred while fetching user data:', error);
     }
   };
+  
   
   const handleLoginToggle = () => setLoginOpen((prev) => !prev);
   const handleRegisterToggle = () => setRegisterOpen((prev) => !prev);
