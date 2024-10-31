@@ -12,7 +12,8 @@ const cors = require('cors');
 const path = require('path');
 const i18n = require('i18n');
 const fs = require('fs');
-const productsProxyRoutes = require('./routes/productsProxy'); // En üstte import et
+const productsProxyRoutes = require('./routes/productsProxy'); // Import productsProxyRoutes
+const userRoutes = require('./routes/userRoutes'); // Import userRoutes
 
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
@@ -61,15 +62,16 @@ mongoose
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.log(err));
 
-// Routes
+// Mount specific routes first
+app.use('/api/products', productsProxyRoutes); // Mount /api/products
+app.use('/api/user', userRoutes); // Mount /api/user
+
+// Mount other /api routes
 app.use('/api/bands', bandRoutes);
 app.use('/api/songs', songRoutes);
 app.use('/api/playlist', playlistRoutes);
 app.use('/api/spotify', spotifyAuthRoutes);
 app.use('/api', emailRoute); // Include the email route
-
-// Mount productsProxyRoutes before other /api routes to avoid conflicts
-app.use('/api/products', productsProxyRoutes); // Correctly mount on /api/products
 
 // Paddle Webhook Endpoint
 app.post('/paddle/webhook', async (req, res) => {
@@ -183,7 +185,7 @@ if (!fs.existsSync(uploadsDir)) {
 // Serve uploaded images
 app.use('/uploads', cors(), express.static(path.join(__dirname, 'uploads')));
 
-// Wildcard route for frontend
+// Wildcard route for frontend (should be last)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
 });
