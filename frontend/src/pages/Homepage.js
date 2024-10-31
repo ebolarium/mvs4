@@ -77,47 +77,45 @@ const Homepage = () => {
     fetchProducts();
   }, []);
 
-  // Kullanıcı verisini alma fonksiyonu
-const fetchUserData = async () => {
-  try {
-    const token = localStorage.getItem('token'); 
-    if (!token) {
-      console.error('No token found');
-      return;
-    }
-
-    const response = await fetch('/api/bands/profile', {
-      headers: {
-        'Authorization': `Bearer ${token}`, 
-      },
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Error fetching user data:', response.status, errorText);
-      return;
-    }
-
-    const contentType = response.headers.get("content-type");
-    if (contentType && contentType.includes("application/json")) {
-      const data = await response.json();
-      console.log('Fetched user data:', data);
-
-      if (data._id) {
-        setLoggedInUserId(data._id);
-        console.log("User ID fetched successfully:", data._id);
-      } else {
-        console.error('Error: User ID is missing in the response:', data);
+  const fetchUserData = async () => {
+    try {
+      const token = localStorage.getItem('token'); 
+      if (!token) {
+        console.error('No token found');
+        return;
       }
-    } else {
-      const textData = await response.text();
-      console.error('Error: Response is not in JSON format:', textData);
+  
+      const response = await fetch('/api/bands/profile', {
+        headers: {
+          'Authorization': `Bearer ${token}`, 
+        },
+      });
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error fetching user data:', response.status, errorText);
+        return;
+      }
+  
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        console.log('Fetched user data:', data);
+  
+        if (data.band && data.band._id) {
+          setLoggedInUserId(data.band._id);
+          console.log("User ID fetched successfully:", data.band._id);
+        } else {
+          console.error('Error: User ID is missing in the response:', data);
+        }
+      } else {
+        const textData = await response.text();
+        console.error('Error: Response is not in JSON format:', textData);
+      }
+    } catch (error) {
+      console.error('An error occurred while fetching user data:', error);
     }
-  } catch (error) {
-    console.error('An error occurred while fetching user data:', error);
-  }
-};
-
+  };
   
   const handleLoginToggle = () => setLoginOpen((prev) => !prev);
   const handleRegisterToggle = () => setRegisterOpen((prev) => !prev);
