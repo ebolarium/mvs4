@@ -78,7 +78,12 @@ const Homepage = () => {
   };
   const handleRegisterClose = () => setRegisterOpen(false);
 
-  const handleLoginSuccess = () => {
+  const [loggedInUserId, setLoggedInUserId] = useState(null);
+
+
+  const handleLoginSuccess = (userData) => {
+    setLoggedInUserId(userData.userId);  // Kullanıcı kimliğini sakla
+
     setIsLoggedIn(true);
     setLoginOpen(false);
   };
@@ -176,12 +181,12 @@ const Homepage = () => {
       </Box>
 
       <Container maxWidth="lg" sx={{ py: 0 }}>
-        <PricesSection
-          isLoggedIn={isLoggedIn}
-          openLoginModal={handleLoginToggle}
-          initiatePlanSelection={initiatePlanSelection}
-          products={products}
-        />
+      <PricesSection
+  isLoggedIn={isLoggedIn}
+  openLoginModal={handleLoginToggle}
+  products={products}
+  loggedInUserId={loggedInUserId} // Kullanıcı kimliğini PricesSection bileşenine geçiriyoruz
+/>
         <HowItWorksSection />
         <AboutUsSection />
       </Container>

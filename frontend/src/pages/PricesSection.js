@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Container, Grid, Card, CardContent, Typography, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
-const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
+const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId }) => {
   const { t } = useTranslation();
 
   const initiateCheckout = (productId) => {
@@ -14,9 +14,9 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
 
     if (window.Paddle) {
       window.Paddle.Checkout.open({
-        product: priceId, // Burada priceId kullanarak doğru ID'yi geçiriyoruz.
+        product: priceId,  // Ürün kimliğini burada geçiyoruz
         vendor: 24248,
-        passthrough: JSON.stringify({ userId: loggedInUserId }),
+        passthrough: JSON.stringify({ userId: loggedInUserId }),  // Kullanıcı kimliğini geçiyoruz
         successCallback: (data) => {
           console.log('Payment Successful:', data);
         },
@@ -45,15 +45,12 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
 
         <Grid container spacing={4} justifyContent="center">
           {products.map((product) => {
-            // Tüm product nesnesini konsola yazdır
-            console.log("Product Details:", product);
-
             return (
               <Grid item xs={12} md={6} key={product.id}>
                 <Card
                   sx={{ backgroundColor: '#ffffffcc', borderRadius: '16px', transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}
-                  onClick={() => initiateCheckout(product.id)}
-                >
+                  onClick={() => initiateCheckout(product.id)} // Burada doğru olan priceId'yi geçin
+                  >
                   <CardContent>
                     <Typography variant="h5" align="center" gutterBottom>
                       {product.name}
