@@ -8,8 +8,8 @@ const querystring = require('querystring'); // Import querystring module
 router.get('/products', async (req, res) => {
   try {
     const body = querystring.stringify({
-      vendor_id: '24248',
-      vendor_auth_code: '0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19',
+      vendor_id: '24248', // Replace with your actual vendor_id
+      vendor_auth_code: '0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19', // Replace with your actual vendor_auth_code
     });
 
     const response = await fetch('https://sandbox-vendors.paddle.com/api/2.0/product/get_products', {
