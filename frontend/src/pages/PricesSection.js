@@ -18,8 +18,7 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
       console.log('Using Price ID:', priceId);
 
       window.Paddle.Checkout.open({
-        product: productId, // Ürün ID'si (pro_... şeklinde)
-        override: priceId,  // Fiyat ID'si (pri_... şeklinde)
+        product: productId,
         successCallback: (data) => {
           console.log('Payment Successful:', data);
         },
@@ -31,6 +30,7 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
         },
         locale: 'en',
       });
+      
     } else {
       console.error('Paddle is not initialized');
     }

@@ -1,5 +1,3 @@
-// productsProxy.js
-
 const express = require('express');
 const fetch = require('node-fetch');
 const router = express.Router();
@@ -8,11 +6,11 @@ const querystring = require('querystring');
 router.get('/products', async (req, res) => {
   try {
     const params = {
-      vendor_id: '24248', // Kendi Vendor ID'nizi buraya yazın
-      vendor_auth_code: '0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19', // Kendi Vendor Auth Code'unuzu buraya yazın
+      vendor_id: '24248',
+      vendor_auth_code: '0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19', // Buraya kendi vendor_auth_code'unu koy
     };
 
-    const response = await fetch('https://sandbox-vendors.paddle.com/api/2.0/subscription/plans', {
+    const response = await fetch('https://sandbox-vendors.paddle.com/api/2.0/product/get_products', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -23,27 +21,21 @@ router.get('/products', async (req, res) => {
     const data = await response.json();
 
     if (data.success) {
-      // Planları konsola yazdır
-      console.log('Fetched Plans:', data.response);
-
-      const products = data.response.map((plan) => {
-        return {
-          id: plan.product_id, // Ürün ID'si (pro_... şeklinde)
-          name: plan.name,
-          description: plan.description || '',
-          price: plan.recurring_price.usd, // Fiyat bilgisini al
-          currency: 'USD',
-          price_id: plan.prices && plan.prices.length > 0 ? plan.prices[0].price_id : null, // Fiyat ID'si (pri_... şeklinde)
-        };
-      });
-
-      res.json(products);
+      res.json(
+        data.response.products.map((product) => ({
+          id: product.id,
+          name: product.name,
+          description: product.description,
+          price: product.base_price, // veya uygun fiyat alanı
+          currency: product.currency,
+        }))
+      );
     } else {
-      console.error('Failed to fetch plans:', data.error);
-      res.status(500).json({ error: 'Failed to fetch plans' });
+      console.error('Failed to fetch products:', data.error);
+      res.status(500).json({ error: 'Failed to fetch products' });
     }
   } catch (error) {
-    console.error('Error fetching plans:', error);
+    console.error('Error fetching products:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
