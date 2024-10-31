@@ -2,26 +2,29 @@
 const express = require('express');
 const fetch = require('node-fetch');
 const router = express.Router();
+const querystring = require('querystring'); // Import querystring module
 
 // /api/products endpoint
 router.get('/products', async (req, res) => {
   try {
+    const body = querystring.stringify({
+      vendor_id: '24248',
+      vendor_auth_code: '0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19',
+    });
+
     const response = await fetch('https://sandbox-vendors.paddle.com/api/2.0/product/get_products', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded', // Correct Content-Type
       },
-      body: JSON.stringify({
-        vendor_id: '24248',
-        vendor_auth_code: '0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19',
-      }),
+      body: body, // URL-encoded body
     });
 
     const data = await response.json();
 
     if (!data.success) {
       console.error('Paddle API returned an error:', data.error);
-      return res.status(500).send('Paddle API returned an error');
+      return res.status(500).json({ error: data.error });
     }
 
     const products = data.response.products;
@@ -30,7 +33,7 @@ router.get('/products', async (req, res) => {
       id: product.id,
       name: product.name,
       description: product.description,
-      price: product.base_price, // Assuming this is in the correct format
+      price: product.base_price, // Ensure this is in the correct format
       currency: product.currency,
       // Include any additional fields you need
     }));
