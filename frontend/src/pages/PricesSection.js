@@ -1,3 +1,4 @@
+// PricesSection.js
 import React from 'react';
 import { Box, Container, Grid, Card, CardContent, Typography, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
@@ -5,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId }) => {
   const { t } = useTranslation();
 
-  const initiateCheckout = (productId) => {
+  const initiateCheckout = (priceId) => {
     if (!isLoggedIn) {
       alert(t('login_required_to_purchase'));
       openLoginModal();
@@ -45,12 +46,13 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
 
         <Grid container spacing={4} justifyContent="center">
           {products.map((product) => {
+            const priceId = product.id;  // Fiyat kimliğini tanımlıyoruz
             return (
-              <Grid item xs={12} md={6} key={product.id}>
+              <Grid item xs={12} md={6} key={priceId}>
                 <Card
                   sx={{ backgroundColor: '#ffffffcc', borderRadius: '16px', transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}
                   onClick={() => initiateCheckout(product.id)} // Burada doğru olan priceId'yi geçin
-                  >
+                >
                   <CardContent>
                     <Typography variant="h5" align="center" gutterBottom>
                       {product.name}
