@@ -28,6 +28,7 @@ const Homepage = () => {
   // Kullanıcı giriş durumunu kontrol etme
   useEffect(() => {
     const token = localStorage.getItem('token');
+    console.log('Fetched token:', token);
     if (token) {
       setIsLoggedIn(true);
       fetchUserData(); // Giriş yapılmışsa kullanıcı verisini alıyoruz
@@ -41,7 +42,7 @@ const Homepage = () => {
     script.async = true;
     script.onload = () => {
       if (window.Paddle) {
-        window.Paddle.Environment.set('sandbox');
+        window.Paddle.Environment.set('sandbox'); // Sandbox ortamını kullanıyorsanız
         window.Paddle.Setup({ vendor: 24248 });
         console.log('Paddle.js successfully set up');
       } else {
@@ -60,7 +61,13 @@ const Homepage = () => {
     const fetchProducts = async () => {
       try {
         const response = await fetch('/api/products');
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Failed to fetch products:', errorText);
+          return;
+        }
         const data = await response.json();
+        console.log('Fetched products:', data);
         setProducts(data);
       } catch (error) {
         console.error("Error fetching products: ", error);
@@ -74,19 +81,32 @@ const Homepage = () => {
   const fetchUserData = async () => {
     try {
       const token = localStorage.getItem('token'); // Token alınıyor
+      console.log('Fetched token in fetchUserData:', token);
+      if (!token) {
+        console.error('No token found');
+        return;
+      }
+
       const response = await fetch('/api/user', {
         headers: {
           'Authorization': `Bearer ${token}`, // Token ile yetkilendirme başlığı ekliyoruz
         },
       });
-  
+
+      console.log('Response status:', response.status);
       const contentType = response.headers.get("content-type");
+      console.log('Response content-type:', contentType);
       if (contentType && contentType.includes("application/json")) {
         const data = await response.json();
-        setLoggedInUserId(data.userId); // Kullanıcı kimliğini ayarla
-        console.log('User Data:', data);
+        console.log('Fetched user data:', data);
+        if (data.userId) {
+          setLoggedInUserId(data.userId); // Kullanıcı kimliğini ayarla
+        } else {
+          console.error('Error: userId is missing in the response:', data);
+        }
       } else {
-        console.error('Error: Response is not in JSON format:', contentType);
+        const text = await response.text();
+        console.error('Error: Response is not in JSON format:', text);
       }
     } catch (error) {
       console.error('An error occurred while fetching user data:', error);
@@ -158,12 +178,13 @@ const Homepage = () => {
             sx={{
               position: 'absolute',
               top: anchorRef.current?.getBoundingClientRect().bottom + 8 || 0,
-              left: anchorRef.current?.getBoundingClientRect().right - 300 || 0,
+              left: anchorRef.current?.getBoundingClientRect().left || 0,
               backgroundColor: 'rgba(41, 41, 41, 0.75)',
               color: '#fff',
               width: 300,
               padding: 2,
               boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)',
+              zIndex: 1300,
             }}
           >
             <Login onLoginSuccess={handleLoginSuccess} />

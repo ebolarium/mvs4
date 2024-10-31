@@ -8,6 +8,7 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
 
   const initiateCheckout = (priceId) => {
     console.log('Initiating checkout with priceId:', priceId);
+    console.log('Logged In User ID:', loggedInUserId);
 
     if (!isLoggedIn) {
       alert(t('login_required_to_purchase'));
@@ -15,12 +16,19 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
       return;
     }
 
+    if (!loggedInUserId) {
+      console.error('loggedInUserId is null or undefined');
+      alert(t('user_id_missing'));
+      return;
+    }
+
     if (window.Paddle) {
       window.Paddle.Checkout.open({
-        price: priceId, // 'price' parametresini kullanıyoruz
-     //   passthrough: JSON.stringify({ userId: loggedInUserId }),
+        items: [{ priceId: priceId, quantity: 1 }], // Items dizisini kullanıyoruz
+        passthrough: JSON.stringify({ userId: loggedInUserId }), // Kullanıcı kimliğini geçiyoruz
         successCallback: (data) => {
           console.log('Payment Successful:', data);
+          // Ödeme sonrası yönlendirme veya diğer işlemleri burada yapabilirsiniz
         },
         closeCallback: () => {
           console.warn('Checkout was closed.');
@@ -29,6 +37,7 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
           console.error('Checkout Error:', error);
         },
         locale: 'en',
+        // Diğer gerekli ayarları ekleyebilirsiniz
       });
     } else {
       console.error('Paddle is not initialized');
@@ -47,7 +56,7 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
 
         <Grid container spacing={4} justifyContent="center">
           {products.map((product) => {
-            const priceId = product.id;  // Fiyat kimliğini tanımlıyoruz
+            const priceId = product.id;  // 'pri_...' formatında priceId
             return (
               <Grid item xs={12} md={6} key={priceId}>
                 <Card
