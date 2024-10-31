@@ -70,6 +70,27 @@ const Homepage = () => {
   
     fetchProducts();
   }, []);
+
+
+  // Kullanıcı verisini alma fonksiyonu
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch('/api/user');
+      if (response.ok) {
+        const data = await response.json();
+        setLoggedInUserId(data.userId); // Kullanıcı kimliğini ayarla
+        console.log('User Data:', data);
+      } else {
+        console.error('Error fetching user data:', response.statusText);
+      }
+    } catch (error) {
+      console.error('An error occurred while fetching user data:', error);
+    }
+  };
+
+
+
+
   const handleLoginToggle = () => setLoginOpen((prev) => !prev);
   const handleRegisterToggle = () => setRegisterOpen((prev) => !prev);
   const handleLoginClose = (event) => {
@@ -82,6 +103,8 @@ const Homepage = () => {
     
     setIsLoggedIn(true);
     setLoginOpen(false);
+    fetchUserData(); // Giriş başarılı olduğunda kullanıcı verisini alıyoruz
+
   };
 
   const handleRegisterSuccess = () => {

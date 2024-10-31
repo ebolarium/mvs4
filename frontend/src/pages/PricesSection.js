@@ -51,7 +51,7 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
               <Grid item xs={12} md={6} key={priceId}>
                 <Card
                   sx={{ backgroundColor: '#ffffffcc', borderRadius: '16px', transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}
-                  onClick={() => initiateCheckout(product.id)} // Burada doğru olan priceId'yi geçin
+                  onClick={() => initiateCheckout(priceId)} // Burada priceId'yi kullanarak checkout başlatıyoruz
                 >
                   <CardContent>
                     <Typography variant="h5" align="center" gutterBottom>
