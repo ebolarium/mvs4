@@ -73,7 +73,13 @@ const Homepage = () => {
   // Kullanıcı verisini alma fonksiyonu
   const fetchUserData = async () => {
     try {
-      const response = await fetch('/api/user');
+      const token = localStorage.getItem('token'); // Token alınıyor
+      const response = await fetch('/api/user', {
+        headers: {
+          'Authorization': `Bearer ${token}`, // Token ile yetkilendirme başlığı ekliyoruz
+        },
+      });
+  
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.includes("application/json")) {
         const data = await response.json();
