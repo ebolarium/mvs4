@@ -16,7 +16,7 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
       window.Paddle.Checkout.open({
         product: 'pri_01jbedvwaxzpn2q69p88e9yd96',  // Doğru ürün kimliği
         vendor: 24248,  // Satıcı kimliği
-        passthrough: JSON.stringify({ userId: loggedInUserId }),  // Kullanıcı bilgisi (isteğe bağlı)
+        //passthrough: JSON.stringify({ userId: loggedInUserId }),  // Kullanıcı bilgisi (isteğe bağlı)
         successCallback: (data) => {
           console.log('Payment Successful:', data);  // Ödeme başarılı olduğunda tetiklenir
         },
