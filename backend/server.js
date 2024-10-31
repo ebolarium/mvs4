@@ -193,7 +193,7 @@ app.get('*', (req, res) => {
 // Socket.io setup
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL,
+    origin: 'https://votesong.live', // Replace with your frontend URL if different
     methods: ['GET', 'POST'],
     credentials: true,
   },

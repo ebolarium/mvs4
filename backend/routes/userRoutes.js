@@ -3,9 +3,9 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken'); // JWT token doğrulama
-const dotenv = require('dotenv');
 
-dotenv.config();
+// Demo amaçlı olarak JWT_SECRET doğrudan kod içinde tanımlandı
+const JWT_SECRET = 'your_demo_jwt_secret_key'; // Güvenliğiniz için güçlü bir secret kullanın
 
 // Middleware to authenticate and extract user data from JWT
 const authenticateToken = (req, res, next) => {
@@ -14,7 +14,7 @@ const authenticateToken = (req, res, next) => {
   const token = authHeader && authHeader.split(' ')[1];
   if (token == null) return res.status(401).json({ error: 'Unauthorized: No token provided' });
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+  jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
       console.error('JWT Verification Error:', err);
       return res.status(403).json({ error: 'Forbidden: Invalid token' });

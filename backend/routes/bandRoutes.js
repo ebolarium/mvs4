@@ -1,3 +1,4 @@
+// bandRoutes.js
 const express = require('express');
 const { registerBand, loginBand, uploadBandImage, getBandProfile, updateBandProfile } = require('../controllers/bandController');
 const { protect } = require('../middleware/authMiddleware');
