@@ -7,7 +7,7 @@ router.get('/products', async (req, res) => {
   try {
     const params = {
       vendor_id: '24248',
-      vendor_auth_code: '0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19', // Kendi vendor_auth_code'unuzu ekleyin
+      vendor_auth_code: '0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19', // Buraya kendi vendor_auth_code'unuzu ekleyin
     };
 
     const response = await fetch('https://sandbox-vendors.paddle.com/api/2.0/product/get_products', {
@@ -20,10 +20,14 @@ router.get('/products', async (req, res) => {
 
     const data = await response.json();
 
+    // Başarı durumu kontrolü
     if (!data.success) {
-      console.error('Failed to fetch products:', data.error);
+      console.error('Failed to fetch products:', data.error);  // Hata mesajını konsola yazdır
       return res.status(500).json({ error: 'Failed to fetch products' });
     }
+
+    // Gelen veriyi konsolda inceleyelim
+    console.log("API Response Data:", data.response.products);
 
     res.json(
       data.response.products.map((product) => ({
