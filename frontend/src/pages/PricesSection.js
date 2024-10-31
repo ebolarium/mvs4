@@ -1,3 +1,4 @@
+//PricesSection.js
 import React from 'react';
 import { Box, Container, Grid, Card, CardContent, Typography, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +16,6 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
     if (window.Paddle) {
       window.Paddle.Checkout.open({
         product: productId,       // Ürün ID'sini burada doğru gönderiyoruz
-        vendor: 24248,             // Satıcı ID'sini burada doğru gönderiyoruz
         successCallback: (data) => {
           console.log('Payment Successful:', data);
         },
