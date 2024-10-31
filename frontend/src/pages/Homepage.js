@@ -57,25 +57,25 @@ const Homepage = () => {
   }, []);
 
   // Ürünleri Paddle API'den çekme
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch('/api/products');
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Failed to fetch products:', errorText);
-          return;
-        }
-        const data = await response.json();
-        console.log('Fetched products:', data);
-        setProducts(data);
-      } catch (error) {
-        console.error("Error fetching products: ", error);
+ useEffect(() => {
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch('/api/products');
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Failed to fetch products:', errorText);
+        return;
       }
-    };
+      const data = await response.json();
+      console.log('Fetched products:', data);
+      setProducts(data);
+    } catch (error) {
+      console.error("Error fetching products: ", error);
+    }
+  };
 
-    fetchProducts();
-  }, []);
+  fetchProducts();
+}, []);
 
   const fetchUserData = async () => {
     try {
