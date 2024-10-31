@@ -12,7 +12,7 @@ const cors = require('cors');
 const path = require('path');
 const i18n = require('i18n');
 const fs = require('fs');
-const productsProxyRoutes = require('./routes/productsProxy'); // En üstte import et
+const productsProxy = require('./routes/productsProxy');
 
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
@@ -67,7 +67,7 @@ app.use('/api/songs', songRoutes);
 app.use('/api/playlist', playlistRoutes);
 app.use('/api/spotify', spotifyAuthRoutes);
 app.use('/api', emailRoute); // Include the email route
-app.use('/api', productsProxyRoutes); // Doğru şekilde middleware olarak kullanma
+app.use('/api', productsProxy);
 
 
 
