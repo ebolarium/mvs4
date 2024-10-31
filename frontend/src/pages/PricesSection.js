@@ -1,3 +1,4 @@
+// PricesSection.js
 import React from 'react';
 import { Box, Container, Grid, Card, CardContent, Typography, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
@@ -14,19 +15,18 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
 
     if (window.Paddle) {
       window.Paddle.Checkout.open({
-        product: 'pri_01jbedvwaxzpn2q69p88e9yd96',  // Doğru ürün kimliği
-        vendor: 24248,  // Satıcı kimliği
-        passthrough: JSON.stringify({ userId: loggedInUserId }),  // Kullanıcı bilgisi (isteğe bağlı)
+        product: productId,
+        vendor: 24248,
         successCallback: (data) => {
-          console.log('Payment Successful:', data);  // Ödeme başarılı olduğunda tetiklenir
+          console.log('Payment Successful:', data);
         },
         closeCallback: () => {
-          console.warn('Checkout was closed.');  // Ödeme penceresi kapatıldığında tetiklenir
+          console.warn('Checkout was closed.');
         },
         errorCallback: (error) => {
-          console.error('Checkout Error:', error);  // Ödeme sırasında hata oluşursa tetiklenir
+          console.error('Checkout Error:', error);
         },
-        locale: 'en',  // Dil ayarı
+        locale: 'en',
       });
     } else {
       console.error('Paddle is not initialized');
@@ -45,13 +45,16 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
 
         <Grid container spacing={4} justifyContent="center">
           {products.map((product) => {
-            // Tüm product nesnesini konsola yazdır
             console.log("Product Details:", product);
-
             return (
               <Grid item xs={12} md={6} key={product.id}>
                 <Card
-                  sx={{ backgroundColor: '#ffffffcc', borderRadius: '16px', transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}
+                  sx={{
+                    backgroundColor: '#ffffffcc',
+                    borderRadius: '16px',
+                    transition: 'transform 0.3s',
+                    '&:hover': { transform: 'scale(1.05)' },
+                  }}
                   onClick={() => initiateCheckout(product.id)}
                 >
                   <CardContent>
@@ -59,7 +62,7 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
                       {product.name}
                     </Typography>
                     <Typography variant="h6" align="center" color="primary" gutterBottom>
-                      {`Price: $${(product.price / 100).toFixed(2)} ${product.currency}`}
+                      {`Price: $${(product.unit_price.amount / 100).toFixed(2)} ${product.unit_price.currency_code}`}
                     </Typography>
                     <Typography variant="body1" align="center" sx={{ mb: 2 }}>
                       {product.description}
