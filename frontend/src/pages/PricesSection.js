@@ -9,26 +9,27 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
   const initiateCheckout = (priceId) => {
     console.log('Initiating checkout with priceId:', priceId);
     console.log('Logged In User ID:', loggedInUserId);
-
+  
     if (!isLoggedIn) {
       alert(t('login_required_to_purchase'));
       openLoginModal();
       return;
     }
-
+  
     if (!loggedInUserId) {
       console.error('loggedInUserId is null or undefined');
       alert(t('user_id_missing'));
       return;
     }
-
+  
     if (window.Paddle) {
       window.Paddle.Checkout.open({
-        items: [{ priceId: priceId, quantity: 1 }], // Items dizisini kullanıyoruz
-        passthrough: JSON.stringify({ userId: loggedInUserId }), // Kullanıcı kimliğini geçiyoruz
+        product: priceId, // Paddle ürün kimliği
+        passthrough: JSON.stringify({ userId: loggedInUserId }), // Kullanıcı kimliğini geçiriyoruz
         successCallback: (data) => {
           console.log('Payment Successful:', data);
-          // Ödeme sonrası yönlendirme veya diğer işlemleri burada yapabilirsiniz
+          // Başarılı ödeme sonrası yönlendirme
+          window.location.href = '/tesekkurler';
         },
         closeCallback: () => {
           console.warn('Checkout was closed.');
@@ -37,12 +38,12 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
           console.error('Checkout Error:', error);
         },
         locale: 'en',
-        // Diğer gerekli ayarları ekleyebilirsiniz
       });
     } else {
       console.error('Paddle is not initialized');
     }
   };
+  
 
   return (
     <Box sx={{ py: 2, backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
