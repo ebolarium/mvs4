@@ -43,7 +43,7 @@ const Homepage = () => {
         window.Paddle.Setup({ vendor: 24248 });
         console.log('Paddle.js successfully set up');
       } else {
-        console.error('Paddle is not available');
+        console.error('Paddle is not available yet');
       }
     };
     document.body.appendChild(script);

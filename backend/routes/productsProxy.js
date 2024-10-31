@@ -35,7 +35,7 @@ router.get('/products', async (req, res) => {
       res.status(500).json({ error: 'Failed to fetch products' });
     }
   } catch (error) {
-    console.error('Error fetching products:', error);
+    console.error('Error while fetching products:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });

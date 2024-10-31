@@ -135,7 +135,7 @@ XhItJqwfXBfNMS9669K42oUtU8wGPnWGCVCdUV1F5/zJ2fXfcitfpT/FSybOSLaU
       const band = await Band.findOne({ band_email: email });
 
       if (!band) {
-        console.error(`Band with email ${email} not found.`);
+        console.error(`Band with email ${email} not found tho.`);
         return res.sendStatus(200); // Respond 200 to Paddle
       }
 

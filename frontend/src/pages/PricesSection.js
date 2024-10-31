@@ -20,7 +20,7 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products }) => {
       window.Paddle.Checkout.open({
         product: productId,
         successCallback: (data) => {
-          console.log('Payment Successful:', data);
+          console.log('Payment Successful yaay:', data);
         },
         closeCallback: () => {
           console.warn('Checkout was closed.');
