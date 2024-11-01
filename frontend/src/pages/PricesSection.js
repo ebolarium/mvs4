@@ -9,22 +9,27 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
   const initiateCheckout = (productId) => {
     console.log('Initiating checkout with productId:', productId);
     console.log('Logged In User ID:', loggedInUserId);
-
+  
     if (!isLoggedIn) {
       alert(t('login_required_to_purchase'));
       openLoginModal();
       return;
     }
-
+  
     if (!loggedInUserId) {
       console.error('loggedInUserId is null or undefined');
       alert(t('user_id_missing'));
       return;
     }
-
+  
     if (window.Paddle) {
       window.Paddle.Checkout.open({
-        product: productId, // Paddle product ID (integer)
+        items: [
+          {
+            priceId: productId, // Use priceId here
+            quantity: 1,        // Set the desired quantity
+          },
+        ],
         passthrough: JSON.stringify({ userId: loggedInUserId }),
         successCallback: (data) => {
           console.log('Payment Successful:', data);
