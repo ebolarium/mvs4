@@ -2,9 +2,6 @@
 import React, { useEffect } from 'react';
 import { Box, Typography, Button } from '@mui/material';
 
-// Paddle tanımını global değişken olarak kullanıyoruz
-/* global Paddle */
-
 const PricesSection = () => {
   useEffect(() => {
     // Paddle scriptini yükle
@@ -13,30 +10,41 @@ const PricesSection = () => {
     script.async = true;
     script.onload = () => {
       // Paddle'ı başlat ve sadece client-side token kullanarak yapılandır
-      Paddle.Environment.set("sandbox");
-      Paddle.Initialize({
-        token: "test_605824494b6e720104d54646e1c" // Buraya kendi client-side token'ınızı ekleyin
-      });
+      if (window.Paddle) {
+        window.Paddle.Environment.set("sandbox");
+        window.Paddle.Initialize({
+          token: "test_605824494b6e720104d54646e1c" // Buraya kendi client-side token'ınızı ekleyin
+        });
+      } else {
+        console.error("Paddle yüklenemedi.");
+      }
+    };
+    script.onerror = () => {
+      console.error("Paddle scripti yüklenemedi.");
     };
     document.body.appendChild(script);
   }, []);
 
   const handleSubscribe = () => {
-    // Paddle entegrasyonu: checkout penceresini aç
-    Paddle.Checkout.open({
-      items: [
-        {
-          priceId: "pri_01jbm4srw7rgc8a1wbrdkhaetd",
-          quantity: 1,
+    if (window.Paddle) {
+      // Paddle entegrasyonu: checkout penceresini aç
+      window.Paddle.Checkout.open({
+        items: [
+          {
+            priceId: "pri_01jbm4srw7rgc8a1wbrdkhaetd",
+            quantity: 1,
+          },
+        ],
+        successCallback: function (data) {
+          console.log("Satın alma başarılı!", data);
         },
-      ],
-      successCallback: function (data) {
-        console.log("Satın alma başarılı!", data);
-      },
-      closeCallback: function () {
-        console.log("Ödeme penceresi kapatıldı.");
-      },
-    });
+        closeCallback: function () {
+          console.log("Ödeme penceresi kapatıldı.");
+        },
+      });
+    } else {
+      console.error("Paddle tanımlı değil.");
+    }
   };
 
   return (
