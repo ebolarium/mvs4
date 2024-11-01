@@ -1,6 +1,6 @@
 // Homepage.js
-import React, { useState, useRef, useEffect } from 'react';
-import { AppBar, Toolbar, Typography, Button, Box, Paper, ClickAwayListener, Link, Container, Grid, Card, CardContent, IconButton } from '@mui/material';
+import React, { useState, useRef } from 'react';
+import { AppBar, Toolbar, Typography, Button, Box, Paper, ClickAwayListener, Link, Container, Grid, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../assets/VoteSong_Logo.gif';
@@ -22,100 +22,7 @@ const Homepage = () => {
   const anchorRef = useRef(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
-  const [products, setProducts] = useState([]);
-  const [loggedInUserId, setLoggedInUserId] = useState(null);
 
-  // Kullanıcı giriş durumunu kontrol etme
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    console.log('Fetched token:', token);
-    if (token) {
-      setIsLoggedIn(true);
-      fetchUserData(); // Giriş yapılmışsa kullanıcı verisini alıyoruz
-    }
-  }, []);
-
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.paddle.com/paddle/paddle.js';
-    script.async = true;
-    script.onload = () => {
-      if (window.Paddle) {
-        window.Paddle.Environment.set('sandbox'); 
-        window.Paddle.Initialize({ vendor: 24248 }); 
-        console.log('Paddle.js successfully set up');
-      } else {
-        console.error('Paddle is not available');
-      }
-    };
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
-
-  // Ürünleri Paddle API'den çekme
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch('/api/products');
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Failed to fetch products:', errorText);
-          return;
-        }
-        const data = await response.json();
-        console.log('Fetched products:', data);
-        setProducts(data);
-      } catch (error) {
-        console.error('Error fetching products: ', error);
-      }
-    };
-
-    fetchProducts();
-  }, []);
-
-  const fetchUserData = async () => {
-    try {
-      const token = localStorage.getItem('token'); 
-      if (!token) {
-        console.error('No token found');
-        return;
-      }
-  
-      const response = await fetch('/api/bands/profile', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-  
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error fetching user data:', response.status, errorText);
-        return;
-      }
-  
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        const data = await response.json();
-        console.log('Fetched user data:', data);
-  
-        if (data.band && data.band._id) {
-          setLoggedInUserId(data.band._id);
-          console.log('User ID fetched successfully:', data.band._id);
-        } else {
-          console.error('Error: User ID is missing in the response:', data);
-        }
-      } else {
-        const textData = await response.text();
-        console.error('Error: Response is not in JSON format:', textData);
-      }
-    } catch (error) {
-      console.error('An error occurred while fetching user data:', error);
-    }
-  };
-  
   const handleLoginToggle = () => setLoginOpen((prev) => !prev);
   const handleRegisterToggle = () => setRegisterOpen((prev) => !prev);
   const handleLoginClose = (event) => {
@@ -124,10 +31,9 @@ const Homepage = () => {
   };
   const handleRegisterClose = () => setRegisterOpen(false);
 
-  const handleLoginSuccess = (userData) => {
+  const handleLoginSuccess = () => {
     setIsLoggedIn(true);
     setLoginOpen(false);
-    fetchUserData(); // Giriş başarılı olduğunda kullanıcı verisini alıyoruz
   };
 
   const handleRegisterSuccess = () => {
@@ -137,13 +43,6 @@ const Homepage = () => {
 
   const handleVerificationModalClose = () => {
     setShowVerificationModal(false);
-  };
-
-  const initiatePlanSelection = () => {
-    if (!isLoggedIn) {
-      alert(t('login_required_to_select_plan')); // Kullanıcı giriş yapmadıysa uyarı mesajı
-      setLoginOpen(true); // Giriş modalını aç
-    }
   };
 
   return (
@@ -224,12 +123,7 @@ const Homepage = () => {
       </Box>
 
       <Container maxWidth="lg" sx={{ py: 0 }}>
-        <PricesSection
-          isLoggedIn={isLoggedIn}
-          openLoginModal={handleLoginToggle}
-          products={products}
-          loggedInUserId={loggedInUserId} // Pass the loggedInUserId
-        />
+        <PricesSection />
         <HowItWorksSection />
         <AboutUsSection />
       </Container>
