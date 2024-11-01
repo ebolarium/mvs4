@@ -24,102 +24,95 @@ const Homepage = () => {
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [products, setProducts] = useState([]);
   const [loggedInUserId, setLoggedInUserId] = useState(null);
-  const [isPaddleInitialized, setIsPaddleInitialized] = useState(false);
 
-
-  // Kullanıcı giriş durumunu kontrol etme
+  // Check user login status
   useEffect(() => {
     const token = localStorage.getItem('token');
     console.log('Fetched token:', token);
     if (token) {
       setIsLoggedIn(true);
-      fetchUserData(); // Giriş yapılmışsa kullanıcı verisini alıyoruz
+      fetchUserData(); // Fetch user data if logged in
     }
   }, []);
 
+  // Load Paddle.js and set up Paddle
   useEffect(() => {
     const script = document.createElement('script');
-    script.src = 'https://cdn.paddle.com/paddle/paddle.js'; // Use standard Paddle SDK
+    script.src = 'https://cdn.paddle.com/paddle/paddle.js';
     script.async = true;
     script.onload = () => {
       if (window.Paddle) {
-        window.Paddle.Environment.set('sandbox'); // or 'production'
-        window.Paddle.Setup({ vendor: 24248 }); // Use Setup() instead of Initialize()
+        window.Paddle.Environment.set('sandbox'); // Use 'sandbox' for testing
+        window.Paddle.Setup({ vendor: 24248 }); // Replace with your actual vendor ID
         console.log('Paddle.js successfully set up');
-        setIsPaddleInitialized(true); // Set state to true when initialized
       } else {
         console.error('Paddle is not available');
       }
     };
     document.body.appendChild(script);
-  
+
     return () => {
       document.body.removeChild(script);
     };
   }, []);
 
-
-  // Ürünleri Paddle API'den çekme
- useEffect(() => {
-  const fetchProducts = async () => {
-    try {
-      const response = await fetch('/api/products');
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Failed to fetch products:', errorText);
-        return;
+  // Fetch products from your backend
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('/api/products');
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Failed to fetch products:', errorText);
+          return;
+        }
+        const data = await response.json();
+        console.log('Fetched products:', data);
+        setProducts(data);
+      } catch (error) {
+        console.error("Error fetching products: ", error);
       }
-      const data = await response.json();
-      console.log('Fetched products:', data);
-      setProducts(data);
-    } catch (error) {
-      console.error("Error fetching products: ", error);
-    }
-  };
+    };
 
-  fetchProducts();
-}, []);
+    fetchProducts();
+  }, []);
 
+  // Fetch user data
   const fetchUserData = async () => {
     try {
-      const token = localStorage.getItem('token'); 
+      const token = localStorage.getItem('token');
       if (!token) {
         console.error('No token found');
         return;
       }
-  
+
       const response = await fetch('/api/bands/profile', {
         headers: {
-          'Authorization': `Bearer ${token}`, 
+          'Authorization': `Bearer ${token}`,
         },
       });
-  
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Error fetching user data:', response.status, errorText);
         return;
       }
-  
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
-        const data = await response.json();
-        console.log('Fetched user data:', data);
-  
-        if (data.band && data.band._id) {
-          setLoggedInUserId(data.band._id);
-          console.log("User ID fetched successfully:", data.band._id);
-        } else {
-          console.error('Error: User ID is missing in the response:', data);
-        }
+
+      const data = await response.json();
+      console.log('Fetched user data:', data);
+
+      if (data.band && data.band._id) {
+        setLoggedInUserId(data.band._id);
+        console.log("User ID fetched successfully:", data.band._id);
       } else {
-        const textData = await response.text();
-        console.error('Error: Response is not in JSON format:', textData);
+        console.error('Error: User ID is missing in the response:', data);
       }
     } catch (error) {
       console.error('An error occurred while fetching user data:', error);
     }
   };
-  
+
+  // Handlers for login and register modals
   const handleLoginToggle = () => setLoginOpen((prev) => !prev);
   const handleRegisterToggle = () => setRegisterOpen((prev) => !prev);
   const handleLoginClose = (event) => {
@@ -128,10 +121,10 @@ const Homepage = () => {
   };
   const handleRegisterClose = () => setRegisterOpen(false);
 
-  const handleLoginSuccess = (userData) => {
+  const handleLoginSuccess = () => {
     setIsLoggedIn(true);
     setLoginOpen(false);
-    fetchUserData(); // Giriş başarılı olduğunda kullanıcı verisini alıyoruz
+    fetchUserData(); // Fetch user data after successful login
   };
 
   const handleRegisterSuccess = () => {
@@ -141,13 +134,6 @@ const Homepage = () => {
 
   const handleVerificationModalClose = () => {
     setShowVerificationModal(false);
-  };
-
-  const initiatePlanSelection = () => {
-    if (!isLoggedIn) {
-      alert(t('login_required_to_select_plan')); // Kullanıcı giriş yapmadıysa uyarı mesajı
-      setLoginOpen(true); // Giriş modalını aç
-    }
   };
 
   return (
@@ -179,6 +165,7 @@ const Homepage = () => {
         </Toolbar>
       </AppBar>
 
+      {/* Login Modal */}
       {loginOpen && (
         <ClickAwayListener onClickAway={handleLoginClose}>
           <Paper
@@ -199,6 +186,7 @@ const Homepage = () => {
         </ClickAwayListener>
       )}
 
+      {/* Register Modal */}
       {registerOpen && (
         <Box
           sx={{
@@ -228,13 +216,12 @@ const Homepage = () => {
       </Box>
 
       <Container maxWidth="lg" sx={{ py: 0 }}>
-      <PricesSection
-        isLoggedIn={isLoggedIn}
-        openLoginModal={handleLoginToggle}
-        products={products}
-        loggedInUserId={loggedInUserId}
-        isPaddleInitialized={isPaddleInitialized} // Pass the state down
-      />
+        <PricesSection
+          isLoggedIn={isLoggedIn}
+          openLoginModal={handleLoginToggle}
+          products={products}
+          loggedInUserId={loggedInUserId}
+        />
         <HowItWorksSection />
         <AboutUsSection />
       </Container>

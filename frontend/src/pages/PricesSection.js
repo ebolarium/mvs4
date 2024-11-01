@@ -3,7 +3,7 @@ import React from 'react';
 import { Box, Container, Grid, Card, CardContent, Typography, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
-const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId, isPaddleInitialized }) => {
+const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId }) => {
   const { t } = useTranslation();
 
   const initiateCheckout = (productId) => {
@@ -22,15 +22,9 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId, i
       return;
     }
 
-    if (!isPaddleInitialized) {
-      console.error('Paddle is not initialized yet');
-      alert(t('payment_system_not_ready')); // You can translate this message
-      return;
-    }
-
     if (window.Paddle) {
       window.Paddle.Checkout.open({
-        product: productId, // Use integer product ID
+        product: productId, // Paddle product ID (integer)
         passthrough: JSON.stringify({ userId: loggedInUserId }),
         successCallback: (data) => {
           console.log('Payment Successful:', data);
@@ -45,10 +39,9 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId, i
         locale: 'en',
       });
     } else {
-      console.error('Paddle is not available after initialization');
+      console.error('Paddle is not initialized');
     }
   };
-
 
   return (
     <Box sx={{ py: 2, backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
@@ -66,7 +59,12 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId, i
             return (
               <Grid item xs={12} md={6} key={productId}>
                 <Card
-                  sx={{ backgroundColor: '#ffffffcc', borderRadius: '16px', transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}
+                  sx={{
+                    backgroundColor: '#ffffffcc',
+                    borderRadius: '16px',
+                    transition: 'transform 0.3s',
+                    '&:hover': { transform: 'scale(1.05)' },
+                  }}
                 >
                   <CardContent>
                     <Typography variant="h5" align="center" gutterBottom>
@@ -78,12 +76,11 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId, i
                     <Typography variant="body1" align="center" sx={{ mb: 2 }}>
                       {product.description}
                     </Typography>
-                    <Button 
-                      variant="contained" 
-                      color="primary" 
-                      fullWidth 
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      fullWidth
                       onClick={() => initiateCheckout(productId)}
-                      disabled={!isPaddleInitialized} // Disable button if Paddle isn't ready
                     >
                       {t('pricing.purchase_button')}
                     </Button>
