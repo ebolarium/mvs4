@@ -43,7 +43,7 @@ const Homepage = () => {
     script.onload = () => {
       if (window.Paddle) {
         window.Paddle.Environment.set('sandbox'); // Sandbox ortamını kullanıyorsanız
-        window.Paddle.setup({ vendor: 24248 });
+        window.Paddle.Initialize({ vendor: 24248 }); // 'setup' yerine 'Initialize' kullanıyoruz.
         console.log('Paddle.js successfully set up');
       } else {
         console.error('Paddle is not available');

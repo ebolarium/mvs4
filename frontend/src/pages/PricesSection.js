@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId }) => {
   const { t } = useTranslation();
 
-  const initiateCheckout = (productId) => {
+  const initiateCheckout = (priceId) => {
     if (!isLoggedIn) {
       alert(t('login_required_to_purchase'));
       openLoginModal();
@@ -19,8 +19,15 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
     }
 
     if (window.Paddle) {
+      let itemsList = [
+        {
+          priceId: "pri_01jbm4srw7rgc8a1wbrdkhaetd",
+          quantity: 1
+        }
+      ];
+
       window.Paddle.Checkout.open({
-        product: productId,
+        items: itemsList,
         passthrough: JSON.stringify({ userId: loggedInUserId }),
         successCallback: (data) => {
           console.log('Payment Successful:', data);
@@ -56,7 +63,7 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
                     variant="contained" 
                     color="primary" 
                     fullWidth 
-                    onClick={() => initiateCheckout(product.id)}
+                    onClick={() => initiateCheckout(product.id)} // Price ID'yi initiateCheckout'a geçiyoruz
                   >
                     {t('pricing.purchase_button')}
                   </Button>
