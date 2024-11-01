@@ -38,13 +38,13 @@ const Homepage = () => {
   // Paddle.js yükleme ve Paddle.Setup() işlemi
   useEffect(() => {
     const script = document.createElement('script');
-    script.src = 'https://cdn.paddle.com/paddle/paddle.js';
+    script.src = 'https://cdn.paddle.com/paddle/elements.js';
     script.async = true;
     script.onload = () => {
       if (window.Paddle) {
-        window.Paddle.Environment.set('sandbox'); // Sandbox ortamını kullanıyorsanız
-        window.Paddle.Setup({ vendor: 24248 });
-        console.log('Paddle.js successfully set up');
+          window.Paddle.Environment.set('sandbox'); // Use 'sandbox' or 'production'
+          window.Paddle.Initialize({ vendor: 24248 }); // Initialize Elements SDK
+          console.log('Paddle Elements SDK successfully set up');
       } else {
         console.error('Paddle is not available');
       }
