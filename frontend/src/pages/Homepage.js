@@ -39,13 +39,13 @@ const Homepage = () => {
 
   useEffect(() => {
     const script = document.createElement('script');
-    script.src = 'https://cdn.paddle.com/paddle/elements.js';
+    script.src = 'https://cdn.paddle.com/paddle/paddle.js';
     script.async = true;
     script.onload = () => {
       if (window.Paddle) {
         window.Paddle.Environment.set('sandbox'); // or 'production'
         window.Paddle.Initialize({ vendor: 24248 }); // Use your actual vendor ID
-        console.log('Paddle Elements SDK successfully set up');
+        console.log('Paddle.js successfully set up');
         setIsPaddleInitialized(true); // Set state to true when initialized
       } else {
         console.error('Paddle is not available');

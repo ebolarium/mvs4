@@ -30,12 +30,7 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId, i
 
     if (window.Paddle) {
       window.Paddle.Checkout.open({
-        items: [
-          {
-            priceId: productId,
-            quantity: 1,
-          },
-        ],
+        product: productId, // Use integer product ID
         passthrough: JSON.stringify({ userId: loggedInUserId }),
         successCallback: (data) => {
           console.log('Payment Successful:', data);

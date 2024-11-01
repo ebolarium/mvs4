@@ -26,13 +26,11 @@ router.get('/products', async (req, res) => {
       console.log('Fetched products from Paddle API:', data);
       
       const formattedProducts = data.data.map(item => ({
-        id: item.id, // Price ID
-        name: item.name,
-        description: item.description,
-        price: item.unit_price.amount, // Fiyatı cent cinsinden alıyorsunuz
-        currency: item.unit_price.currency_code,
-        interval: item.billing_cycle.interval, // Ödeme döngüsü aralığı (örneğin, 1)
-        frequency: item.billing_cycle.frequency, // Ödeme sıklığı (örneğin, 'month' veya 'year')
+        id: product.id, // Integer product ID
+        name: product.name,
+        description: product.description,
+        base_price: product.base_price,
+        currency: product.currency,
       }));
 
       res.json(formattedProducts);
