@@ -14,6 +14,8 @@ const i18n = require('i18n');
 const fs = require('fs');
 const spotifyAuthRoutes = require('./routes/spotifyAuth');
 const emailRoute = require('./routes/emailRoute');
+const bodyParser = require('body-parser');
+
 
 const Band = require('./models/Band'); // Import the Band model
 
