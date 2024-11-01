@@ -25,25 +25,25 @@ const Homepage = () => {
   const [products, setProducts] = useState([]);
   const [loggedInUserId, setLoggedInUserId] = useState(null);
 
-  // Check user login status
+  // Kullanıcı giriş durumunu kontrol etme
   useEffect(() => {
     const token = localStorage.getItem('token');
     console.log('Fetched token:', token);
     if (token) {
       setIsLoggedIn(true);
-      fetchUserData(); // Fetch user data if logged in
+      fetchUserData(); // Giriş yapılmışsa kullanıcı verisini alıyoruz
     }
   }, []);
 
-  // Load Paddle.js and set up Paddle
+  // Paddle.js yükleme ve Paddle.Setup() işlemi
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://cdn.paddle.com/paddle/paddle.js';
     script.async = true;
     script.onload = () => {
       if (window.Paddle) {
-        window.Paddle.Environment.set('sandbox'); // Use 'sandbox' for testing
-        window.Paddle.Setup({ vendor: 24248 }); // Replace with your actual vendor ID
+        window.Paddle.Environment.set('sandbox'); // Sandbox ortamını kullanıyorsanız
+        window.Paddle.Setup({ vendor: 24248 });
         console.log('Paddle.js successfully set up');
       } else {
         console.error('Paddle is not available');
@@ -56,7 +56,7 @@ const Homepage = () => {
     };
   }, []);
 
-  // Fetch products from your backend
+  // Ürünleri Paddle API'den çekme
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -70,49 +70,53 @@ const Homepage = () => {
         console.log('Fetched products:', data);
         setProducts(data);
       } catch (error) {
-        console.error("Error fetching products: ", error);
+        console.error('Error fetching products: ', error);
       }
     };
 
     fetchProducts();
   }, []);
 
-  // Fetch user data
   const fetchUserData = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token'); 
       if (!token) {
         console.error('No token found');
         return;
       }
-
+  
       const response = await fetch('/api/bands/profile', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
-
+  
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Error fetching user data:', response.status, errorText);
         return;
       }
-
-      const data = await response.json();
-      console.log('Fetched user data:', data);
-
-      if (data.band && data.band._id) {
-        setLoggedInUserId(data.band._id);
-        console.log("User ID fetched successfully:", data.band._id);
+  
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const data = await response.json();
+        console.log('Fetched user data:', data);
+  
+        if (data.band && data.band._id) {
+          setLoggedInUserId(data.band._id);
+          console.log('User ID fetched successfully:', data.band._id);
+        } else {
+          console.error('Error: User ID is missing in the response:', data);
+        }
       } else {
-        console.error('Error: User ID is missing in the response:', data);
+        const textData = await response.text();
+        console.error('Error: Response is not in JSON format:', textData);
       }
     } catch (error) {
       console.error('An error occurred while fetching user data:', error);
     }
   };
-
-  // Handlers for login and register modals
+  
   const handleLoginToggle = () => setLoginOpen((prev) => !prev);
   const handleRegisterToggle = () => setRegisterOpen((prev) => !prev);
   const handleLoginClose = (event) => {
@@ -121,10 +125,10 @@ const Homepage = () => {
   };
   const handleRegisterClose = () => setRegisterOpen(false);
 
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = (userData) => {
     setIsLoggedIn(true);
     setLoginOpen(false);
-    fetchUserData(); // Fetch user data after successful login
+    fetchUserData(); // Giriş başarılı olduğunda kullanıcı verisini alıyoruz
   };
 
   const handleRegisterSuccess = () => {
@@ -134,6 +138,13 @@ const Homepage = () => {
 
   const handleVerificationModalClose = () => {
     setShowVerificationModal(false);
+  };
+
+  const initiatePlanSelection = () => {
+    if (!isLoggedIn) {
+      alert(t('login_required_to_select_plan')); // Kullanıcı giriş yapmadıysa uyarı mesajı
+      setLoginOpen(true); // Giriş modalını aç
+    }
   };
 
   return (
@@ -165,7 +176,6 @@ const Homepage = () => {
         </Toolbar>
       </AppBar>
 
-      {/* Login Modal */}
       {loginOpen && (
         <ClickAwayListener onClickAway={handleLoginClose}>
           <Paper
@@ -186,7 +196,6 @@ const Homepage = () => {
         </ClickAwayListener>
       )}
 
-      {/* Register Modal */}
       {registerOpen && (
         <Box
           sx={{
@@ -220,7 +229,7 @@ const Homepage = () => {
           isLoggedIn={isLoggedIn}
           openLoginModal={handleLoginToggle}
           products={products}
-          loggedInUserId={loggedInUserId}
+          loggedInUserId={loggedInUserId} // Pass the loggedInUserId
         />
         <HowItWorksSection />
         <AboutUsSection />

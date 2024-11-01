@@ -59,12 +59,7 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
             return (
               <Grid item xs={12} md={6} key={productId}>
                 <Card
-                  sx={{
-                    backgroundColor: '#ffffffcc',
-                    borderRadius: '16px',
-                    transition: 'transform 0.3s',
-                    '&:hover': { transform: 'scale(1.05)' },
-                  }}
+                  sx={{ backgroundColor: '#ffffffcc', borderRadius: '16px', transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.05)' } }}
                 >
                   <CardContent>
                     <Typography variant="h5" align="center" gutterBottom>
@@ -76,11 +71,11 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
                     <Typography variant="body1" align="center" sx={{ mb: 2 }}>
                       {product.description}
                     </Typography>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      fullWidth
-                      onClick={() => initiateCheckout(productId)}
+                    <Button 
+                      variant="contained" 
+                      color="primary" 
+                      fullWidth 
+                      onClick={() => initiateCheckout(productId)} // Use the correct product ID
                     >
                       {t('pricing.purchase_button')}
                     </Button>
