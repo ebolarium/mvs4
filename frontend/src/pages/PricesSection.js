@@ -3,31 +3,37 @@ import React from 'react';
 import { Box, Container, Grid, Card, CardContent, Typography, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
-const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId }) => {
+const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId, isPaddleInitialized }) => {
   const { t } = useTranslation();
 
   const initiateCheckout = (productId) => {
     console.log('Initiating checkout with productId:', productId);
     console.log('Logged In User ID:', loggedInUserId);
-  
+
     if (!isLoggedIn) {
       alert(t('login_required_to_purchase'));
       openLoginModal();
       return;
     }
-  
+
     if (!loggedInUserId) {
       console.error('loggedInUserId is null or undefined');
       alert(t('user_id_missing'));
       return;
     }
-  
+
+    if (!isPaddleInitialized) {
+      console.error('Paddle is not initialized yet');
+      alert(t('payment_system_not_ready')); // You can translate this message
+      return;
+    }
+
     if (window.Paddle) {
       window.Paddle.Checkout.open({
         items: [
           {
-            priceId: productId, // Use priceId here
-            quantity: 1,        // Set the desired quantity
+            priceId: productId,
+            quantity: 1,
           },
         ],
         passthrough: JSON.stringify({ userId: loggedInUserId }),
@@ -44,9 +50,10 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
         locale: 'en',
       });
     } else {
-      console.error('Paddle is not initialized');
+      console.error('Paddle is not available after initialization');
     }
   };
+
 
   return (
     <Box sx={{ py: 2, backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
@@ -80,7 +87,8 @@ const PricesSection = ({ isLoggedIn, openLoginModal, products, loggedInUserId })
                       variant="contained" 
                       color="primary" 
                       fullWidth 
-                      onClick={() => initiateCheckout(productId)} // Use the correct product ID
+                      onClick={() => initiateCheckout(productId)}
+                      disabled={!isPaddleInitialized} // Disable button if Paddle isn't ready
                     >
                       {t('pricing.purchase_button')}
                     </Button>

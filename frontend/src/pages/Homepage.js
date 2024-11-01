@@ -24,6 +24,8 @@ const Homepage = () => {
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [products, setProducts] = useState([]);
   const [loggedInUserId, setLoggedInUserId] = useState(null);
+  const [isPaddleInitialized, setIsPaddleInitialized] = useState(false);
+
 
   // Kullanıcı giriş durumunu kontrol etme
   useEffect(() => {
@@ -35,16 +37,16 @@ const Homepage = () => {
     }
   }, []);
 
-  // Paddle.js yükleme ve Paddle.Setup() işlemi
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://cdn.paddle.com/paddle/elements.js';
     script.async = true;
     script.onload = () => {
       if (window.Paddle) {
-          window.Paddle.Environment.set('sandbox'); // Use 'sandbox' or 'production'
-          window.Paddle.Initialize({ vendor: 24248 }); // Initialize Elements SDK
-          console.log('Paddle Elements SDK successfully set up');
+        window.Paddle.Environment.set('sandbox'); // or 'production'
+        window.Paddle.Initialize({ vendor: 24248 }); // Use your actual vendor ID
+        console.log('Paddle Elements SDK successfully set up');
+        setIsPaddleInitialized(true); // Set state to true when initialized
       } else {
         console.error('Paddle is not available');
       }
@@ -55,6 +57,7 @@ const Homepage = () => {
       document.body.removeChild(script);
     };
   }, []);
+
 
   // Ürünleri Paddle API'den çekme
  useEffect(() => {
@@ -226,11 +229,12 @@ const Homepage = () => {
 
       <Container maxWidth="lg" sx={{ py: 0 }}>
       <PricesSection
-      isLoggedIn={isLoggedIn}
-      openLoginModal={handleLoginToggle}
-      products={products}
-      loggedInUserId={loggedInUserId} // Pass the loggedInUserId
-    />
+        isLoggedIn={isLoggedIn}
+        openLoginModal={handleLoginToggle}
+        products={products}
+        loggedInUserId={loggedInUserId}
+        isPaddleInitialized={isPaddleInitialized} // Pass the state down
+      />
         <HowItWorksSection />
         <AboutUsSection />
       </Container>
