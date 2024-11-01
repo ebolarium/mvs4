@@ -39,12 +39,12 @@ const Homepage = () => {
 
   useEffect(() => {
     const script = document.createElement('script');
-    script.src = 'https://cdn.paddle.com/paddle/paddle.js';
+    script.src = 'https://cdn.paddle.com/paddle/paddle.js'; // Use standard Paddle SDK
     script.async = true;
     script.onload = () => {
       if (window.Paddle) {
         window.Paddle.Environment.set('sandbox'); // or 'production'
-        window.Paddle.Initialize({ vendor: 24248 }); // Use your actual vendor ID
+        window.Paddle.Setup({ vendor: 24248 }); // Use Setup() instead of Initialize()
         console.log('Paddle.js successfully set up');
         setIsPaddleInitialized(true); // Set state to true when initialized
       } else {
@@ -52,7 +52,7 @@ const Homepage = () => {
       }
     };
     document.body.appendChild(script);
-
+  
     return () => {
       document.body.removeChild(script);
     };
