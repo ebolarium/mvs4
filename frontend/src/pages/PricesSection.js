@@ -7,11 +7,18 @@ import { Box, Typography, Button } from '@mui/material';
 
 const PricesSection = () => {
   useEffect(() => {
-    // Paddle'ı başlat ve sadece client-side token kullanarak yapılandır
-    Paddle.Environment.set("sandbox");
-    Paddle.Initialize({
-      token: "test_605824494b6e720104d54646e1c" // Buraya kendi client-side token'ınızı ekleyin
-    });
+    // Paddle scriptini yükle
+    const script = document.createElement('script');
+    script.src = "https://cdn.paddle.com/paddle/v2/paddle.js";
+    script.async = true;
+    script.onload = () => {
+      // Paddle'ı başlat ve sadece client-side token kullanarak yapılandır
+      Paddle.Environment.set("sandbox");
+      Paddle.Initialize({
+        token: "test_605824494b6e720104d54646e1c" // Buraya kendi client-side token'ınızı ekleyin
+      });
+    };
+    document.body.appendChild(script);
   }, []);
 
   const handleSubscribe = () => {
