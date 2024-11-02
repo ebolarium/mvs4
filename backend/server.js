@@ -70,16 +70,10 @@ app.use('/api', emailRoute); // Include the email route
 
 
 // Paddle Webhook Endpoint
+const crypto = require('crypto');
+
 app.post('/paddle/webhook', (req, res) => {
   const webhookData = req.body;
-  
-  // Gelen veriyi console'a yazdır
-  console.log('Paddle Webhook Data:', webhookData);
-
-  if (webhookData.passthrough) {
-    const bandId = JSON.parse(webhookData.passthrough).bandId;
-    console.log('Ödemeyi yapan bandId:', bandId);
-  }
 
   // Paddle'dan gelen p_signature alınıyor
   const signature = webhookData.p_signature;
@@ -88,7 +82,7 @@ app.post('/paddle/webhook', (req, res) => {
   const serializedData = Object.keys(webhookData)
     .filter(key => key !== 'p_signature')
     .sort()
-    .map(key => `${key}=${webhookData[key]}`)
+    .map(key => `${key}=${JSON.stringify(webhookData[key])}`) // Değerleri string olarak almak için JSON.stringify kullanıyoruz
     .join('&');
 
   // İmza doğrulaması için Paddle secret key kullanılır

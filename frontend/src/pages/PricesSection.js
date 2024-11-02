@@ -27,11 +27,11 @@ const PricesSection = () => {
   const handleSubscribe = () => {
     // Kullanıcı login olmuş mu kontrol et
     const token = localStorage.getItem('token');
-    if (!token) {
+    if (!token || token === "undefined") {
       alert("Lütfen önce giriş yapın veya kayıt olun.");
       return;
     }
-
+  
     // Token'dan band_id al
     let bandId;
     try {
@@ -42,7 +42,7 @@ const PricesSection = () => {
       alert("Geçersiz giriş bilgisi. Lütfen tekrar giriş yapın.");
       return;
     }
-
+  
     if (window.Paddle) {
       // Paddle entegrasyonu: checkout penceresini aç
       window.Paddle.Checkout.open({
@@ -64,6 +64,7 @@ const PricesSection = () => {
       console.error("Paddle tanımlı değil.");
     }
   };
+  
 
   return (
     <Box sx={{ py: 2, textAlign: 'center', backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
