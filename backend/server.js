@@ -15,7 +15,7 @@ const fs = require('fs');
 const spotifyAuthRoutes = require('./routes/spotifyAuth');
 const emailRoute = require('./routes/emailRoute');
 const bodyParser = require('body-parser');
-import { Paddle, EventName } from '@paddle/paddle-node-sdk';
+const { Paddle, EventName } = require('@paddle/paddle-node-sdk');
 
 
 
@@ -72,7 +72,9 @@ app.use('/api', emailRoute); // Include the email route
 
 
 const paddle = new Paddle('0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19'); // Sandbox ya da Production API anahtarını buraya ekleyin
-app.use(express.raw({ type: 'application/json' }));
+app.use('/paddle/webhook', express.raw({ type: 'application/json' }));
+
+
 
 // Webhook endpoint
 app.post('/paddle/webhook', (req, res) => {
@@ -115,6 +117,9 @@ app.post('/paddle/webhook', (req, res) => {
     res.status(400).send('Invalid signature');
   }
 });
+
+
+
 
 
 
