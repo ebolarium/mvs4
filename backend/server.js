@@ -70,34 +70,49 @@ app.use('/api', emailRoute); // Include the email route
 
 
 // Paddle Webhook Endpoint
-
 app.post('/paddle/webhook', (req, res) => {
-  const webhookData = req.body;
+  // Paddle'dan gelen 'Paddle-Signature' header'ını al
+  const paddleSignature = req.headers['paddle-signature'];
+  if (!paddleSignature) {
+    console.error('Paddle-Signature header not found');
+    return res.status(400).send('Invalid signature');
+  }
 
-  // Paddle'dan gelen p_signature alınıyor
-  const signature = webhookData.p_signature;
+  // 'ts' ve 'h1' değerlerini Paddle-Signature header'ından ayır
+  const parts = paddleSignature.split(';');
+  const tsPart = parts.find(part => part.startsWith('ts='));
+  const h1Part = parts.find(part => part.startsWith('h1='));
 
-  // Webhook verisini içeren, imza hariç, tüm alanlar alfabetik olarak sıralanıp string haline getirilir
-  const serializedData = Object.keys(webhookData)
-    .filter(key => key !== 'p_signature')
-    .sort()
-    .map(key => `${key}=${JSON.stringify(webhookData[key])}`) // Değerleri string olarak almak için JSON.stringify kullanıyoruz
-    .join('&');
+  if (!tsPart || !h1Part) {
+    console.error('Invalid Paddle-Signature header format');
+    return res.status(400).send('Invalid signature');
+  }
 
-  // İmza doğrulaması için Paddle secret key kullanılır
+  // Timestamp ve h1 imzasını al
+  const ts = tsPart.split('=')[1];
+  const h1 = h1Part.split('=')[1];
+
+  // İmza doğrulaması için payload oluştur ('ts' + ':' + request'in raw body'si)
+  const rawBody = req.body.toString();
+  const signedPayload = `${ts}:${rawBody}`;
+
+  // İmza oluşturma (HMAC-SHA256) - Paddle secret key kullanılarak
+  const secretKey = 'pdl_ntfset_01jbeg11et89t7579610fhxn5z_YdkhEaae7TAP/gl/GwAkloZGNFFSWf1+';
   const hash = crypto
-    .createHmac('sha256', 'pdl_ntfset_01jbeg11et89t7579610fhxn5z_YdkhEaae7TAP/gl/GwAkloZGNFFSWf1+')
-    .update(serializedData)
-    .digest('base64');
+    .createHmac('sha256', secretKey)
+    .update(signedPayload)
+    .digest('hex'); // 'h1' değeri hexadecimal formattadır
 
-  if (hash === signature) {
-    console.log('Paddle Webhook Doğrulandı:', webhookData);
+  // İmzaları karşılaştırma
+  if (hash === h1) {
+    console.log('Paddle Webhook Doğrulandı:', req.body);
     res.status(200).send('Webhook received');
   } else {
     console.error('Webhook doğrulaması başarısız oldu');
     res.status(400).send('Invalid signature');
   }
 });
+
 
 
 // Serve frontend files
