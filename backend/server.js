@@ -81,12 +81,14 @@ app.use('/api', emailRoute); // Include the email route
 
 
 
+
+
 // Paddle API Anahtarı ve Webhook Secret Key
 const PADDLE_API_KEY = '0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19';
 const WEBHOOK_SECRET_KEY = 'pdl_ntfset_01jbeg11et89t7579610fhxn5z_YdkhEaae7TAP/gl/GwAkloZGNFFSWf1+';
 
-// Middleware - Raw body elde etmek için
-app.post('/paddle/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+// Webhook endpoint (raw body middleware)
+app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
   const signature = req.headers['paddle-signature'] || req.headers['Paddle-Signature'];
 
   if (!signature) {
@@ -95,14 +97,22 @@ app.post('/paddle/webhook', express.raw({ type: 'application/json' }), async (re
   }
 
   try {
-    // Buffer elde etmek için body'yi okuyoruz
-    const buf = await bufferBody(req);
+    // Gelen body'nin türünü kontrol edin
+    if (Buffer.isBuffer(req.body)) {
+      console.log('Body Type: Buffer');
+    } else {
+      console.error('Body is not a Buffer');
+      return res.status(400).send('Invalid body type');
+    }
+
+    // Buffer elde etmek için body'yi kullanıyoruz (Paddle'ın gönderdiği şekliyle)
+    const rawRequestBody = req.body;
 
     // İmza doğrulamasını yap
-    verifyPaddleSignature(buf, signature);
+    verifyPaddleSignature(rawRequestBody, signature);
 
     // Webhook'u işliyoruz
-    const eventData = JSON.parse(buf.toString('utf8'));
+    const eventData = JSON.parse(rawRequestBody.toString('utf8'));
 
     // Olay türüne göre işleme
     switch (eventData.event_type) {
@@ -122,15 +132,6 @@ app.post('/paddle/webhook', express.raw({ type: 'application/json' }), async (re
     res.status(400).send('Invalid signature');
   }
 });
-
-// Buffer elde etmek için body'yi oku (stream olarak gelen body'yi buffer'a çevir)
-async function bufferBody(readable) {
-  const chunks = [];
-  for await (const chunk of readable) {
-    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
-  }
-  return Buffer.concat(chunks);
-}
 
 // Paddle Signature Doğrulama Fonksiyonu
 function verifyPaddleSignature(requestBody, signature) {
@@ -181,6 +182,8 @@ function hashPayload(payload, secret) {
     throw new Error('Crypto HMAC creation failed');
   }
 }
+
+
 
 
 
