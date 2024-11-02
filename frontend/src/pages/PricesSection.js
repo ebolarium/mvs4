@@ -1,4 +1,3 @@
-// PricesSection.js
 import React, { useEffect } from 'react';
 import { Box, Typography, Button } from '@mui/material';
 
@@ -26,6 +25,24 @@ const PricesSection = () => {
   }, []);
 
   const handleSubscribe = () => {
+    // Kullanıcı login olmuş mu kontrol et
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert("Lütfen önce giriş yapın veya kayıt olun.");
+      return;
+    }
+
+    // Token'dan band_id al
+    let bandId;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      bandId = payload.id;
+    } catch (error) {
+      console.error("Token çözme hatası:", error);
+      alert("Geçersiz giriş bilgisi. Lütfen tekrar giriş yapın.");
+      return;
+    }
+
     if (window.Paddle) {
       // Paddle entegrasyonu: checkout penceresini aç
       window.Paddle.Checkout.open({
@@ -35,6 +52,7 @@ const PricesSection = () => {
             quantity: 1,
           },
         ],
+        passthrough: JSON.stringify({ bandId }), // bandId'yi passthrough olarak gönderiyoruz
         successCallback: function (data) {
           console.log("Satın alma başarılı!", data);
         },

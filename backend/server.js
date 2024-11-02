@@ -76,6 +76,11 @@ app.post('/paddle/webhook', (req, res) => {
   // Gelen veriyi console'a yazdır
   console.log('Paddle Webhook Data:', webhookData);
 
+  if (webhookData.passthrough) {
+    const bandId = JSON.parse(webhookData.passthrough).bandId;
+    console.log('Ödemeyi yapan bandId:', bandId);
+  }
+
   // Paddle'dan gelen p_signature alınıyor
   const signature = webhookData.p_signature;
 
