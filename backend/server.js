@@ -66,12 +66,6 @@ mongoose
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.log(err));
 
-// Routes
-app.use('/api/bands', bandRoutes);
-app.use('/api/songs', songRoutes);
-app.use('/api/playlist', playlistRoutes);
-app.use('/api/spotify', spotifyAuthRoutes);
-app.use('/api', emailRoute); // Include the email route
 
 
 
@@ -81,6 +75,9 @@ app.use('/api', emailRoute); // Include the email route
 
 
 
+
+
+  
 
 // Paddle Webhook Endpoint
 app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
@@ -178,6 +175,15 @@ function hashPayload(payload, secret) {
 
 
 
+
+
+
+// Routes
+app.use('/api/bands', bandRoutes);
+app.use('/api/songs', songRoutes);
+app.use('/api/playlist', playlistRoutes);
+app.use('/api/spotify', spotifyAuthRoutes);
+app.use('/api', emailRoute); // Include the email route
 
 // Serve frontend files
 app.use(express.static(path.join(__dirname, '../frontend/build')));
