@@ -71,13 +71,14 @@ app.use('/api', emailRoute); // Include the email route
 
 
 
+
 // Paddle API Anahtarı ve Webhook Secret Key
-const PADDLE_API_KEY = '0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19'; // Sandbox veya Production API anahtarınızı buraya ekleyin
+const PADDLE_API_KEY = '0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19'; // API anahtarınızı buraya ekleyin
 const WEBHOOK_SECRET_KEY = 'pdl_ntfset_01jbeg11et89t7579610fhxn5z_YdkhEaae7TAP/gl/GwAkloZGNFFSWf1+';
 
 const paddle = new Paddle(PADDLE_API_KEY);
 
-// Sadece /paddle/webhook rotasında raw body kullan
+// Raw body middleware - sadece '/paddle/webhook' rotası için kullanıyoruz
 app.use('/paddle/webhook', express.raw({ type: 'application/json' }));
 
 // Webhook endpoint
@@ -90,8 +91,8 @@ app.post('/paddle/webhook', (req, res) => {
     return res.status(400).send('Invalid signature');
   }
 
-  // Raw body buffer'ını alıyoruz ve string'e çeviriyoruz
-  const rawRequestBody = req.body.toString();
+  // Raw body'yi direkt olarak kullanıyoruz, buffer türünde tutuyoruz
+  const rawRequestBody = req.body; // Buffer olarak gelen body'yi direkt kullanıyoruz
 
   try {
     if (signature && rawRequestBody) {
@@ -122,6 +123,8 @@ app.post('/paddle/webhook', (req, res) => {
     res.status(400).send('Invalid signature');
   }
 });
+
+
 
 
 
