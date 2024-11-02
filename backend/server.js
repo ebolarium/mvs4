@@ -59,7 +59,6 @@ app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
   console.log("Webhook endpoint hit!");
 
   const signature = req.headers['paddle-signature'] || req.headers['Paddle-Signature'];
-  console.log('Paddle Signature:', signature);
 
   if (!signature) {
     console.error('Paddle-Signature header not found');
@@ -67,43 +66,33 @@ app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
   }
 
   try {
-    // Gelen body'nin türünü kontrol edin (Buffer olup olmadığı)
     if (!Buffer.isBuffer(req.body)) {
       console.error('Body is not a Buffer');
       return res.status(400).send('Invalid body type');
     }
 
-    // Buffer olarak alınan raw body
     const rawRequestBody = req.body;
 
     // İmza doğrulamasını yap
-    const { ts } = extractHeaderElements(signature);
-
-    // Paddle timestamp'ini ve sunucu saatini logla
-    const paddleTime = new Date(parseInt(ts) * 1000);
-    const serverTime = new Date();
-    console.log(`Paddle Time (from signature): ${paddleTime.toISOString()}`);
-    console.log(`Server Time: ${serverTime.toISOString()}`);
-
-    const timeDifferenceInSeconds = Math.abs(serverTime.getTime() - paddleTime.getTime()) / 1000;
-    console.log(`Time Difference: ${timeDifferenceInSeconds} seconds`);
-
     verifyPaddleSignature(rawRequestBody, signature);
 
-    // Webhook'u işliyoruz
     const eventData = JSON.parse(rawRequestBody.toString('utf8'));
-    console.log('Received Event Data:', eventData);
+    const { event_type, data } = eventData;
 
-    // Olay türüne göre işleme
-    switch (eventData.event_type) {
+    // Sadece önemli bilgileri logla
+    console.log(`Received Event: ${event_type}`);
+    console.log(`Transaction ID: ${data.id}`);
+    console.log(`Event Status: ${data.status}`);
+
+    switch (event_type) {
       case 'subscription_created':
-        console.log(`Subscription ${eventData.subscription_id} was created`);
+        console.log(`Subscription ${data.subscription_id} was created`);
         break;
       case 'payment_succeeded':
-        console.log(`Payment ${eventData.order_id} was successful`);
+        console.log(`Payment ${data.order_id} was successful`);
         break;
       default:
-        console.log('Webhook event type:', eventData.event_type);
+        console.log(`Unhandled Webhook Event Type: ${event_type}`);
     }
 
     res.status(200).send('Webhook received');
@@ -118,10 +107,7 @@ function verifyPaddleSignature(requestBody, signature) {
   const { ts, receivedH1 } = extractHeaderElements(signature);
   const payload = buildPayload(ts, requestBody);
   
-  console.log(`Payload to hash: ${payload}`);
   const computedH1 = hashPayload(payload, WEBHOOK_SECRET_KEY);
-
-  console.log(`Computed H1: ${computedH1}, Received H1: ${receivedH1}`);
 
   if (receivedH1 !== computedH1) {
     throw new Error('Invalid paddle signature');
@@ -161,6 +147,8 @@ function hashPayload(payload, secret) {
 // Normal middleware'leri Paddle webhook'tan sonra ekliyoruz
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
+
+
 
 // Routes
 app.use('/api/bands', bandRoutes);
