@@ -65,13 +65,20 @@ app.use('/api/songs', songRoutes);
 app.use('/api/playlist', playlistRoutes);
 app.use('/api/spotify', spotifyAuthRoutes);
 app.use('/api', emailRoute); // Include the email route
-// Paddle webhook endpoint
-app.post('/webhook', (req, res) => {
-  console.log('Paddle Webhook Data:', req.body);
 
-  // Paddle, webhook'un doğru şekilde alındığını doğrulamak için 200 OK bekler
-  res.status(200).send('Webhook received');
-});
+app.post('/paddle/webhook', (req, res) => {
+  const webhookData = req.body;
+
+  // Paddle'dan gelen p_signature alınıyor
+  const signature = webhookData.p_signature;
+
+  // Webhook verisini içeren, imza hariç, tüm alanlar alfabetik olarak sıralanıp string haline getirilir
+  const serializedData = Object.keys(webhookData)
+    .filter(key => key !== 'p_signature')
+    .sort()
+    .map(key => `${key}=${webhookData[key]}`)
+    .join('&');
+  });
 
 
 // Serve frontend files
