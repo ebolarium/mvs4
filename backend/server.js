@@ -17,6 +17,8 @@ const emailRoute = require('./routes/emailRoute');
 const bodyParser = require('body-parser');
 const { Paddle, EventName } = require('@paddle/paddle-node-sdk');
 const { Readable } = require('stream');
+const CryptoJS = require('crypto-js');
+
 
 
 
@@ -74,13 +76,16 @@ app.use('/api', emailRoute); // Include the email route
 
 
 
+
+
+
+
+
 // Paddle API Anahtarı ve Webhook Secret Key
 const PADDLE_API_KEY = '0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19';
 const WEBHOOK_SECRET_KEY = 'pdl_ntfset_01jbeg11et89t7579610fhxn5z_YdkhEaae7TAP/gl/GwAkloZGNFFSWf1+';
 
-const paddle = new Paddle(PADDLE_API_KEY);
-
-// Webhook endpoint (raw body için middleware kullanıyoruz)
+// Middleware - Raw body elde etmek için
 app.post('/paddle/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   const signature = req.headers['paddle-signature'] || req.headers['Paddle-Signature'];
 
@@ -166,17 +171,27 @@ function buildPayload(ts, requestBody) {
   return `${ts}:${requestBody.toString('utf8')}`;
 }
 
-// HMAC-SHA256 kullanarak payload'ı hashle
+// HMAC-SHA256 kullanarak payload'ı hashle (crypto-js ile)
 function hashPayload(payload, secret) {
   try {
-    const hmac = crypto.createHmac('sha256', secret);
-    hmac.update(payload);
-    return hmac.digest('hex');
+    const hmac = CryptoJS.HmacSHA256(payload, secret);
+    return hmac.toString(CryptoJS.enc.Hex);
   } catch (error) {
     console.error('Error creating HMAC hash:', error.message);
     throw new Error('Crypto HMAC creation failed');
   }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
