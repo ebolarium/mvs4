@@ -16,6 +16,8 @@ const spotifyAuthRoutes = require('./routes/spotifyAuth');
 const emailRoute = require('./routes/emailRoute');
 const bodyParser = require('body-parser');
 const { Paddle, EventName } = require('@paddle/paddle-node-sdk');
+const { Readable } = require('stream');
+
 
 
 
@@ -73,14 +75,11 @@ app.use('/api', emailRoute); // Include the email route
 
 
 // Paddle API Anahtarı ve Webhook Secret Key
-const PADDLE_API_KEY = '0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19'; // API anahtarınızı buraya ekleyin
+const PADDLE_API_KEY = '0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19';
 const WEBHOOK_SECRET_KEY = 'pdl_ntfset_01jbeg11et89t7579610fhxn5z_YdkhEaae7TAP/gl/GwAkloZGNFFSWf1+';
 
-const paddle = new Paddle(PADDLE_API_KEY);
-
-// Webhook endpoint (raw body için middleware kullanıyoruz)
-app.post('/paddle/webhook', express.raw({ type: 'application/json' }), (req, res) => {
-  // Paddle-Signature header'ını alıyoruz
+// Middleware - Raw body elde etmek için
+app.post('/paddle/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   const signature = req.headers['paddle-signature'] || req.headers['Paddle-Signature'];
 
   if (!signature) {
@@ -88,38 +87,92 @@ app.post('/paddle/webhook', express.raw({ type: 'application/json' }), (req, res
     return res.status(400).send('Invalid signature');
   }
 
-  // Raw body'yi alıyoruz ve string'e çeviriyoruz
-  const rawRequestBody = req.body.toString();
-
   try {
-    if (signature && rawRequestBody) {
-      // Webhook'un geçerliliğini kontrol etmek ve doğrulamak için `unmarshal` fonksiyonunu kullanıyoruz
-      const eventData = paddle.webhooks.unmarshal(rawRequestBody, WEBHOOK_SECRET_KEY, signature);
+    // Buffer elde etmek için body'yi okuyoruz
+    const buf = await bufferBody(req);
 
-      // Olayı işleyelim
-      switch (eventData.eventType) {
-        case EventName.ProductUpdated:
-          console.log(`Product ${eventData.data.id} was updated`);
-          break;
-        case EventName.SubscriptionUpdated:
-          console.log(`Subscription ${eventData.data.id} was updated`);
-          break;
-        default:
-          console.log('Webhook event type:', eventData.eventType);
-      }
+    // İmza doğrulamasını yap
+    verifyPaddleSignature(buf, signature);
 
-      // Başarılı durumda HTTP 200 yanıtı gönder
-      res.status(200).send('Webhook received');
-    } else {
-      console.log('Signature missing in header');
-      res.status(400).send('Invalid signature');
+    // Webhook'u işliyoruz
+    const eventData = JSON.parse(buf.toString('utf8'));
+
+    // Olay türüne göre işleme
+    switch (eventData.event_type) {
+      case 'product.updated':
+        console.log(`Product ${eventData.data.id} was updated`);
+        break;
+      case 'subscription.updated':
+        console.log(`Subscription ${eventData.data.id} was updated`);
+        break;
+      default:
+        console.log('Webhook event type:', eventData.event_type);
     }
+
+    res.status(200).send('Webhook received');
   } catch (e) {
-    // İmza uyumsuzluğu veya diğer runtime hatalarını burada ele alıyoruz
-    console.error('Error processing webhook:', e);
+    console.error('Error processing webhook:', e.message);
     res.status(400).send('Invalid signature');
   }
 });
+
+// Buffer elde etmek için body'yi oku (stream olarak gelen body'yi buffer'a çevir)
+async function bufferBody(readable) {
+  const chunks = [];
+  for await (const chunk of readable) {
+    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+  }
+  return Buffer.concat(chunks);
+}
+
+// Paddle Signature Doğrulama Fonksiyonu
+function verifyPaddleSignature(requestBody, signature) {
+  const { ts, receivedH1 } = extractHeaderElements(signature);
+  const payload = buildPayload(ts, requestBody);
+  const computedH1 = hashPayload(payload, WEBHOOK_SECRET_KEY);
+
+  if (receivedH1 !== computedH1) {
+    throw new Error('Invalid paddle signature');
+  }
+}
+
+// Header elemanlarını çıkar
+function extractHeaderElements(header) {
+  const parts = header.split(';');
+  if (parts.length !== 2) {
+    throw new Error('Incompatible header format');
+  }
+  const tsPart = parts.find((part) => part.startsWith('ts='));
+  const h1Part = parts.find((part) => part.startsWith('h1='));
+
+  if (!tsPart || !h1Part) {
+    throw new Error('Missing ts or h1 in header');
+  }
+
+  const ts = tsPart.split('=')[1];
+  const receivedH1 = h1Part.split('=')[1];
+
+  if (!ts || !receivedH1) {
+    throw new Error('Missing ts or h1 values in header');
+  }
+
+  return { ts, receivedH1 };
+}
+
+// Payload oluştur
+function buildPayload(ts, requestBody) {
+  return `${ts}:${requestBody.toString('utf8')}`;
+}
+
+// HMAC-SHA256 kullanarak payload'ı hashle
+function hashPayload(payload, secret) {
+  const hmac = crypto.createHmac('sha256', secret);
+  hmac.update(payload);
+  return hmac.digest('hex');
+}
+
+
+
 
 
 
