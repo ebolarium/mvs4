@@ -78,12 +78,9 @@ const WEBHOOK_SECRET_KEY = 'pdl_ntfset_01jbeg11et89t7579610fhxn5z_YdkhEaae7TAP/g
 
 const paddle = new Paddle(PADDLE_API_KEY);
 
-// Raw body middleware - sadece '/paddle/webhook' rotası için kullanıyoruz
-app.use('/paddle/webhook', express.raw({ type: 'application/json' }));
-
-// Webhook endpoint
-app.post('/paddle/webhook', (req, res) => {
-  // Paddle-Signature header'ını alıyoruz (küçük/büyük harf durumu)
+// Webhook endpoint (raw body için middleware kullanıyoruz)
+app.post('/paddle/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+  // Paddle-Signature header'ını alıyoruz
   const signature = req.headers['paddle-signature'] || req.headers['Paddle-Signature'];
 
   if (!signature) {
@@ -91,8 +88,8 @@ app.post('/paddle/webhook', (req, res) => {
     return res.status(400).send('Invalid signature');
   }
 
-  // Raw body'yi direkt olarak kullanıyoruz, buffer türünde tutuyoruz
-  const rawRequestBody = req.body; // Buffer olarak gelen body'yi direkt kullanıyoruz
+  // Raw body'yi alıyoruz ve string'e çeviriyoruz
+  const rawRequestBody = req.body.toString();
 
   try {
     if (signature && rawRequestBody) {
