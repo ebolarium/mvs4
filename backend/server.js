@@ -82,12 +82,7 @@ app.use('/api', emailRoute); // Include the email route
 
 
 
-
-// Paddle API Anahtarı ve Webhook Secret Key
-const PADDLE_API_KEY = '0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19';
-const WEBHOOK_SECRET_KEY = 'pdl_ntfset_01jbeg11et89t7579610fhxn5z_YdkhEaae7TAP/gl/GwAkloZGNFFSWf1+';
-
-// Webhook endpoint (raw body middleware)
+// Paddle Webhook Endpoint
 app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
   const signature = req.headers['paddle-signature'] || req.headers['Paddle-Signature'];
 
@@ -97,33 +92,26 @@ app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
   }
 
   try {
-    // Gelen body'nin türünü kontrol edin
-    if (Buffer.isBuffer(req.body)) {
-      console.log('Body Type: Buffer');
-    } else {
+    if (!Buffer.isBuffer(req.body)) {
       console.error('Body is not a Buffer');
       return res.status(400).send('Invalid body type');
     }
 
-    // Buffer elde etmek için body'yi kullanıyoruz (Paddle'ın gönderdiği şekliyle)
-    const rawRequestBody = req.body;
+    // Verify the Paddle Signature
+    verifyPaddleSignature(req.body, signature);
 
-    // İmza doğrulamasını yap
-    verifyPaddleSignature(rawRequestBody, signature);
+    // Process the webhook
+    const eventData = JSON.parse(req.body.toString('utf8'));
 
-    // Webhook'u işliyoruz
-    const eventData = JSON.parse(rawRequestBody.toString('utf8'));
-
-    // Olay türüne göre işleme
     switch (eventData.event_type) {
-      case 'product.updated':
-        console.log(`Product ${eventData.data.id} was updated`);
+      case 'subscription.created':
+        console.log(`Subscription ${eventData.data.id} was created`);
         break;
       case 'subscription.updated':
         console.log(`Subscription ${eventData.data.id} was updated`);
         break;
       default:
-        console.log('Webhook event type:', eventData.event_type);
+        console.log('Unhandled webhook event type:', eventData.event_type);
     }
 
     res.status(200).send('Webhook received');
@@ -133,18 +121,17 @@ app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
   }
 });
 
-// Paddle Signature Doğrulama Fonksiyonu
+// Paddle Signature Verification Functions
 function verifyPaddleSignature(requestBody, signature) {
   const { ts, receivedH1 } = extractHeaderElements(signature);
   const payload = buildPayload(ts, requestBody);
-  const computedH1 = hashPayload(payload, WEBHOOK_SECRET_KEY);
+  const computedH1 = hashPayload(payload, process.env.WEBHOOK_SECRET_KEY);
 
   if (receivedH1 !== computedH1) {
     throw new Error('Invalid paddle signature');
   }
 }
 
-// Header elemanlarını çıkar
 function extractHeaderElements(header) {
   const parts = header.split(';');
   if (parts.length !== 2) {
@@ -160,31 +147,17 @@ function extractHeaderElements(header) {
   const ts = tsPart.split('=')[1];
   const receivedH1 = h1Part.split('=')[1];
 
-  if (!ts || !receivedH1) {
-    throw new Error('Missing ts or h1 values in header');
-  }
-
   return { ts, receivedH1 };
 }
 
-// Payload oluştur
 function buildPayload(ts, requestBody) {
   return `${ts}:${requestBody.toString('utf8')}`;
 }
 
-// HMAC-SHA256 kullanarak payload'ı hashle (crypto-js ile)
 function hashPayload(payload, secret) {
-  try {
-    const hmac = CryptoJS.HmacSHA256(payload, secret);
-    return hmac.toString(CryptoJS.enc.Hex);
-  } catch (error) {
-    console.error('Error creating HMAC hash:', error.message);
-    throw new Error('Crypto HMAC creation failed');
-  }
+  const hmac = CryptoJS.HmacSHA256(payload, secret);
+  return hmac.toString(CryptoJS.enc.Hex);
 }
-
-
-
 
 
 
