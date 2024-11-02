@@ -22,6 +22,9 @@ dotenv.config(); // Environment variables'ları yükleyin
 const app = express();
 const server = http.createServer(app);
 
+// Paddle Webhook Secret Key
+const WEBHOOK_SECRET_KEY = 'pdl_ntfset_01jbeg11et89t7579610fhxn5z_YdkhEaae7TAP/gl/GwAkloZGNFFSWf1+';
+
 // i18n configuration
 i18n.configure({
   locales: ['en', 'tr'],
@@ -116,7 +119,7 @@ function verifyPaddleSignature(requestBody, signature) {
   const payload = buildPayload(ts, requestBody);
   
   console.log(`Payload to hash: ${payload}`);
-  const computedH1 = hashPayload(payload, process.env.WEBHOOK_SECRET_KEY);
+  const computedH1 = hashPayload(payload, WEBHOOK_SECRET_KEY);
 
   console.log(`Computed H1: ${computedH1}, Received H1: ${receivedH1}`);
 
@@ -196,15 +199,11 @@ app.set('io', io);
 
 // Socket.io connections
 io.on('connection', (socket) => {
-  //console.log('A user connected:', socket.id);
-
   socket.on('joinPlaylist', (playlistId) => {
-    //console.log('User joined playlist room with ID:', playlistId);
     socket.join(playlistId);
   });
 
   socket.on('leavePlaylist', (playlistId) => {
-    //console.log('User left playlist room with ID:', playlistId);
     socket.leave(playlistId);
   });
 
@@ -213,9 +212,7 @@ io.on('connection', (socket) => {
     socket.to(playlistId).emit('newSongRequest', song);
   });
 
-  socket.on('disconnect', () => {
-    //console.log('A user disconnected:', socket.id);
-  });
+  socket.on('disconnect', () => {});
 });
 
 const PORT = process.env.PORT || 5000;
