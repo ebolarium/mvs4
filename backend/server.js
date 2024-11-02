@@ -71,29 +71,34 @@ app.use('/api', emailRoute); // Include the email route
 
 
 
-const paddle = new Paddle('0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19'); // Sandbox ya da Production API anahtarını buraya ekleyin
+// Paddle API Anahtarı ve Webhook Secret Key
+const PADDLE_API_KEY = '0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19'; // Sandbox veya Production API anahtarınızı buraya ekleyin
+const WEBHOOK_SECRET_KEY = 'pdl_ntfset_01jbeg11et89t7579610fhxn5z_YdkhEaae7TAP/gl/GwAkloZGNFFSWf1+';
+
+const paddle = new Paddle(PADDLE_API_KEY);
+
+// Sadece /paddle/webhook rotasında raw body kullan
 app.use('/paddle/webhook', express.raw({ type: 'application/json' }));
-
-
 
 // Webhook endpoint
 app.post('/paddle/webhook', (req, res) => {
-  const signature = req.headers['paddle-signature'];
+  // Paddle-Signature header'ını alıyoruz (küçük/büyük harf durumu)
+  const signature = req.headers['paddle-signature'] || req.headers['Paddle-Signature'];
 
   if (!signature) {
     console.error('Paddle-Signature header not found');
     return res.status(400).send('Invalid signature');
   }
 
-  const rawRequestBody = req.body.toString(); // Raw body buffer'ını string'e çeviriyoruz
-  const secretKey = process.env['WEBHOOK_SECRET_KEY'] || 'pdl_ntfset_01jbeg11et89t7579610fhxn5z_YdkhEaae7TAP/gl/GwAkloZGNFFSWf1+';
+  // Raw body buffer'ını alıyoruz ve string'e çeviriyoruz
+  const rawRequestBody = req.body.toString();
 
   try {
     if (signature && rawRequestBody) {
       // Webhook'un geçerliliğini kontrol etmek ve doğrulamak için `unmarshal` fonksiyonunu kullanıyoruz
-      const eventData = paddle.webhooks.unmarshal(rawRequestBody, secretKey, signature);
+      const eventData = paddle.webhooks.unmarshal(rawRequestBody, WEBHOOK_SECRET_KEY, signature);
 
-      // Event türüne göre işlemleri yönet
+      // Olayı işleyelim
       switch (eventData.eventType) {
         case EventName.ProductUpdated:
           console.log(`Product ${eventData.data.id} was updated`);
@@ -117,9 +122,6 @@ app.post('/paddle/webhook', (req, res) => {
     res.status(400).send('Invalid signature');
   }
 });
-
-
-
 
 
 
