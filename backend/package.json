@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@paddle/paddle-node-sdk": "^1.9.1",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -25,6 +26,7 @@
     "node-fetch": "^2.7.0",
     "nodemailer": "^6.9.15",
     "paddle": "^1.0.0",
+    "paddle-sdk": "^4.7.0",
     "socket.io": "^4.8.0",
     "socket.io-client": "^4.8.0",
     "xlsx": "^0.18.5"

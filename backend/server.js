@@ -15,7 +15,7 @@ const fs = require('fs');
 const spotifyAuthRoutes = require('./routes/spotifyAuth');
 const emailRoute = require('./routes/emailRoute');
 const bodyParser = require('body-parser');
-const crypto = require('crypto');
+import { Paddle, EventName } from '@paddle/paddle-node-sdk';
 
 
 
@@ -40,6 +40,7 @@ app.use(i18n.init);
 // Middleware
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false })); // For handling URL-encoded data
+
 
 // CORS Middleware
 app.use(
@@ -69,49 +70,52 @@ app.use('/api/spotify', spotifyAuthRoutes);
 app.use('/api', emailRoute); // Include the email route
 
 
-// Paddle Webhook Endpoint
+
+const paddle = new Paddle('0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19'); // Sandbox ya da Production API anahtarını buraya ekleyin
+app.use(express.raw({ type: 'application/json' }));
+
+// Webhook endpoint
 app.post('/paddle/webhook', (req, res) => {
-  // Paddle'dan gelen 'Paddle-Signature' header'ını al
-  const paddleSignature = req.headers['paddle-signature'];
-  if (!paddleSignature) {
+  const signature = req.headers['paddle-signature'];
+
+  if (!signature) {
     console.error('Paddle-Signature header not found');
     return res.status(400).send('Invalid signature');
   }
 
-  // 'ts' ve 'h1' değerlerini Paddle-Signature header'ından ayır
-  const parts = paddleSignature.split(';');
-  const tsPart = parts.find(part => part.startsWith('ts='));
-  const h1Part = parts.find(part => part.startsWith('h1='));
+  const rawRequestBody = req.body.toString(); // Raw body buffer'ını string'e çeviriyoruz
+  const secretKey = process.env['WEBHOOK_SECRET_KEY'] || 'pdl_ntfset_01jbeg11et89t7579610fhxn5z_YdkhEaae7TAP/gl/GwAkloZGNFFSWf1+';
 
-  if (!tsPart || !h1Part) {
-    console.error('Invalid Paddle-Signature header format');
-    return res.status(400).send('Invalid signature');
-  }
+  try {
+    if (signature && rawRequestBody) {
+      // Webhook'un geçerliliğini kontrol etmek ve doğrulamak için `unmarshal` fonksiyonunu kullanıyoruz
+      const eventData = paddle.webhooks.unmarshal(rawRequestBody, secretKey, signature);
 
-  // Timestamp ve h1 imzasını al
-  const ts = tsPart.split('=')[1];
-  const h1 = h1Part.split('=')[1];
+      // Event türüne göre işlemleri yönet
+      switch (eventData.eventType) {
+        case EventName.ProductUpdated:
+          console.log(`Product ${eventData.data.id} was updated`);
+          break;
+        case EventName.SubscriptionUpdated:
+          console.log(`Subscription ${eventData.data.id} was updated`);
+          break;
+        default:
+          console.log('Webhook event type:', eventData.eventType);
+      }
 
-  // İmza doğrulaması için payload oluştur ('ts' + ':' + request'in raw body'si)
-  const rawBody = req.body.toString();
-  const signedPayload = `${ts}:${rawBody}`;
-
-  // İmza oluşturma (HMAC-SHA256) - Paddle secret key kullanılarak
-  const secretKey = 'pdl_ntfset_01jbeg11et89t7579610fhxn5z_YdkhEaae7TAP/gl/GwAkloZGNFFSWf1+';
-  const hash = crypto
-    .createHmac('sha256', secretKey)
-    .update(signedPayload)
-    .digest('hex'); // 'h1' değeri hexadecimal formattadır
-
-  // İmzaları karşılaştırma
-  if (hash === h1) {
-    console.log('Paddle Webhook Doğrulandı:', req.body);
-    res.status(200).send('Webhook received');
-  } else {
-    console.error('Webhook doğrulaması başarısız oldu');
+      // Başarılı durumda HTTP 200 yanıtı gönder
+      res.status(200).send('Webhook received');
+    } else {
+      console.log('Signature missing in header');
+      res.status(400).send('Invalid signature');
+    }
+  } catch (e) {
+    // İmza uyumsuzluğu veya diğer runtime hatalarını burada ele alıyoruz
+    console.error('Error processing webhook:', e);
     res.status(400).send('Invalid signature');
   }
 });
+
 
 
 
