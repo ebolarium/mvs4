@@ -15,6 +15,8 @@ const fs = require('fs');
 const spotifyAuthRoutes = require('./routes/spotifyAuth');
 const emailRoute = require('./routes/emailRoute');
 const bodyParser = require('body-parser');
+const crypto = require('crypto');
+
 
 
 const Band = require('./models/Band'); // Import the Band model
@@ -66,8 +68,13 @@ app.use('/api/playlist', playlistRoutes);
 app.use('/api/spotify', spotifyAuthRoutes);
 app.use('/api', emailRoute); // Include the email route
 
+
+// Paddle Webhook Endpoint
 app.post('/paddle/webhook', (req, res) => {
   const webhookData = req.body;
+  
+  // Gelen veriyi console'a yazdır
+  console.log('Paddle Webhook Data:', webhookData);
 
   // Paddle'dan gelen p_signature alınıyor
   const signature = webhookData.p_signature;
@@ -78,7 +85,21 @@ app.post('/paddle/webhook', (req, res) => {
     .sort()
     .map(key => `${key}=${webhookData[key]}`)
     .join('&');
-  });
+
+  // İmza doğrulaması için Paddle secret key kullanılır
+  const hash = crypto
+    .createHmac('sha256', 'pdl_ntfset_01jbeg11et89t7579610fhxn5z_YdkhEaae7TAP/gl/GwAkloZGNFFSWf1+')
+    .update(serializedData)
+    .digest('base64');
+
+  if (hash === signature) {
+    console.log('Paddle Webhook Doğrulandı:', webhookData);
+    res.status(200).send('Webhook received');
+  } else {
+    console.error('Webhook doğrulaması başarısız oldu');
+    res.status(400).send('Invalid signature');
+  }
+});
 
 
 // Serve frontend files
