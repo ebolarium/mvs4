@@ -70,7 +70,6 @@ app.use('/api', emailRoute); // Include the email route
 
 
 // Paddle Webhook Endpoint
-const crypto = require('crypto');
 
 app.post('/paddle/webhook', (req, res) => {
   const webhookData = req.body;
