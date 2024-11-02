@@ -65,6 +65,14 @@ app.use('/api/songs', songRoutes);
 app.use('/api/playlist', playlistRoutes);
 app.use('/api/spotify', spotifyAuthRoutes);
 app.use('/api', emailRoute); // Include the email route
+// Paddle webhook endpoint
+app.post('/webhook', (req, res) => {
+  console.log('Paddle Webhook Data:', req.body);
+
+  // Paddle, webhook'un doğru şekilde alındığını doğrulamak için 200 OK bekler
+  res.status(200).send('Webhook received');
+});
+
 
 // Serve frontend files
 app.use(express.static(path.join(__dirname, '../frontend/build')));
