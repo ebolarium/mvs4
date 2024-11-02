@@ -15,20 +15,12 @@ const fs = require('fs');
 const spotifyAuthRoutes = require('./routes/spotifyAuth');
 const emailRoute = require('./routes/emailRoute');
 const bodyParser = require('body-parser');
-const { Paddle, EventName } = require('@paddle/paddle-node-sdk');
-const { Readable } = require('stream');
 const CryptoJS = require('crypto-js');
 
-
-
-
-
-const Band = require('./models/Band'); // Import the Band model
+dotenv.config(); // Environment variables'ları yükleyin
 
 const app = express();
 const server = http.createServer(app);
-
-dotenv.config();
 
 // i18n configuration
 i18n.configure({
@@ -37,14 +29,7 @@ i18n.configure({
   defaultLocale: 'en',
   objectNotation: true,
 });
-
-// Use i18n middleware
 app.use(i18n.init);
-
-// Middleware
-app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: false })); // For handling URL-encoded data
-
 
 // CORS Middleware
 app.use(
@@ -66,22 +51,12 @@ mongoose
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.log(err));
 
-
-
-
-
-
-
-
-
-
-
-
-  
-
-// Paddle Webhook Endpoint
+// Paddle Webhook Endpoint (WebHook İçin express.raw Kullanımı)
 app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
+  console.log("Webhook endpoint hit!");
+
   const signature = req.headers['paddle-signature'] || req.headers['Paddle-Signature'];
+  console.log('Paddle Signature:', signature);
 
   if (!signature) {
     console.error('Paddle-Signature header not found');
@@ -89,26 +64,43 @@ app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
   }
 
   try {
+    // Gelen body'nin türünü kontrol edin (Buffer olup olmadığı)
     if (!Buffer.isBuffer(req.body)) {
       console.error('Body is not a Buffer');
       return res.status(400).send('Invalid body type');
     }
 
-    // Verify the Paddle Signature
-    verifyPaddleSignature(req.body, signature);
+    // Buffer olarak alınan raw body
+    const rawRequestBody = req.body;
 
-    // Process the webhook
-    const eventData = JSON.parse(req.body.toString('utf8'));
+    // İmza doğrulamasını yap
+    const { ts } = extractHeaderElements(signature);
 
+    // Paddle timestamp'ini ve sunucu saatini logla
+    const paddleTime = new Date(parseInt(ts) * 1000);
+    const serverTime = new Date();
+    console.log(`Paddle Time (from signature): ${paddleTime.toISOString()}`);
+    console.log(`Server Time: ${serverTime.toISOString()}`);
+
+    const timeDifferenceInSeconds = Math.abs(serverTime.getTime() - paddleTime.getTime()) / 1000;
+    console.log(`Time Difference: ${timeDifferenceInSeconds} seconds`);
+
+    verifyPaddleSignature(rawRequestBody, signature);
+
+    // Webhook'u işliyoruz
+    const eventData = JSON.parse(rawRequestBody.toString('utf8'));
+    console.log('Received Event Data:', eventData);
+
+    // Olay türüne göre işleme
     switch (eventData.event_type) {
-      case 'subscription.created':
-        console.log(`Subscription ${eventData.data.id} was created`);
+      case 'subscription_created':
+        console.log(`Subscription ${eventData.subscription_id} was created`);
         break;
-      case 'subscription.updated':
-        console.log(`Subscription ${eventData.data.id} was updated`);
+      case 'payment_succeeded':
+        console.log(`Payment ${eventData.order_id} was successful`);
         break;
       default:
-        console.log('Unhandled webhook event type:', eventData.event_type);
+        console.log('Webhook event type:', eventData.event_type);
     }
 
     res.status(200).send('Webhook received');
@@ -118,17 +110,22 @@ app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
   }
 });
 
-// Paddle Signature Verification Functions
+// Paddle Signature Doğrulama Fonksiyonu
 function verifyPaddleSignature(requestBody, signature) {
   const { ts, receivedH1 } = extractHeaderElements(signature);
   const payload = buildPayload(ts, requestBody);
+  
+  console.log(`Payload to hash: ${payload}`);
   const computedH1 = hashPayload(payload, process.env.WEBHOOK_SECRET_KEY);
+
+  console.log(`Computed H1: ${computedH1}, Received H1: ${receivedH1}`);
 
   if (receivedH1 !== computedH1) {
     throw new Error('Invalid paddle signature');
   }
 }
 
+// Header elemanlarını çıkar
 function extractHeaderElements(header) {
   const parts = header.split(';');
   if (parts.length !== 2) {
@@ -147,36 +144,20 @@ function extractHeaderElements(header) {
   return { ts, receivedH1 };
 }
 
+// Payload oluştur
 function buildPayload(ts, requestBody) {
   return `${ts}:${requestBody.toString('utf8')}`;
 }
 
+// HMAC-SHA256 kullanarak payload'ı hashle (crypto-js ile)
 function hashPayload(payload, secret) {
   const hmac = CryptoJS.HmacSHA256(payload, secret);
   return hmac.toString(CryptoJS.enc.Hex);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// Normal middleware'leri Paddle webhook'tan sonra ekliyoruz
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
 
 // Routes
 app.use('/api/bands', bandRoutes);
