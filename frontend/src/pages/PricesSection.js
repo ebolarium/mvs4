@@ -1,18 +1,16 @@
 import React, { useEffect } from 'react';
 import { Box, Typography, Button } from '@mui/material';
 
-const PricesSection = () => {
+const PricesSection = ({ isLoggedIn }) => {
   useEffect(() => {
-    // Paddle scriptini yükle
     const script = document.createElement('script');
     script.src = "https://cdn.paddle.com/paddle/v2/paddle.js";
     script.async = true;
     script.onload = () => {
-      // Paddle'ı başlat ve sadece client-side token kullanarak yapılandır
       if (window.Paddle) {
         window.Paddle.Environment.set("sandbox");
         window.Paddle.Initialize({
-          token: "test_605824494b6e720104d54646e1c" // Buraya kendi client-side token'ınızı ekleyin
+          token: "test_605824494b6e720104d54646e1c"
         });
       } else {
         console.error("Paddle yüklenemedi.");
@@ -25,14 +23,12 @@ const PricesSection = () => {
   }, []);
 
   const handleSubscribe = () => {
-    // Kullanıcı login olmuş mu kontrol et
     const token = localStorage.getItem('token');
     if (!token || token === "undefined") {
       alert("Lütfen önce giriş yapın veya kayıt olun.");
       return;
     }
-  
-    // Token'dan band_id al
+
     let bandId;
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
@@ -42,9 +38,8 @@ const PricesSection = () => {
       alert("Geçersiz giriş bilgisi. Lütfen tekrar giriş yapın.");
       return;
     }
-  
+
     if (window.Paddle) {
-      // Paddle entegrasyonu: checkout penceresini aç
       window.Paddle.Checkout.open({
         items: [
           {
@@ -52,7 +47,7 @@ const PricesSection = () => {
             quantity: 1,
           },
         ],
-        passthrough: JSON.stringify({ bandId }), // bandId'yi passthrough olarak gönderiyoruz
+        passthrough: JSON.stringify({ bandId }),
         successCallback: function (data) {
           console.log("Satın alma başarılı!", data);
         },
@@ -64,12 +59,17 @@ const PricesSection = () => {
       console.error("Paddle tanımlı değil.");
     }
   };
-  
 
   return (
     <Box sx={{ py: 2, textAlign: 'center', backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
       <Typography variant="h4">Abonelik Planları</Typography>
-      <Button variant="contained" color="primary" onClick={handleSubscribe} sx={{ mt: 2 }}>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleSubscribe}
+        sx={{ mt: 2 }}
+        disabled={!isLoggedIn}
+      >
         Abone Ol
       </Button>
     </Box>

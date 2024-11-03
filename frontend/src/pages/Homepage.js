@@ -123,8 +123,8 @@ const Homepage = () => {
       </Box>
 
       <Container maxWidth="lg" sx={{ py: 0 }}>
-        <PricesSection />
-        <HowItWorksSection />
+      <PricesSection isLoggedIn={isLoggedIn} />
+      <HowItWorksSection />
         <AboutUsSection />
       </Container>
 
