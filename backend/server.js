@@ -54,69 +54,83 @@ mongoose
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.log(err));
 
-// Paddle Webhook Endpoint (WebHook İçin express.raw Kullanımı)
-app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
-  console.log("Webhook endpoint hit!");
-
-  const signature = req.headers['paddle-signature'] || req.headers['Paddle-Signature'];
-
-  if (!signature) {
-    console.error('Paddle-Signature header not found');
-    return res.status(400).send('Invalid signature');
-  }
-
-  try {
-    if (!Buffer.isBuffer(req.body)) {
-      console.error('Body is not a Buffer');
-      return res.status(400).send('Invalid body type');
+  app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
+    console.log("Webhook endpoint hit!");
+  
+    const signature = req.headers['paddle-signature'] || req.headers['Paddle-Signature'];
+  
+    if (!signature) {
+      console.error('Paddle-Signature header not found');
+      return res.status(400).send('Invalid signature');
     }
-
-    const rawRequestBody = req.body;
-
-    // İmza doğrulamasını yap
-    verifyPaddleSignature(rawRequestBody, signature);
-
-    const eventData = JSON.parse(rawRequestBody.toString('utf8'));
-    const { event_type, data } = eventData;
-
-    // Sadece önemli bilgileri logla
-    console.log(`Received Event: ${event_type}`);
-    console.log(`Transaction ID: ${data.id}`);
-    console.log(`Event Status: ${data.status}`);
-
-
-    
-
-// passtrough bilgisini alıyoruz
-const passthrough = JSON.parse(data.passthrough);
-const bandId = passthrough.bandId;
-
-switch (event_type) {
-  case 'subscription_created':
-    console.log(`Subscription ${data.subscription_id} was created`);
-
-    // Kullanıcının aboneliğini güncelle
-    await Band.findByIdAndUpdate(bandId, { is_premium: true });
-    console.log(`Band ${bandId} abonelik durumu güncellendi.`);
-    break;
-
-  case 'payment_succeeded':
-    console.log(`Payment ${data.order_id} was successful`);
-    break;
-
-
-
-
-      default:
-        console.log(`Unhandled Webhook Event Type: ${event_type}`);
+  
+    try {
+      if (!Buffer.isBuffer(req.body)) {
+        console.error('Body is not a Buffer');
+        return res.status(400).send('Invalid body type');
+      }
+  
+      const rawRequestBody = req.body;
+  
+      // İmza doğrulamasını yap
+      verifyPaddleSignature(rawRequestBody, signature);
+  
+      // Gövdeyi JSON formatına çeviriyoruz
+      let eventData;
+      try {
+        eventData = JSON.parse(rawRequestBody.toString('utf8'));
+      } catch (error) {
+        console.error('Error parsing webhook JSON:', error.message);
+        return res.status(400).send('Invalid JSON');
+      }
+  
+      const { event_type, data } = eventData;
+  
+      // data ve passthrough var mı kontrol edelim
+      if (!data || !data.passthrough) {
+        console.error('Data field or passthrough is missing in the webhook payload');
+        return res.status(400).send('Invalid data or passthrough in webhook');
+      }
+  
+      // passthrough bilgisini alıyoruz ve parse ediyoruz
+      let passthrough;
+      try {
+        passthrough = JSON.parse(data.passthrough);
+      } catch (error) {
+        console.error('Error parsing passthrough JSON:', error.message);
+        return res.status(400).send('Invalid passthrough JSON');
+      }
+  
+      const bandId = passthrough.bandId;
+  
+      switch (event_type) {
+        case 'subscription_created':
+          console.log(`Subscription ${data.subscription_id} was created`);
+  
+          // Kullanıcının aboneliğini güncelle
+          await Band.findByIdAndUpdate(bandId, { is_premium: true });
+          console.log(`Band ${bandId} abonelik durumu güncellendi.`);
+          break;
+  
+        case 'payment_succeeded':
+          console.log(`Payment ${data.order_id} was successful`);
+          break;
+  
+        default:
+          console.log(`Unhandled Webhook Event Type: ${event_type}`);
+      }
+  
+      res.status(200).send('Webhook received');
+    } catch (e) {
+      console.error('Error processing webhook:', e.message);
+      res.status(400).send('Invalid signature');
     }
+  });
+  
 
-    res.status(200).send('Webhook received');
-  } catch (e) {
-    console.error('Error processing webhook:', e.message);
-    res.status(400).send('Invalid signature');
-  }
-});
+
+
+
 
 // Paddle Signature Doğrulama Fonksiyonu
 function verifyPaddleSignature(requestBody, signature) {
