@@ -64,7 +64,6 @@ mongoose
 
 
 
-
   app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
     console.log("Webhook endpoint hit!");
   
@@ -97,8 +96,10 @@ mongoose
   
       const { event_type, data } = eventData;
   
-      // Sadece bizim için önemli olan olayları işleyelim
-      if (event_type === 'subscription_created' || event_type === 'payment_succeeded') {
+      console.log(`Webhook event received: ${event_type}`);
+  
+      // Sadece transaction.completed olayını ele alalım
+      if (event_type === 'transaction.completed') {
         if (!data || !data.passthrough) {
           console.error('Data field or passthrough is missing in the webhook payload');
           return res.status(400).send('Invalid data or passthrough in webhook');
@@ -115,25 +116,17 @@ mongoose
   
         const bandId = passthrough.bandId;
   
-        switch (event_type) {
-          case 'subscription_created':
-            console.log(`Subscription ${data.subscription_id} was created`);
-  
-            // Kullanıcının aboneliğini güncelle
-            await Band.findByIdAndUpdate(bandId, { is_premium: true });
-            console.log(`Band ${bandId} abonelik durumu güncellendi.`);
-            break;
-  
-          case 'payment_succeeded':
-            console.log(`Payment ${data.order_id} was successful`);
-            break;
-  
-          default:
-            console.log(`Unhandled Webhook Event Type: ${event_type}`);
+        try {
+          // Kullanıcının premium durumunu güncelle
+          await Band.findByIdAndUpdate(bandId, { is_premium: true });
+          console.log(`Band ${bandId} abonelik durumu güncellendi (is_premium: true).`);
+        } catch (error) {
+          console.error('Error updating band subscription status:', error.message);
+          return res.status(500).send('Error updating subscription status');
         }
       } else {
-        // Sadece önemli olmayan event_type'ları kısaca logla veya tamamen kaldır
-        console.log(`Webhook event received: ${event_type}`);
+        // Diğer olay türlerini sadece logla
+        console.log(`Unhandled Webhook Event Type: ${event_type}`);
       }
   
       res.status(200).send('Webhook received');
@@ -142,6 +135,7 @@ mongoose
       res.status(400).send('Invalid signature');
     }
   });
+  
   
   
   
