@@ -97,10 +97,7 @@ mongoose
   
       const { event_type, data } = eventData;
   
-      // Gelen event_type'ı loglayarak takip edelim
-      console.log(`Received Event Type: ${event_type}`);
-  
-      // Sadece belirli etkinlik türleri `data` ve `passthrough` kullanır
+      // Sadece bizim için önemli olan olayları işleyelim
       if (event_type === 'subscription_created' || event_type === 'payment_succeeded') {
         if (!data || !data.passthrough) {
           console.error('Data field or passthrough is missing in the webhook payload');
@@ -135,8 +132,8 @@ mongoose
             console.log(`Unhandled Webhook Event Type: ${event_type}`);
         }
       } else {
-        // Diğer event türleri için sadece loglama yapalım
-        console.log(`Unhandled Webhook Event Type (no data processing needed): ${event_type}`);
+        // Sadece önemli olmayan event_type'ları kısaca logla veya tamamen kaldır
+        console.log(`Webhook event received: ${event_type}`);
       }
   
       res.status(200).send('Webhook received');
@@ -147,12 +144,13 @@ mongoose
   });
   
   
-
-
-
-
-
   
+
+
+
+
+
+
 
 
 
