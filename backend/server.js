@@ -84,13 +84,29 @@ app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
     console.log(`Transaction ID: ${data.id}`);
     console.log(`Event Status: ${data.status}`);
 
-    switch (event_type) {
-      case 'subscription_created':
-        console.log(`Subscription ${data.subscription_id} was created`);
-        break;
-      case 'payment_succeeded':
-        console.log(`Payment ${data.order_id} was successful`);
-        break;
+
+    
+
+// passtrough bilgisini alıyoruz
+const passthrough = JSON.parse(data.passthrough);
+const bandId = passthrough.bandId;
+
+switch (event_type) {
+  case 'subscription_created':
+    console.log(`Subscription ${data.subscription_id} was created`);
+
+    // Kullanıcının aboneliğini güncelle
+    await Band.findByIdAndUpdate(bandId, { is_premium: true });
+    console.log(`Band ${bandId} abonelik durumu güncellendi.`);
+    break;
+
+  case 'payment_succeeded':
+    console.log(`Payment ${data.order_id} was successful`);
+    break;
+
+
+
+
       default:
         console.log(`Unhandled Webhook Event Type: ${event_type}`);
     }
