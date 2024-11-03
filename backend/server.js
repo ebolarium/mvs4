@@ -54,6 +54,17 @@ mongoose
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.log(err));
 
+
+
+
+
+
+
+
+
+
+
+
   app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
     console.log("Webhook endpoint hit!");
   
@@ -86,38 +97,46 @@ mongoose
   
       const { event_type, data } = eventData;
   
-      // data ve passthrough var mı kontrol edelim
-      if (!data || !data.passthrough) {
-        console.error('Data field or passthrough is missing in the webhook payload');
-        return res.status(400).send('Invalid data or passthrough in webhook');
-      }
+      // Gelen event_type'ı loglayarak takip edelim
+      console.log(`Received Event Type: ${event_type}`);
   
-      // passthrough bilgisini alıyoruz ve parse ediyoruz
-      let passthrough;
-      try {
-        passthrough = JSON.parse(data.passthrough);
-      } catch (error) {
-        console.error('Error parsing passthrough JSON:', error.message);
-        return res.status(400).send('Invalid passthrough JSON');
-      }
+      // Sadece belirli etkinlik türleri `data` ve `passthrough` kullanır
+      if (event_type === 'subscription_created' || event_type === 'payment_succeeded') {
+        if (!data || !data.passthrough) {
+          console.error('Data field or passthrough is missing in the webhook payload');
+          return res.status(400).send('Invalid data or passthrough in webhook');
+        }
   
-      const bandId = passthrough.bandId;
+        // passthrough bilgisini alıyoruz ve parse ediyoruz
+        let passthrough;
+        try {
+          passthrough = JSON.parse(data.passthrough);
+        } catch (error) {
+          console.error('Error parsing passthrough JSON:', error.message);
+          return res.status(400).send('Invalid passthrough JSON');
+        }
   
-      switch (event_type) {
-        case 'subscription_created':
-          console.log(`Subscription ${data.subscription_id} was created`);
+        const bandId = passthrough.bandId;
   
-          // Kullanıcının aboneliğini güncelle
-          await Band.findByIdAndUpdate(bandId, { is_premium: true });
-          console.log(`Band ${bandId} abonelik durumu güncellendi.`);
-          break;
+        switch (event_type) {
+          case 'subscription_created':
+            console.log(`Subscription ${data.subscription_id} was created`);
   
-        case 'payment_succeeded':
-          console.log(`Payment ${data.order_id} was successful`);
-          break;
+            // Kullanıcının aboneliğini güncelle
+            await Band.findByIdAndUpdate(bandId, { is_premium: true });
+            console.log(`Band ${bandId} abonelik durumu güncellendi.`);
+            break;
   
-        default:
-          console.log(`Unhandled Webhook Event Type: ${event_type}`);
+          case 'payment_succeeded':
+            console.log(`Payment ${data.order_id} was successful`);
+            break;
+  
+          default:
+            console.log(`Unhandled Webhook Event Type: ${event_type}`);
+        }
+      } else {
+        // Diğer event türleri için sadece loglama yapalım
+        console.log(`Unhandled Webhook Event Type (no data processing needed): ${event_type}`);
       }
   
       res.status(200).send('Webhook received');
@@ -127,8 +146,13 @@ mongoose
     }
   });
   
+  
 
 
+
+
+
+  
 
 
 
