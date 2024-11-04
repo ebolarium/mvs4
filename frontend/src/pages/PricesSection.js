@@ -63,7 +63,9 @@ const PricesSection = ({ isLoggedIn }) => {
             quantity: 1,
           },
         ],
-        passthrough: JSON.stringify({ bandId }), // bandId'yi passthrough olarak gönderiyoruz
+        customData: {
+          "bandId": bandId  // bandId'yi customData olarak gönderiyoruz
+        },
         successCallback: function (data) {
           console.log("Satın alma başarılı! Paddle verileri:", data);
         },

@@ -64,86 +64,79 @@ mongoose
 
 
 
-  app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
-    console.log("Webhook endpoint hit!");
-  
-    const signature = req.headers['paddle-signature'] || req.headers['Paddle-Signature'];
-  
-    if (!signature) {
-      console.error('Paddle-Signature header not found');
-      return res.status(400).send('Invalid signature');
+// Paddle Webhook Endpoint
+app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
+  console.log("Webhook endpoint hit!");
+
+  const signature = req.headers['paddle-signature'] || req.headers['Paddle-Signature'];
+
+  if (!signature) {
+    console.error('Paddle-Signature header not found');
+    return res.status(400).send('Invalid signature');
+  }
+
+  try {
+    if (!Buffer.isBuffer(req.body)) {
+      console.error('Body is not a Buffer');
+      return res.status(400).send('Invalid body type');
     }
-  
+
+    const rawRequestBody = req.body;
+
+    // İmza doğrulamasını yap
+    verifyPaddleSignature(rawRequestBody, signature);
+
+    // Gövdeyi JSON formatına çeviriyoruz
+    let eventData;
     try {
-      if (!Buffer.isBuffer(req.body)) {
-        console.error('Body is not a Buffer');
-        return res.status(400).send('Invalid body type');
-      }
-  
-      const rawRequestBody = req.body;
-  
-      // İmza doğrulamasını yap
-      verifyPaddleSignature(rawRequestBody, signature);
-  
-      // Gövdeyi JSON formatına çeviriyoruz
-      let eventData;
-      try {
-        eventData = JSON.parse(rawRequestBody.toString('utf8'));
-        console.log("Webhook payload JSON parse edildi:", eventData);
-      } catch (error) {
-        console.error('Error parsing webhook JSON:', error.message);
-        return res.status(400).send('Invalid JSON');
-      }
-  
-      const { event_type, data } = eventData;
-  
-      console.log(`Webhook event received: ${event_type}`);
-  
-      // Sadece transaction.completed olayını ele alalım
-      if (event_type === 'transaction.completed') {
-        if (!data) {
-          console.error('Data field is missing in the webhook payload');
-          console.log('Webhook Event Data:', JSON.stringify(eventData, null, 2));
-          return res.status(400).send('Invalid data in webhook');
-        }
-  
-        if (!data.passthrough) {
-          console.error(`Passthrough field is missing in the webhook payload for event_type: ${event_type}`);
-          console.log('Received Data:', JSON.stringify(data, null, 2));
-          return res.status(400).send('Invalid passthrough in webhook');
-        }
-  
-        // passthrough bilgisini alıyoruz ve parse ediyoruz
-        let passthrough;
-        try {
-          passthrough = JSON.parse(data.passthrough);
-          console.log('Passthrough JSON parse edildi:', passthrough);
-        } catch (error) {
-          console.error('Error parsing passthrough JSON:', error.message);
-          return res.status(400).send('Invalid passthrough JSON');
-        }
-  
-        const bandId = passthrough.bandId;
-  
-        try {
-          // Kullanıcının premium durumunu güncelle
-          await Band.findByIdAndUpdate(bandId, { is_premium: true });
-          console.log(`Band ${bandId} abonelik durumu güncellendi (is_premium: true).`);
-        } catch (error) {
-          console.error('Error updating band subscription status:', error.message);
-          return res.status(500).send('Error updating subscription status');
-        }
-      } else {
-        // Diğer olay türlerini sadece logla
-        console.log(`Unhandled Webhook Event Type: ${event_type}`);
-      }
-  
-      res.status(200).send('Webhook received');
-    } catch (e) {
-      console.error('Error processing webhook:', e.message);
-      res.status(400).send('Invalid signature');
+      eventData = JSON.parse(rawRequestBody.toString('utf8'));
+      console.log("Webhook payload JSON parse edildi:", eventData);
+    } catch (error) {
+      console.error('Error parsing webhook JSON:', error.message);
+      return res.status(400).send('Invalid JSON');
     }
-  });
+
+    const { event_type, data } = eventData;
+
+    console.log(`Webhook event received: ${event_type}`);
+
+    // Sadece transaction.completed olayını ele alalım
+    if (event_type === 'transaction.completed') {
+      if (!data) {
+        console.error('Data field is missing in the webhook payload');
+        return res.status(400).send('Invalid data in webhook');
+      }
+
+      if (!data.custom_data) {
+        console.error(`Custom data is missing in the webhook payload for event_type: ${event_type}`);
+        return res.status(400).send('Invalid custom data in webhook');
+      }
+
+      // custom_data bilgisini alıyoruz
+      let customData = data.custom_data;
+      console.log('Custom data parse edildi:', customData);
+
+      const bandId = customData.bandId;
+
+      try {
+        // Kullanıcının premium durumunu güncelle
+        await Band.findByIdAndUpdate(bandId, { is_premium: true });
+        console.log(`Band ${bandId} abonelik durumu güncellendi (is_premium: true).`);
+      } catch (error) {
+        console.error('Error updating band subscription status:', error.message);
+        return res.status(500).send('Error updating subscription status');
+      }
+    } else {
+      // Diğer olay türlerini sadece logla
+      console.log(`Unhandled Webhook Event Type: ${event_type}`);
+    }
+
+    res.status(200).send('Webhook received');
+  } catch (e) {
+    console.error('Error processing webhook:', e.message);
+    res.status(400).send('Invalid signature');
+  }
+});
   
   
   
