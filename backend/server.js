@@ -102,28 +102,35 @@ app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
 
     console.log(`Webhook event received: ${event_type}`);
 
-    // Sadece transaction.completed olayını ele alalım
+    // Olay türüne göre işlem yap
     if (event_type === 'transaction.completed') {
-      if (!data) {
-        console.error('Data field is missing in the webhook payload');
-        return res.status(400).send('Invalid data in webhook');
-      }
-
       if (!data.custom_data) {
         console.error(`Custom data is missing in the webhook payload for event_type: ${event_type}`);
         return res.status(400).send('Invalid custom data in webhook');
       }
 
-      // custom_data bilgisini alıyoruz
-      let customData = data.custom_data;
-      console.log('Custom data parse edildi:', customData);
-
-      const bandId = customData.bandId;
+      const bandId = data.custom_data.bandId;
 
       try {
-        // Kullanıcının premium durumunu güncelle
+        // Kullanıcının premium durumunu güncelle (is_premium: true)
         await Band.findByIdAndUpdate(bandId, { is_premium: true });
         console.log(`Band ${bandId} abonelik durumu güncellendi (is_premium: true).`);
+      } catch (error) {
+        console.error('Error updating band subscription status:', error.message);
+        return res.status(500).send('Error updating subscription status');
+      }
+    } else if (event_type === 'subscription.payment_failed' || event_type === 'subscription.cancelled') {
+      if (!data.custom_data) {
+        console.error(`Custom data is missing in the webhook payload for event_type: ${event_type}`);
+        return res.status(400).send('Invalid custom data in webhook');
+      }
+
+      const bandId = data.custom_data.bandId;
+
+      try {
+        // Kullanıcının premium durumunu güncelle (is_premium: false)
+        await Band.findByIdAndUpdate(bandId, { is_premium: false });
+        console.log(`Band ${bandId} abonelik durumu güncellendi (is_premium: false).`);
       } catch (error) {
         console.error('Error updating band subscription status:', error.message);
         return res.status(500).send('Error updating subscription status');
@@ -139,6 +146,7 @@ app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
     res.status(400).send('Invalid signature');
   }
 });
+
   
   
   
