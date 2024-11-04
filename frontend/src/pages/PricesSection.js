@@ -10,8 +10,9 @@ const PricesSection = ({ isLoggedIn }) => {
       if (window.Paddle) {
         window.Paddle.Environment.set("sandbox");
         window.Paddle.Initialize({
-          token: "test_605824494b6e720104d54646e1c"
+          token: "test_605824494b6e720104d54646e1c",
         });
+        console.log("Paddle successfully initialized.");
       } else {
         console.error("Paddle yüklenemedi.");
       }
@@ -23,23 +24,38 @@ const PricesSection = ({ isLoggedIn }) => {
   }, []);
 
   const handleSubscribe = () => {
+    // Kullanıcı login olmuş mu kontrol et
     const token = localStorage.getItem('token');
     if (!token || token === "undefined") {
+      console.error("Token bulunamadı veya tanımsız. Kullanıcı giriş yapmalı.");
       alert("Lütfen önce giriş yapın veya kayıt olun.");
       return;
     }
 
+    console.log("Token alındı:", token);
+
+    // Token'dan bandId al
     let bandId;
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const payload = JSON.parse(atob(token.split('.')[1])); // Token'ın payload kısmını base64'ten çöz
       bandId = payload.id;
+      console.log("bandId token'dan başarıyla çözüldü:", bandId);
     } catch (error) {
       console.error("Token çözme hatası:", error);
       alert("Geçersiz giriş bilgisi. Lütfen tekrar giriş yapın.");
       return;
     }
 
+    // Eğer bandId hala geçerli değilse, ödeme başlatma
+    if (!bandId) {
+      console.error("bandId bulunamadı veya geçersiz.");
+      alert("Geçersiz kullanıcı bilgisi.");
+      return;
+    }
+
     if (window.Paddle) {
+      console.log("Ödeme başlatılıyor. bandId:", bandId);
+      // Paddle entegrasyonu: checkout penceresini aç
       window.Paddle.Checkout.open({
         items: [
           {
@@ -47,9 +63,9 @@ const PricesSection = ({ isLoggedIn }) => {
             quantity: 1,
           },
         ],
-        passthrough: JSON.stringify({ bandId }),
+        passthrough: JSON.stringify({ bandId }), // bandId'yi passthrough olarak gönderiyoruz
         successCallback: function (data) {
-          console.log("Satın alma başarılı!", data);
+          console.log("Satın alma başarılı! Paddle verileri:", data);
         },
         closeCallback: function () {
           console.log("Ödeme penceresi kapatıldı.");

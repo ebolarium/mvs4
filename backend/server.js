@@ -89,6 +89,7 @@ mongoose
       let eventData;
       try {
         eventData = JSON.parse(rawRequestBody.toString('utf8'));
+        console.log("Webhook payload JSON parse edildi:", eventData);
       } catch (error) {
         console.error('Error parsing webhook JSON:', error.message);
         return res.status(400).send('Invalid JSON');
@@ -100,15 +101,23 @@ mongoose
   
       // Sadece transaction.completed olayını ele alalım
       if (event_type === 'transaction.completed') {
-        if (!data || !data.passthrough) {
-          console.error('Data field or passthrough is missing in the webhook payload');
-          return res.status(400).send('Invalid data or passthrough in webhook');
+        if (!data) {
+          console.error('Data field is missing in the webhook payload');
+          console.log('Webhook Event Data:', JSON.stringify(eventData, null, 2));
+          return res.status(400).send('Invalid data in webhook');
+        }
+  
+        if (!data.passthrough) {
+          console.error(`Passthrough field is missing in the webhook payload for event_type: ${event_type}`);
+          console.log('Received Data:', JSON.stringify(data, null, 2));
+          return res.status(400).send('Invalid passthrough in webhook');
         }
   
         // passthrough bilgisini alıyoruz ve parse ediyoruz
         let passthrough;
         try {
           passthrough = JSON.parse(data.passthrough);
+          console.log('Passthrough JSON parse edildi:', passthrough);
         } catch (error) {
           console.error('Error parsing passthrough JSON:', error.message);
           return res.status(400).send('Invalid passthrough JSON');
@@ -135,6 +144,7 @@ mongoose
       res.status(400).send('Invalid signature');
     }
   });
+  
   
   
   
