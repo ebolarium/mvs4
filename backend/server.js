@@ -16,6 +16,8 @@ const spotifyAuthRoutes = require('./routes/spotifyAuth');
 const emailRoute = require('./routes/emailRoute');
 const bodyParser = require('body-parser');
 const CryptoJS = require('crypto-js');
+const Band = require('./models/Band'); // Band modelini ekledik
+
 
 dotenv.config(); // Environment variables'ları yükleyin
 
