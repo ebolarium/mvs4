@@ -117,3 +117,27 @@
     color: #ffffff !important;  /* Fontları beyaz yap */
   }
   
+  /* Üyelik Durumu Göstergesi */
+.membership-status {
+  margin-bottom: 15px;
+}
+
+.membership-indicator {
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-weight: bold;
+}
+
+.membership-indicator.free {
+  background-color: #e74c3c; /* Kırmızı arka plan */
+  color: #fff; /* Beyaz yazı rengi */
+}
+
+.membership-indicator.premium {
+  background-color: #4caf50; /* Yeşil arka plan */
+  color: #fff; /* Beyaz yazı rengi */
+}
+
+.white-text {
+  color: white;
+}

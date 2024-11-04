@@ -16,6 +16,7 @@ import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 
 
+
 const BandDashboard = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -185,8 +186,9 @@ const BandDashboard = () => {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <img src={Logo} alt={t('vote_song_logo')} width={40} style={{ borderRadius: '50%' }} />
+          <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
           <Typography variant="h6">{t('vote_song')}</Typography>
-        </div>
+          </Link>        </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Typography variant="body1">{t('welcome_band')}, {bandName}</Typography> {/* Kullanıcı adı burada gösteriliyor */}
           <Button variant="info" as={Link} to="/profile" className="me-2">

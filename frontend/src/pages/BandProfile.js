@@ -159,6 +159,11 @@ const BandProfile = () => {
       <Card className="band-profile-card">
         <Card.Body>
           <h5 className="band-profile-title">{t('band_profile')}</h5>
+          <div className="membership-status">
+            <span className={`membership-indicator ${bandInfo.is_premium ? 'premium' : 'free'}`}>
+            {bandInfo.is_premium ? 'Premium' : 'Free'}
+            </span>
+            </div>
           <Row className="align-items-center mb-4">
             <Col xs={3} className="text-center">
               {bandInfo.band_image ? (
@@ -168,8 +173,9 @@ const BandProfile = () => {
                   className="band-profile-image"
                 />
               ) : (
-                <p>{t('no_image_uploaded')}</p>
+            <p class="white-text">{t('no_image_uploaded')}</p>
               )}
+
             </Col>
             <Col xs={9}>
               <Form onSubmit={handleImageUpload} className="d-flex align-items-center">
