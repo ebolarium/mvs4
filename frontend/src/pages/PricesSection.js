@@ -193,15 +193,7 @@ const PricesSection = ({ isLoggedIn }) => {
   return (
     <Box sx={{ py: 2, textAlign: 'center', backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
       <Typography variant="h4">Abonelik Planları</Typography>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleSubscribe}
-        sx={{ mt: 2 }}
-        disabled={!isLoggedIn}
-      >
-        Abone Ol
-      </Button>
+     
       <Button
         variant="contained"
         color="secondary"
