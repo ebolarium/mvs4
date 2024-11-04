@@ -4,6 +4,8 @@ import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../assets/VoteSong_Logo.gif';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+
 
 const CommonAppBar = ({ isLoggedIn }) => {
   const { t } = useTranslation();
