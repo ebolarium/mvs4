@@ -114,7 +114,12 @@ const PricesSection = ({ isLoggedIn }) => {
       console.log("Aylık abonelik başlatılıyor. bandId:", bandId);
       // Paddle entegrasyonu: aylık abonelik için checkout penceresini aç
       window.Paddle.Checkout.open({
-        override: "pri_01jbedvwaxzpn2q69p88e9yd96",
+        items: [
+          {
+            priceId: "pri_01jbedvwaxzpn2q69p88e9yd96",
+            quantity: 1,
+          },
+        ],
         customData: {
           "bandId": bandId  // bandId'yi customData olarak gönderiyoruz
         },
