@@ -149,7 +149,44 @@ app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
 
   
   
-  
+app.post('/paddle/cancel-subscription', async (req, res) => {
+  const { bandId } = req.body;
+  const token = process.env.PADDLE_VENDOR_AUTH_CODE;
+
+  if (!bandId) {
+    return res.status(400).json({ message: 'Band ID is required' });
+  }
+
+  try {
+    const band = await Band.findById(bandId);
+    if (!band) {
+      return res.status(404).json({ message: 'Band not found' });
+    }
+
+    const subscriptionId = band.subscription_id;
+    if (!subscriptionId) {
+      return res.status(400).json({ message: 'Subscription ID not found for this band' });
+    }
+
+    const response = await fetch(`https://api.paddle.com/subscription/${subscriptionId}/cancel`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Paddle API error: ${errorText}`);
+    }
+
+    await Band.findByIdAndUpdate(bandId, { is_premium: false });
+    res.status(200).json({ message: 'Subscription canceled successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to cancel subscription', error: error.message });
+  }
+});
   
   
 

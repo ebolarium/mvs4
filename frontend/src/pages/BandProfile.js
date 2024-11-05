@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Form, Button, Card, Row, Col, InputGroup } from 'react-bootstrap';
+import { Container, Form, Button, Card, Row, Col, InputGroup, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
@@ -32,11 +32,15 @@ const BandProfile = () => {
     band_name: '',
     band_email: '',
     band_image: '',
+    is_premium: false,
+
   });
   const [selectedFile, setSelectedFile] = useState(null);
   const [bandPassword, setBandPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+
 
   const navigate = useNavigate();
 
@@ -100,6 +104,40 @@ const BandProfile = () => {
     }
   };
   
+  const handleCancelSubscription = () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert(t('login_required'));
+      window.location.href = '/';
+      return;
+    }
+
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const bandId = payload.id;
+
+    fetch(`${API_BASE_URL}/paddle/cancel-subscription`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ bandId }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(t('error_canceling_subscription'));
+        }
+        return response.json();
+      })
+      .then(() => {
+        setBandInfo({ ...bandInfo, is_premium: false });
+        alert(t('subscription_canceled_successfully'));
+      })
+      .catch((error) => {
+        console.error(t('error_canceling_subscription'), error);
+        alert(t('failed_to_cancel_subscription'));
+      });
+  };
 
   const handleProfileUpdate = (e) => {
     e.preventDefault();
@@ -233,8 +271,36 @@ const BandProfile = () => {
               </Button>
             </div>
           </Form>
+          {bandInfo.is_premium && (
+            <div className="text-center mt-4">
+              <Button variant="danger" onClick={() => setShowCancelModal(true)}>
+                {t('cancel_subscription')}
+              </Button>
+            </div>
+          )}
+
         </Card.Body>
       </Card>
+
+
+      <Modal show={showCancelModal} onHide={() => setShowCancelModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>{t('confirm_cancellation')}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{t('are_you_sure_cancel')}</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowCancelModal(false)}>
+            {t('close')}
+          </Button>
+          <Button variant="danger" onClick={handleCancelSubscription}>
+            {t('yes_cancel')}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+
+
+
     </Container>
   );
 };
