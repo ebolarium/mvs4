@@ -104,17 +104,19 @@ app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
 
     // Olay türüne göre işlem yap
     if (event_type === 'transaction.completed') {
-      if (!data.custom_data) {
-        console.error(`Custom data is missing in the webhook payload for event_type: ${event_type}`);
+      if (!data.custom_data || !data.subscription_id) {
+        console.error(`Custom data or subscription_id is missing in the webhook payload for event_type: ${event_type}`);
         return res.status(400).send('Invalid custom data in webhook');
       }
 
       const bandId = data.custom_data.bandId;
+      const subscriptionId = data.subscription_id;
+
 
       try {
         // Kullanıcının premium durumunu güncelle (is_premium: true)
-        await Band.findByIdAndUpdate(bandId, { is_premium: true });
-        console.log(`Band ${bandId} abonelik durumu güncellendi (is_premium: true).`);
+        await Band.findByIdAndUpdate(bandId, { is_premium: true, subscription_id: subscriptionId });
+        console.log(`Band ${bandId} abonelik durumu güncellendi (is_premium: true, subscription_id: ${subscriptionId}).`);
       } catch (error) {
         console.error('Error updating band subscription status:', error.message);
         return res.status(500).send('Error updating subscription status');
@@ -151,7 +153,7 @@ app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
   
 app.post('/paddle/cancel-subscription', async (req, res) => {
   const { bandId } = req.body;
-  const token = process.env.PADDLE_VENDOR_AUTH_CODE;
+  const token = 'pdl_ntfset_01jbeg11et89t7579610fhxn5z_YdkhEaae7TAP/gl/GwAkloZGNFFSWf1+'; // Environment kullanmadan doğrudan token yazıldı
 
   if (!bandId) {
     return res.status(400).json({ message: 'Band ID is required' });
@@ -184,6 +186,7 @@ app.post('/paddle/cancel-subscription', async (req, res) => {
     await Band.findByIdAndUpdate(bandId, { is_premium: false });
     res.status(200).json({ message: 'Subscription canceled successfully' });
   } catch (error) {
+    console.error('Error cancelling subscription:', error.message);
     res.status(500).json({ message: 'Failed to cancel subscription', error: error.message });
   }
 });
