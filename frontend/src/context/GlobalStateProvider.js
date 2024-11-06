@@ -21,24 +21,6 @@ const reducer = (state, action) => {
       return { ...state, songs: action.payload };
     case 'SET_ALL_SONGS':
       return { ...state, allSongs: action.payload };
-    case 'ADD_SONG':
-      return { ...state, allSongs: [...state.allSongs, action.payload] };
-    case 'UPDATE_SONG_VOTES':
-      return {
-        ...state,
-        songs: state.songs.map((song) =>
-          song._id === action.payload.songId
-            ? { ...song, votecount: song.votecount + 1 }
-            : song
-        ),
-      };
-    case 'MARK_SONG_PLAYED':
-      return {
-        ...state,
-        songs: state.songs.map((song) =>
-          song._id === action.payload ? { ...song, played: true } : song
-        ),
-      };
     case 'SET_LOGIN_STATUS':
       return { ...state, isLoggedIn: action.payload };
     case 'SET_BAND_NAME':
@@ -52,8 +34,7 @@ export const GlobalStateProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [socket, setSocket] = useState(null);
 
-  // Kullanıcı login durumunu ve band adını kontrol et
-  useEffect(() => {
+  const updateLoginStatus = () => {
     const token = localStorage.getItem('token');
     if (token) {
       dispatch({ type: 'SET_LOGIN_STATUS', payload: true });
@@ -63,6 +44,23 @@ export const GlobalStateProvider = ({ children }) => {
       dispatch({ type: 'SET_LOGIN_STATUS', payload: false });
       dispatch({ type: 'SET_BAND_NAME', payload: '' });
     }
+  };
+
+  // İlk yüklemede login durumunu kontrol et
+  useEffect(() => {
+    updateLoginStatus();
+  }, []);
+
+  // localStorage değişikliklerini dinle
+  useEffect(() => {
+    const handleStorageChange = () => {
+      updateLoginStatus();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   // Socket bağlantısını yönet
