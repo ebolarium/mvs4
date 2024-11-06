@@ -102,6 +102,11 @@ const BandProfile = () => {
     }
   };
   
+
+
+
+
+
   const handleCancelSubscription = () => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -109,20 +114,18 @@ const BandProfile = () => {
       window.location.href = '/';
       return;
     }
-
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    const bandId = payload.id;
-
-    fetch('https://votesong.live/paddle/cancel-subscription', {
+  
+    fetch(`${API_BASE_URL}/api/paddle/cancel-subscription`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ bandId }),
     })
-      .then((response) => {
+      .then(async (response) => {
         if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Sunucu hatası:', errorText);
           throw new Error(t('error_canceling_subscription'));
         }
         return response.json();
@@ -137,6 +140,19 @@ const BandProfile = () => {
         alert(t('failed_to_cancel_subscription'));
       });
   };
+  
+
+
+
+
+
+
+
+
+
+
+
+
 
   const handleProfileUpdate = (e) => {
     e.preventDefault();
