@@ -14,20 +14,18 @@ const i18n = require('i18n');
 const fs = require('fs');
 const spotifyAuthRoutes = require('./routes/spotifyAuth');
 const emailRoute = require('./routes/emailRoute');
+const bodyParser = require('body-parser');
 const CryptoJS = require('crypto-js');
-const Band = require('./models/Band');
-const jwt = require('jsonwebtoken');
+const Band = require('./models/Band'); // Band modelini ekledik
+
 
 dotenv.config(); // Environment variables'ları yükleyin
 
 const app = express();
 const server = http.createServer(app);
 
-// Paddle Credentials
+// Paddle Webhook Secret Key
 const WEBHOOK_SECRET_KEY = 'pdl_ntfset_01jbeg11et89t7579610fhxn5z_YdkhEaae7TAP/gl/GwAkloZGNFFSWf1+';
-const PADDLE_VENDOR_ID = '24248'; // Paddle Vendor ID
-const PADDLE_VENDOR_AUTH_CODE = '0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19'; // Paddle Auth Code
-const JWT_SECRET_KEY = 'ad869542aa1f608bf751614147486d8d6ffcfd7d9c4a14eba563653e3ef59d3dfc81c119a722c95e03d2bffbebd7a50d5c295907924903f779cb34a02686cefe';
 
 // i18n configuration
 i18n.configure({
@@ -58,16 +56,116 @@ mongoose
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.log(err));
 
-// *** PADDLE WEBHOOK ROTASINI VE RAW BODY MIDDLEWARE'İNİ MIDDLEWARE'LERDEN ÖNCE EKLEYİN ***
 
-// Raw body parsing middleware for Paddle webhook
-app.use('/paddle/webhook', express.raw({ type: '*/*' }));
+
+
+
+
+
+
+
+
+
+// Paddle Webhook Endpoint
+app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
+  console.log("Webhook endpoint hit!");
+
+  const signature = req.headers['paddle-signature'] || req.headers['Paddle-Signature'];
+
+  if (!signature) {
+    console.error('Paddle-Signature header not found');
+    return res.status(400).send('Invalid signature');
+  }
+
+  try {
+    if (!Buffer.isBuffer(req.body)) {
+      console.error('Body is not a Buffer');
+      return res.status(400).send('Invalid body type');
+    }
+
+    const rawRequestBody = req.body;
+
+    // İmza doğrulamasını yap
+    verifyPaddleSignature(rawRequestBody, signature);
+
+    // Gövdeyi JSON formatına çeviriyoruz
+    let eventData;
+    try {
+      eventData = JSON.parse(rawRequestBody.toString('utf8'));
+      console.log("Webhook payload JSON parse edildi:", eventData);
+    } catch (error) {
+      console.error('Error parsing webhook JSON:', error.message);
+      return res.status(400).send('Invalid JSON');
+    }
+
+    const { event_type, data } = eventData;
+
+    console.log(`Webhook event received: ${event_type}`);
+
+    // Olay türüne göre işlem yap
+    if (event_type === 'transaction.completed') {
+      if (!data.custom_data) {
+        console.error(`Custom data is missing in the webhook payload for event_type: ${event_type}`);
+        return res.status(400).send('Invalid custom data in webhook');
+      }
+
+      const bandId = data.custom_data.bandId;
+
+      try {
+        // Kullanıcının premium durumunu güncelle (is_premium: true)
+        await Band.findByIdAndUpdate(bandId, { is_premium: true });
+        console.log(`Band ${bandId} abonelik durumu güncellendi (is_premium: true).`);
+      } catch (error) {
+        console.error('Error updating band subscription status:', error.message);
+        return res.status(500).send('Error updating subscription status');
+      }
+    } else if (event_type === 'subscription.payment_failed' || event_type === 'subscription.cancelled') {
+      if (!data.custom_data) {
+        console.error(`Custom data is missing in the webhook payload for event_type: ${event_type}`);
+        return res.status(400).send('Invalid custom data in webhook');
+      }
+
+      const bandId = data.custom_data.bandId;
+
+      try {
+        // Kullanıcının premium durumunu güncelle (is_premium: false)
+        await Band.findByIdAndUpdate(bandId, { is_premium: false });
+        console.log(`Band ${bandId} abonelik durumu güncellendi (is_premium: false).`);
+      } catch (error) {
+        console.error('Error updating band subscription status:', error.message);
+        return res.status(500).send('Error updating subscription status');
+      }
+    } else {
+      // Diğer olay türlerini sadece logla
+      console.log(`Unhandled Webhook Event Type: ${event_type}`);
+    }
+
+    res.status(200).send('Webhook received');
+  } catch (e) {
+    console.error('Error processing webhook:', e.message);
+    res.status(400).send('Invalid signature');
+  }
+});
+
+  
+  
+  
+  
+  
+
+
+
+
+
+
+
+
 
 // Paddle Signature Doğrulama Fonksiyonu
-function verifyPaddleSignature(rawBody, signature) {
+function verifyPaddleSignature(requestBody, signature) {
   const { ts, receivedH1 } = extractHeaderElements(signature);
-  const payload = buildPayload(ts, rawBody);
-
+  const payload = buildPayload(ts, requestBody);
+  
   const computedH1 = hashPayload(payload, WEBHOOK_SECRET_KEY);
 
   if (receivedH1 !== computedH1) {
@@ -77,12 +175,12 @@ function verifyPaddleSignature(rawBody, signature) {
 
 // Header elemanlarını çıkar
 function extractHeaderElements(header) {
-  const parts = header.split(',');
+  const parts = header.split(';');
   if (parts.length !== 2) {
     throw new Error('Incompatible header format');
   }
-  const tsPart = parts.find((part) => part.trim().startsWith('ts='));
-  const h1Part = parts.find((part) => part.trim().startsWith('h1='));
+  const tsPart = parts.find((part) => part.startsWith('ts='));
+  const h1Part = parts.find((part) => part.startsWith('h1='));
 
   if (!tsPart || !h1Part) {
     throw new Error('Missing ts or h1 in header');
@@ -95,8 +193,8 @@ function extractHeaderElements(header) {
 }
 
 // Payload oluştur
-function buildPayload(ts, rawBody) {
-  return `${ts}:${rawBody}`;
+function buildPayload(ts, requestBody) {
+  return `${ts}:${requestBody.toString('utf8')}`;
 }
 
 // HMAC-SHA256 kullanarak payload'ı hashle (crypto-js ile)
@@ -105,54 +203,11 @@ function hashPayload(payload, secret) {
   return hmac.toString(CryptoJS.enc.Hex);
 }
 
-// Paddle Webhook Route
-app.post('/paddle/webhook', async (req, res) => {
-  try {
-    // Webhook imzasını doğrulayın
-    const signature = req.headers['paddle-signature'];
-    if (!signature) {
-      console.error('Paddle signature missing');
-      return res.status(400).send('Paddle signature missing');
-    }
-
-    // Ham isteği alın
-    const rawBody = req.body.toString('utf8');
-
-    // İmzayı doğrulayın
-    verifyPaddleSignature(rawBody, signature);
-
-    // İstek gövdesini parse edin
-    const parsedBody = querystring.parse(rawBody);
-
-    const alertName = parsedBody.alert_name;
-
-    if (alertName === 'subscription_cancelled') {
-      const subscriptionId = parsedBody.subscription_id;
-
-      // Bu subscription_id'ye sahip band'i bulun
-      const band = await Band.findOne({ subscription_id: subscriptionId });
-
-      if (band) {
-        band.is_premium = false;
-        await band.save();
-        console.log(`Abonelik ${subscriptionId} iptal edildi. Band ${band.band_name} güncellendi.`);
-      } else {
-        console.error(`Bu subscription ID ile eşleşen band bulunamadı: ${subscriptionId}`);
-      }
-    }
-
-    // Diğer webhook event'lerini burada işleyebilirsiniz
-
-    res.status(200).send('OK');
-  } catch (error) {
-    console.error('Paddle webhook işlenirken hata oluştu:', error);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-// *** NORMAL MIDDLEWARE'LERİ BURADA EKLEYİN ***
+// Normal middleware'leri Paddle webhook'tan sonra ekliyoruz
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+
+
 
 // Routes
 app.use('/api/bands', bandRoutes);

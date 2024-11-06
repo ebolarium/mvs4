@@ -1,5 +1,3 @@
-// BandProfile.js
-
 import React, { useState, useEffect } from 'react';
 import { Container, Form, Button, Card, Row, Col, InputGroup } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
@@ -9,11 +7,12 @@ import API_BASE_URL from '../config/apiConfig';
 import { useTranslation } from 'react-i18next';
 import './BandProfile.css';
 
+
 import { initializeApp } from "firebase/app";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBafFSa_fM47WlepENcL_qZpED0b4G9w",
+  apiKey: "AIzaSyBafFSa_fM47WlepENcL_qZpED0b4G9w3w",
   authDomain: "votesong-50a22.firebaseapp.com",
   projectId: "votesong-50a22",
   storageBucket: "votesong-50a22.appspot.com",
@@ -26,13 +25,13 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const storage = getStorage(firebaseApp);
 
+
 const BandProfile = () => {
   const { t } = useTranslation();
   const [bandInfo, setBandInfo] = useState({
     band_name: '',
     band_email: '',
     band_image: '',
-    is_premium: false,
   });
   const [selectedFile, setSelectedFile] = useState(null);
   const [bandPassword, setBandPassword] = useState('');
@@ -100,6 +99,7 @@ const BandProfile = () => {
       alert(t('failed_to_upload_image'));
     }
   };
+  
 
   const handleProfileUpdate = (e) => {
     e.preventDefault();
@@ -120,7 +120,8 @@ const BandProfile = () => {
       band_name: bandInfo.band_name || '',
       band_email: bandInfo.band_email || '',
       band_password: bandPassword,
-      band_image: bandInfo.band_image || '',
+      band_image: bandInfo.band_image || '', // Bu satırı ekleyin
+
     };
 
     fetch(`${API_BASE_URL}/bands/profile`, {
@@ -150,11 +151,6 @@ const BandProfile = () => {
     setShowPassword(!showPassword);
   };
 
-  const openPaddleCustomerPortal = () => {
-    const portalUrl = "https://sandbox-customer-portal.paddle.com/cpl_01jbedrh3tzrexxmaye7h3npzk";
-    window.open(portalUrl, '_blank'); // Yeni bir sekmede müşteri portalını aç
-  };
-
   return (
     <Container className="band-profile-container">
       <Button variant="secondary" onClick={() => navigate('/dashboard')} className="mb-3">
@@ -165,9 +161,9 @@ const BandProfile = () => {
           <h5 className="band-profile-title">{t('band_profile')}</h5>
           <div className="membership-status">
             <span className={`membership-indicator ${bandInfo.is_premium ? 'premium' : 'free'}`}>
-              {bandInfo.is_premium ? 'Premium' : 'Free'}
+            {bandInfo.is_premium ? 'Premium' : 'Free'}
             </span>
-          </div>
+            </div>
           <Row className="align-items-center mb-4">
             <Col xs={3} className="text-center">
               {bandInfo.band_image ? (
@@ -177,7 +173,7 @@ const BandProfile = () => {
                   className="band-profile-image"
                 />
               ) : (
-                <p className="white-text">{t('no_image_uploaded')}</p>
+            <p class="white-text">{t('no_image_uploaded')}</p>
               )}
 
             </Col>
@@ -237,13 +233,6 @@ const BandProfile = () => {
               </Button>
             </div>
           </Form>
-          {bandInfo.is_premium && (
-            <div className="text-center mt-4">
-              <Button variant="danger" onClick={openPaddleCustomerPortal}>
-                {t('cancel_subscription')}
-              </Button>
-            </div>
-          )}
         </Card.Body>
       </Card>
     </Container>
