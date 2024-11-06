@@ -113,7 +113,7 @@ const BandProfile = () => {
     const payload = JSON.parse(atob(token.split('.')[1]));
     const bandId = payload.id;
 
-    fetch(`${API_BASE_URL}/paddle/cancel-subscription`, {
+    fetch('https://votesong.live/paddle/cancel-subscription', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
