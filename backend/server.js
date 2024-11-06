@@ -16,8 +16,6 @@ const spotifyAuthRoutes = require('./routes/spotifyAuth');
 const emailRoute = require('./routes/emailRoute');
 const CryptoJS = require('crypto-js');
 const Band = require('./models/Band');
-const fetch = require('node-fetch');
-const querystring = require('querystring');
 const jwt = require('jsonwebtoken');
 
 dotenv.config(); // Environment variables'ları yükleyin
@@ -207,77 +205,6 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {});
-});
-
-// Abonelik iptali için route
-app.post('/paddle/cancel-subscription', async (req, res) => {
-  try {
-    // Token'dan bandId'yi alın
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      console.error('Authorization header missing');
-      return res.status(401).json({ message: 'Authorization header missing' });
-    }
-
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET_KEY); // JWT oluştururken kullandığınız anahtarı kullanın
-
-    const bandId = decoded.id;
-
-    if (!bandId) {
-      console.error('Band ID missing in token');
-      return res.status(400).json({ message: 'Band ID missing' });
-    }
-
-    // Band'i veritabanından bul
-    const band = await Band.findById(bandId);
-    if (!band) {
-      console.error('Band not found');
-      return res.status(404).json({ message: 'Band not found' });
-    }
-
-    // Band'in subscriptionId'sini al
-    const subscriptionId = band.subscription_id;
-    if (!subscriptionId) {
-      console.error('No subscription associated with this band');
-      return res.status(400).json({ message: 'No subscription associated with this band' });
-    }
-
-    // Paddle API'ye istek göndererek aboneliği iptal et
-    const PADDLE_API_URL = 'https://vendors.paddle.com/api/2.0/subscription/users_cancel';
-
-    // İstek gövdesini hazırla
-    const requestBody = {
-      vendor_id: PADDLE_VENDOR_ID,
-      vendor_auth_code: PADDLE_VENDOR_AUTH_CODE,
-      subscription_id: subscriptionId
-    };
-
-    // Paddle API'ye isteği gönder
-    const response = await fetch(PADDLE_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: querystring.stringify(requestBody)
-    });
-
-    const result = await response.json();
-
-    if (!result.success) {
-      console.error('Paddle API Hatası:', result);
-      return res.status(500).json({ message: 'Abonelik iptal edilemedi.', error: result });
-    }
-
-    // Paddle abonelik iptalini kabul etti
-    // is_premium flagini burada güncellemiyoruz
-    // Bunun yerine, Paddle'dan gelen webhook abonelik iptalini onaylayınca güncelliyoruz
-
-    return res.json({ message: 'Abonelik iptali başlatıldı' });
-  } catch (error) {
-    console.error('Abonelik iptali sırasında hata oluştu:', error);
-    return res.status(500).json({ message: 'Sunucu hatası', error: error.message });
-  }
 });
 
 const PORT = process.env.PORT || 5000;
