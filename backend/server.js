@@ -210,7 +210,7 @@ io.on('connection', (socket) => {
 });
 
 // Abonelik iptali için route
-app.post('/api/paddle/cancel-subscription', async (req, res) => {
+app.post('/paddle/cancel-subscription', async (req, res) => {
   try {
     // Token'dan bandId'yi alın
     const authHeader = req.headers.authorization;

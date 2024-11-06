@@ -115,7 +115,7 @@ const BandProfile = () => {
       return;
     }
   
-    fetch(`${API_BASE_URL}/api/paddle/cancel-subscription`, {
+    fetch(`${API_BASE_URL}/paddle/cancel-subscription`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
