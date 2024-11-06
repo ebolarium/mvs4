@@ -170,7 +170,7 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {});
 });
 
-app.post('/paddle/cancel-subscription', async (req, res) => {
+app.post('/api/paddle/cancel-subscription', async (req, res) => {
   const bandId = req.body.bandId;
   if (!bandId) {
     return res.status(400).json({ message: 'Band ID gerekli.' });
