@@ -28,6 +28,9 @@ const server = http.createServer(app);
 // Paddle Webhook Secret Key
 const WEBHOOK_SECRET_KEY = 'pdl_ntfset_01jbeg11et89t7579610fhxn5z_YdkhEaae7TAP/gl/GwAkloZGNFFSWf1+';
 const PADDLE_API_KEY = 'test_605824494b6e720104d54646e1c'; // Paddle API anahtarınızı buraya yazın
+// Paddle API bilgileri
+const PADDLE_VENDOR_ID = '24248'; // Paddle Vendor ID
+const PADDLE_VENDOR_AUTH_CODE = '0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19'; // Paddle Auth Code
 
 
 // i18n configuration
@@ -170,6 +173,7 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {});
 });
 
+// Abonelik iptali için route
 app.post('/api/paddle/cancel-subscription', async (req, res) => {
   const bandId = req.body.bandId;
   if (!bandId) {
@@ -187,30 +191,28 @@ app.post('/api/paddle/cancel-subscription', async (req, res) => {
       return res.status(400).json({ message: 'Bu band ile ilişkili bir abonelik bulunamadı.' });
     }
     // Paddle API'ye istek göndererek aboneliği iptal et
-    const PADDLE_API_URL = 'https://api.paddle.com/subscriptions';
-    const subscriptionCancelUrl = `${PADDLE_API_URL}/${subscriptionId}/cancel`;
+    const PADDLE_API_URL = 'https://vendors.paddle.com/api/2.0/subscription/users_cancel';
 
     // İstek gövdesini hazırla
     const requestBody = {
-      "effective_from": "now" // veya "next_billing_period" kullanabilirsiniz
-    };
-
-    // Başlıkları hazırla
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${PADDLE_API_KEY}`
+      vendor_id: PADDLE_VENDOR_ID,
+      vendor_auth_code: PADDLE_VENDOR_AUTH_CODE,
+      subscription_id: subscriptionId
+      
     };
 
     // Paddle API'ye isteği gönder
-    const response = await fetch(subscriptionCancelUrl, {
+    const response = await fetch(PADDLE_API_URL, {
       method: 'POST',
-      headers: headers,
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(requestBody)
     });
 
     const result = await response.json();
 
-    if (!response.ok) {
+    if (!result.success) {
       console.error('Paddle API Hatası:', result);
       return res.status(500).json({ message: 'Abonelik iptal edilemedi.', error: result });
     }
@@ -223,9 +225,10 @@ app.post('/api/paddle/cancel-subscription', async (req, res) => {
 
   } catch (error) {
     console.error('Abonelik iptal edilirken hata oluştu:', error);
-    return res.status(500).json({ message: 'Sunucu hatası.' });
+    return res.status(500).json({ message: 'Sunucu hatası.', error: error.message });
   }
 });
+
 
 
 
