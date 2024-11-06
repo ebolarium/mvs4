@@ -23,6 +23,10 @@ const bandSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  subscription_id: { 
+    type: String,
+    default: null,
+  },
   band_song_count: {
     type: Number,
     default: 0

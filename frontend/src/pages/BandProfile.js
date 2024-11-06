@@ -1,3 +1,5 @@
+// BandProfile.js
+
 import React, { useState, useEffect } from 'react';
 import { Container, Form, Button, Card, Row, Col, InputGroup, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
@@ -7,12 +9,11 @@ import API_BASE_URL from '../config/apiConfig';
 import { useTranslation } from 'react-i18next';
 import './BandProfile.css';
 
-
 import { initializeApp } from "firebase/app";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBafFSa_fM47WlepENcL_qZpED0b4G9w3w",
+  apiKey: "AIzaSyBafFSa_fM47WlepENcL_qZpED0b4G9w",
   authDomain: "votesong-50a22.firebaseapp.com",
   projectId: "votesong-50a22",
   storageBucket: "votesong-50a22.appspot.com",
@@ -25,7 +26,6 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const storage = getStorage(firebaseApp);
 
-
 const BandProfile = () => {
   const { t } = useTranslation();
   const [bandInfo, setBandInfo] = useState({
@@ -33,14 +33,12 @@ const BandProfile = () => {
     band_email: '',
     band_image: '',
     is_premium: false,
-
   });
   const [selectedFile, setSelectedFile] = useState(null);
   const [bandPassword, setBandPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
-
 
   const navigate = useNavigate();
 
@@ -132,6 +130,7 @@ const BandProfile = () => {
       .then(() => {
         setBandInfo({ ...bandInfo, is_premium: false });
         alert(t('subscription_canceled_successfully'));
+        setShowCancelModal(false); // Modal'ı kapat
       })
       .catch((error) => {
         console.error(t('error_canceling_subscription'), error);
@@ -158,8 +157,7 @@ const BandProfile = () => {
       band_name: bandInfo.band_name || '',
       band_email: bandInfo.band_email || '',
       band_password: bandPassword,
-      band_image: bandInfo.band_image || '', // Bu satırı ekleyin
-
+      band_image: bandInfo.band_image || '',
     };
 
     fetch(`${API_BASE_URL}/bands/profile`, {
@@ -199,9 +197,9 @@ const BandProfile = () => {
           <h5 className="band-profile-title">{t('band_profile')}</h5>
           <div className="membership-status">
             <span className={`membership-indicator ${bandInfo.is_premium ? 'premium' : 'free'}`}>
-            {bandInfo.is_premium ? 'Premium' : 'Free'}
+              {bandInfo.is_premium ? 'Premium' : 'Free'}
             </span>
-            </div>
+          </div>
           <Row className="align-items-center mb-4">
             <Col xs={3} className="text-center">
               {bandInfo.band_image ? (
@@ -211,7 +209,7 @@ const BandProfile = () => {
                   className="band-profile-image"
                 />
               ) : (
-            <p class="white-text">{t('no_image_uploaded')}</p>
+                <p className="white-text">{t('no_image_uploaded')}</p>
               )}
 
             </Col>
@@ -282,7 +280,6 @@ const BandProfile = () => {
         </Card.Body>
       </Card>
 
-
       <Modal show={showCancelModal} onHide={() => setShowCancelModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>{t('confirm_cancellation')}</Modal.Title>
@@ -297,9 +294,6 @@ const BandProfile = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-
-
-
 
     </Container>
   );

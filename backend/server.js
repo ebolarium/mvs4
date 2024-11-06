@@ -17,6 +17,7 @@ const emailRoute = require('./routes/emailRoute');
 const bodyParser = require('body-parser');
 const CryptoJS = require('crypto-js');
 const Band = require('./models/Band'); // Band modelini ekledik
+const fetch = require('node-fetch'); // node-fetch paketini ekledik
 
 
 dotenv.config(); // Environment variables'ları yükleyin
@@ -26,6 +27,8 @@ const server = http.createServer(app);
 
 // Paddle Webhook Secret Key
 const WEBHOOK_SECRET_KEY = 'pdl_ntfset_01jbeg11et89t7579610fhxn5z_YdkhEaae7TAP/gl/GwAkloZGNFFSWf1+';
+const PADDLE_API_KEY = 'test_605824494b6e720104d54646e1c'; // Paddle API anahtarınızı buraya yazın
+
 
 // i18n configuration
 i18n.configure({
@@ -57,141 +60,6 @@ mongoose
   .catch((err) => console.log(err));
 
 
-
-
-
-
-
-
-
-
-
-// Paddle Webhook Endpoint
-app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
-  console.log("Webhook endpoint hit!");
-
-  const signature = req.headers['paddle-signature'] || req.headers['Paddle-Signature'];
-
-  if (!signature) {
-    console.error('Paddle-Signature header not found');
-    return res.status(400).send('Invalid signature');
-  }
-
-  try {
-    if (!Buffer.isBuffer(req.body)) {
-      console.error('Body is not a Buffer');
-      return res.status(400).send('Invalid body type');
-    }
-
-    const rawRequestBody = req.body;
-
-    // İmza doğrulamasını yap
-    verifyPaddleSignature(rawRequestBody, signature);
-
-    // Gövdeyi JSON formatına çeviriyoruz
-    let eventData;
-    try {
-      eventData = JSON.parse(rawRequestBody.toString('utf8'));
-      console.log("Webhook payload JSON parse edildi:", eventData);
-    } catch (error) {
-      console.error('Error parsing webhook JSON:', error.message);
-      return res.status(400).send('Invalid JSON');
-    }
-
-    const { event_type, data } = eventData;
-
-    console.log(`Webhook event received: ${event_type}`);
-
-    // Olay türüne göre işlem yap
-    if (event_type === 'transaction.completed') {
-      if (!data.custom_data || !data.subscription_id) {
-        console.error(`Custom data or subscription_id is missing in the webhook payload for event_type: ${event_type}`);
-        return res.status(400).send('Invalid custom data in webhook');
-      }
-
-      const bandId = data.custom_data.bandId;
-      const subscriptionId = data.subscription_id;
-
-
-      try {
-        // Kullanıcının premium durumunu güncelle (is_premium: true)
-        await Band.findByIdAndUpdate(bandId, { is_premium: true, subscription_id: subscriptionId });
-        console.log(`Band ${bandId} abonelik durumu güncellendi (is_premium: true, subscription_id: ${subscriptionId}).`);
-      } catch (error) {
-        console.error('Error updating band subscription status:', error.message);
-        return res.status(500).send('Error updating subscription status');
-      }
-    } else if (event_type === 'subscription.payment_failed' || event_type === 'subscription.cancelled') {
-      if (!data.custom_data) {
-        console.error(`Custom data is missing in the webhook payload for event_type: ${event_type}`);
-        return res.status(400).send('Invalid custom data in webhook');
-      }
-
-      const bandId = data.custom_data.bandId;
-
-      try {
-        // Kullanıcının premium durumunu güncelle (is_premium: false)
-        await Band.findByIdAndUpdate(bandId, { is_premium: false });
-        console.log(`Band ${bandId} abonelik durumu güncellendi (is_premium: false).`);
-      } catch (error) {
-        console.error('Error updating band subscription status:', error.message);
-        return res.status(500).send('Error updating subscription status');
-      }
-    } else {
-      // Diğer olay türlerini sadece logla
-      console.log(`Unhandled Webhook Event Type: ${event_type}`);
-    }
-
-    res.status(200).send('Webhook received');
-  } catch (e) {
-    console.error('Error processing webhook:', e.message);
-    res.status(400).send('Invalid signature');
-  }
-});
-
-  
-  
-app.post('/paddle/cancel-subscription', async (req, res) => {
-  const { bandId } = req.body;
-  const token = 'pdl_ntfset_01jbeg11et89t7579610fhxn5z_YdkhEaae7TAP/gl/GwAkloZGNFFSWf1+'; // Environment kullanmadan doğrudan token yazıldı
-
-  if (!bandId) {
-    return res.status(400).json({ message: 'Band ID is required' });
-  }
-
-  try {
-    const band = await Band.findById(bandId);
-    if (!band) {
-      return res.status(404).json({ message: 'Band not found' });
-    }
-
-    const subscriptionId = band.subscription_id;
-    if (!subscriptionId) {
-      return res.status(400).json({ message: 'Subscription ID not found for this band' });
-    }
-
-    const response = await fetch(`https://api.paddle.com/subscription/${subscriptionId}/cancel`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Paddle API error: ${errorText}`);
-    }
-
-    await Band.findByIdAndUpdate(bandId, { is_premium: false });
-    res.status(200).json({ message: 'Subscription canceled successfully' });
-  } catch (error) {
-    console.error('Error cancelling subscription:', error.message);
-    res.status(500).json({ message: 'Failed to cancel subscription', error: error.message });
-  }
-});
-  
-  
 
 
 
@@ -301,6 +169,69 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {});
 });
+
+app.post('/paddle/cancel-subscription', async (req, res) => {
+  const bandId = req.body.bandId;
+  if (!bandId) {
+    return res.status(400).json({ message: 'Band ID gerekli.' });
+  }
+  try {
+    // Band'i veritabanından bul
+    const band = await Band.findById(bandId);
+    if (!band) {
+      return res.status(404).json({ message: 'Band bulunamadı.' });
+    }
+    // Band'in subscriptionId'sini al
+    const subscriptionId = band.subscription_id;
+    if (!subscriptionId) {
+      return res.status(400).json({ message: 'Bu band ile ilişkili bir abonelik bulunamadı.' });
+    }
+    // Paddle API'ye istek göndererek aboneliği iptal et
+    const PADDLE_API_URL = 'https://api.paddle.com/subscriptions';
+    const subscriptionCancelUrl = `${PADDLE_API_URL}/${subscriptionId}/cancel`;
+
+    // İstek gövdesini hazırla
+    const requestBody = {
+      "effective_from": "now" // veya "next_billing_period" kullanabilirsiniz
+    };
+
+    // Başlıkları hazırla
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${PADDLE_API_KEY}`
+    };
+
+    // Paddle API'ye isteği gönder
+    const response = await fetch(subscriptionCancelUrl, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(requestBody)
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      console.error('Paddle API Hatası:', result);
+      return res.status(500).json({ message: 'Abonelik iptal edilemedi.', error: result });
+    }
+
+    // Band'in is_premium durumunu güncelle
+    band.is_premium = false;
+    await band.save();
+
+    return res.json({ message: 'Abonelik başarıyla iptal edildi.' });
+
+  } catch (error) {
+    console.error('Abonelik iptal edilirken hata oluştu:', error);
+    return res.status(500).json({ message: 'Sunucu hatası.' });
+  }
+});
+
+
+
+
+
+
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
