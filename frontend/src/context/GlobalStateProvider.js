@@ -8,8 +8,9 @@ export const GlobalStateContext = createContext();
 const initialState = {
   playlist: null,
   songs: [],
-  allSongs: [], // Added to include all songs in the global state
-  // Add other state variables as needed
+  allSongs: [],
+  isLoggedIn: false, // Kullanıcı login durumu
+  bandName: '', // Kullanıcı grubu adı
 };
 
 const reducer = (state, action) => {
@@ -38,6 +39,10 @@ const reducer = (state, action) => {
           song._id === action.payload ? { ...song, played: true } : song
         ),
       };
+    case 'SET_LOGIN_STATUS':
+      return { ...state, isLoggedIn: action.payload };
+    case 'SET_BAND_NAME':
+      return { ...state, bandName: action.payload };
     default:
       return state;
   }
@@ -47,8 +52,21 @@ export const GlobalStateProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [socket, setSocket] = useState(null);
 
+  // Kullanıcı login durumunu ve band adını kontrol et
   useEffect(() => {
-    // Use the correct socket URL based on the environment
+    const token = localStorage.getItem('token');
+    if (token) {
+      dispatch({ type: 'SET_LOGIN_STATUS', payload: true });
+      const storedBandName = localStorage.getItem('bandName');
+      dispatch({ type: 'SET_BAND_NAME', payload: storedBandName || '' });
+    } else {
+      dispatch({ type: 'SET_LOGIN_STATUS', payload: false });
+      dispatch({ type: 'SET_BAND_NAME', payload: '' });
+    }
+  }, []);
+
+  // Socket bağlantısını yönet
+  useEffect(() => {
     const socketURL = process.env.REACT_APP_SOCKET_URL || 'ws://localhost:5000';
 
     const socketInstance = io(socketURL, {
@@ -62,13 +80,9 @@ export const GlobalStateProvider = ({ children }) => {
       console.log('Socket connected:', socketInstance.id);
     });
 
-    // Centralized event handlers
     socketInstance.on('playlistUpdated', (updatedSongs) => {
-      console.log('GlobalStateProvider - playlistUpdated:', updatedSongs);
-
-      // Process the updatedSongs to match the expected structure
       const processedSongs = updatedSongs
-        .filter((song) => song.song_id) // Ensure song_id exists
+        .filter((song) => song.song_id)
         .map((song) => ({
           _id: song.song_id._id,
           title: song.song_id.title,
@@ -76,12 +90,8 @@ export const GlobalStateProvider = ({ children }) => {
           votecount: song.votecount,
           played: song.played || false,
         }))
-        .sort((a, b) => {
-          if (a.played === b.played) {
-            return b.votecount - a.votecount;
-          }
-          return a.played ? 1 : -1;
-        });
+        .sort((a, b) => (a.played === b.played ? b.votecount - a.votecount : a.played ? 1 : -1));
+
       dispatch({ type: 'SET_SONGS', payload: processedSongs });
     });
 
@@ -89,8 +99,6 @@ export const GlobalStateProvider = ({ children }) => {
       if (!data.published) {
         dispatch({ type: 'SET_PLAYLIST', payload: null });
         dispatch({ type: 'SET_SONGS', payload: [] });
-      } else {
-        // Optionally, fetch the playlist again
       }
     });
 
