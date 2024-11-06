@@ -205,7 +205,9 @@ app.post('/api/paddle/cancel-subscription', async (req, res) => {
     const response = await fetch(PADDLE_API_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+
       },
       body: JSON.stringify(requestBody)
     });
