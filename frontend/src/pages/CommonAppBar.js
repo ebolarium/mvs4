@@ -6,23 +6,25 @@ import Logo from '../assets/VoteSong_Logo.gif';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
-const CommonAppBar = ({ isLoggedIn }) => {
+const CommonAppBar = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const location = useLocation(); // Rota bilgisi
+  const location = useLocation();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [bandName, setBandName] = useState('');
 
-  // Login durumunu ve bandName'i kontrol et
+  // Token ve bandName kontrolü
   useEffect(() => {
-    if (isLoggedIn) {
-      const storedBandName = localStorage.getItem('bandName');
-      if (storedBandName) {
-        setBandName(storedBandName);
-      }
+    const token = localStorage.getItem('token'); // Token'i kontrol et
+    if (token) {
+      setIsLoggedIn(true);
+      const storedBandName = localStorage.getItem('bandName'); // Band name'i kontrol et
+      setBandName(storedBandName || '');
     } else {
-      setBandName(''); // Kullanıcı çıkış yaptıysa bandName'i temizle
+      setIsLoggedIn(false);
+      setBandName('');
     }
-  }, [isLoggedIn, location.pathname]); // Rota değişimini tetikleyici olarak ekledik
+  }, [location.pathname]); // Rota değiştikçe kontrolü tekrar et
 
   return (
     <AppBar position="sticky" sx={{ backgroundColor: '#1c1c1c' }}>
