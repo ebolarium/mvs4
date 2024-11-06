@@ -160,10 +160,19 @@ const BandProfile = () => {
         <Card.Body>
           <h5 className="band-profile-title">{t('band_profile')}</h5>
           <div className="membership-status">
-            <span className={`membership-indicator ${bandInfo.is_premium ? 'premium' : 'free'}`}>
-            {bandInfo.is_premium ? 'Premium' : 'Free'}
-            </span>
-            </div>
+  <span className={`membership-indicator ${bandInfo.is_premium ? 'premium' : 'free'}`}>
+    {bandInfo.is_premium ? 'Premium' : 'Free'}
+  </span>
+  {bandInfo.is_premium && (
+    <Button 
+      variant="outline-primary" 
+      className="manage-subscription-button ms-3"
+      onClick={() => window.open('https://sandbox-customer-portal.paddle.com/cpl_01jbedrh3tzrexxmaye7h3npzk', '_blank')}
+    >
+      Manage Subscription
+    </Button>
+  )}
+</div>
           <Row className="align-items-center mb-4">
             <Col xs={3} className="text-center">
               {bandInfo.band_image ? (
