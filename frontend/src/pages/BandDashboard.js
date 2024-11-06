@@ -186,7 +186,7 @@ const BandDashboard = () => {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <img src={Logo} alt={t('vote_song_logo')} width={40} style={{ borderRadius: '50%' }} />
-          <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Link to="/#" style={{ textDecoration: 'none', color: 'inherit' }}>
           <Typography variant="h6">{t('vote_song')}</Typography>
           </Link>        </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>

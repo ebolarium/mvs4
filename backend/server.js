@@ -17,6 +17,8 @@ const emailRoute = require('./routes/emailRoute');
 const bodyParser = require('body-parser');
 const CryptoJS = require('crypto-js');
 const Band = require('./models/Band'); // Band modelini ekledik
+const schedule = require('node-schedule');
+
 
 
 dotenv.config(); // Environment variables'ları yükleyin
@@ -56,16 +58,6 @@ mongoose
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.log(err));
 
-
-
-
-
-
-
-
-
-
-
 // Paddle Webhook Endpoint
 app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
   console.log("Webhook endpoint hit!");
@@ -103,23 +95,30 @@ app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
     console.log(`Webhook event received: ${event_type}`);
 
     // Olay türüne göre işlem yap
-    if (event_type === 'transaction.completed') {
-      if (!data.custom_data) {
-        console.error(`Custom data is missing in the webhook payload for event_type: ${event_type}`);
-        return res.status(400).send('Invalid custom data in webhook');
-      }
+    
+    if (event_type === 'subscription.updated' && data.scheduled_change?.action === 'cancel') {
+      const bandId = data.custom_data?.bandId;
+      const effectiveAt = data.scheduled_change.effective_at;
 
-      const bandId = data.custom_data.bandId;
+      if (bandId && effectiveAt) {
+        // Abonelik iptalinin yürürlüğe gireceği tarihte bir job planla
+        const cancellationDate = new Date(effectiveAt);
 
-      try {
-        // Kullanıcının premium durumunu güncelle (is_premium: true)
-        await Band.findByIdAndUpdate(bandId, { is_premium: true });
-        console.log(`Band ${bandId} abonelik durumu güncellendi (is_premium: true).`);
-      } catch (error) {
-        console.error('Error updating band subscription status:', error.message);
-        return res.status(500).send('Error updating subscription status');
+        schedule.scheduleJob(cancellationDate, async () => {
+          try {
+            // Veritabanında premium durumunu false olarak güncelle
+            await Band.findByIdAndUpdate(bandId, { is_premium: false });
+            console.log(`Band ${bandId} premium üyeliği iptal edildi.`);
+          } catch (error) {
+            console.error(`Band ${bandId} premium üyeliği güncellenemedi:`, error);
+          }
+        });
+
+        res.status(200).send('Webhook processed and cancellation scheduled.');
+      } else {
+        res.status(400).send('Invalid webhook data: Missing bandId or effective date.');
       }
-    } else if (event_type === 'subscription.payment_failed' || event_type === 'subscription.cancelled') {
+    } else if (event_type === 'transaction.completed') {
       if (!data.custom_data) {
         console.error(`Custom data is missing in the webhook payload for event_type: ${event_type}`);
         return res.status(400).send('Invalid custom data in webhook');
@@ -146,20 +145,6 @@ app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
     res.status(400).send('Invalid signature');
   }
 });
-
-  
-  
-  
-  
-  
-
-
-
-
-
-
-
-
 
 // Paddle Signature Doğrulama Fonksiyonu
 function verifyPaddleSignature(requestBody, signature) {
