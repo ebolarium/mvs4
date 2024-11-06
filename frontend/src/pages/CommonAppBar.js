@@ -13,23 +13,23 @@ const CommonAppBar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [bandName, setBandName] = useState('');
 
-  // Token ve bandName kontrolü
+  // Token ve Band Name kontrolü
   useEffect(() => {
-    const token = localStorage.getItem('token'); // Token'i kontrol et
+    const token = localStorage.getItem('token'); // Token kontrolü
     if (token) {
       setIsLoggedIn(true);
-      const storedBandName = localStorage.getItem('bandName'); // Band name'i kontrol et
-      setBandName(storedBandName || '');
+      const storedBandName = localStorage.getItem('bandName'); // Band name kontrolü
+      setBandName(storedBandName || ''); // Band name yoksa boş bırak
     } else {
-      setIsLoggedIn(false);
-      setBandName('');
+      setIsLoggedIn(false); // Token yoksa login değil
+      setBandName(''); // Band name sıfırlanır
     }
-  }, [location.pathname]); // Rota değiştikçe kontrolü tekrar et
+  }, [location.pathname]); // Her rota değişiminde kontrol edilir
 
   return (
     <AppBar position="sticky" sx={{ backgroundColor: '#1c1c1c' }}>
       <Toolbar sx={{ justifyContent: 'space-between' }}>
-        {/* Sol kısım: Logo ve VoteSong yazısı */}
+        {/* Sol Kısım: Logo ve VoteSong */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <img src={Logo} alt={t('vote_song_logo')} width={40} style={{ borderRadius: '50%' }} />
           <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
@@ -37,7 +37,7 @@ const CommonAppBar = () => {
           </Link>
         </Box>
 
-        {/* Sağ kısım: Kullanıcı durumu */}
+        {/* Sağ Kısım: Login Durumu */}
         <Box>
           {isLoggedIn ? (
             <>
