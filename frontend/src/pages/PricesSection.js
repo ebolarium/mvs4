@@ -196,7 +196,7 @@ const PricesSection = ({ isLoggedIn }) => {
 
   return (
     <Box sx={{ py: 2, textAlign: 'center', backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
-      <Typography variant="h4">Abonelik Planları</Typography>
+      <Typography variant="h4">{t('subscriptionPlans')}</Typography>
      
       <Button
         variant="contained"
