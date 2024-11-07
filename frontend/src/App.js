@@ -15,8 +15,8 @@ import TermsAndConditions from './pages/TermsAndConditions';
 import TermsOfService from './pages/TermsOfService';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import RefundPolicy from './pages/RefundPolicy';
-//import CheckoutPage from './pages/CheckoutPage';
-//import PaymentSuccessPage from './pages/PaymentSuccessPage';
+import ResetPassword from './pages/ResetPassword';
+
 
 
 function App() {
@@ -44,6 +44,8 @@ function App() {
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+
           
         </Routes>
       </Router>
