@@ -28,6 +28,7 @@ async function sendEmail(mailOptions) {
 }
 
 // Şifre Sıfırlama İsteği
+// Şifre Sıfırlama İsteği
 router.post('/send-reset-password', async (req, res) => {
   const { email } = req.body;
 
@@ -42,7 +43,10 @@ router.post('/send-reset-password', async (req, res) => {
     const resetToken = crypto.randomBytes(32).toString('hex');
     band.resetPasswordToken = resetToken;
     band.resetPasswordExpires = Date.now() + 3600000; // 1 saat geçerli
+
+    // Token kaydedildi mi kontrol edin
     await band.save();
+    console.log('Token successfully saved for band:', band.band_email);
 
     // Şifre sıfırlama e-postası gönder
     const resetURL = `https://votesong.live/reset-password/${resetToken}`;
@@ -63,6 +67,7 @@ router.post('/send-reset-password', async (req, res) => {
     res.status(500).json({ message: 'Failed to send password reset email.' });
   }
 });
+
 
 // Doğrulama İsteği (Kayıt sonrası e-posta doğrulama)
 router.post('/send-verification', async (req, res) => {

@@ -42,6 +42,12 @@ const bandSchema = new mongoose.Schema({
   band_gig_count: {
     type: Number,
     default: 0
+  },
+  resetPasswordToken: {
+    type: String,
+  },
+  resetPasswordExpires: {
+    type: Date,
   }
 });
 
