@@ -18,7 +18,7 @@ const ResetPassword = () => {
     e.preventDefault();
   
     if (newPassword !== confirmPassword) {
-      setErrorMessage(t('passwordsDoNotMatch'));
+      setErrorMessage(t('passwords_do_not_match'));
       return;
     }
   
@@ -35,7 +35,7 @@ const ResetPassword = () => {
   
       if (response.ok) {
         setSuccessMessage(t('passwordResetSuccessful'));
-        setTimeout(() => navigate('/login'), 3000);
+        setTimeout(() => navigate('/'), 3000);
       } else {
         setErrorMessage(t(data.message));
       }
@@ -76,7 +76,7 @@ const ResetPassword = () => {
           </Form.Group>
 
           <Button variant="primary" type="submit" className="w-100">
-            {t('resetPassword')}
+            {t('resetPasswordButton')}
           </Button>
         </Form>
       </Card.Body>

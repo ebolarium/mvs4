@@ -169,6 +169,13 @@
     "paddleScriptLoadError": "Failed to load Paddle script.",
     "monthlySubscriptionDescription": "Enjoy flexible monthly access to all features with no long-term commitment.",
     "yearlySubscriptionDescription": "Save money with a yearly plan and enjoy uninterrupted access for 12 months.",
-    "subscribeNow": "Subscribe Now"
+    "subscribeNow": "Subscribe Now",
+    "passwordResetSuccessful": "Password Reset Successful!",
+    "resetPassword": "Reset Your Password",
+    "newPassword": "New Password",
+    "enterNewPassword": "Enter New Password",
+    "confirmPassword": "Confirm Password",
+    "confirmNewPassword": "Confirm New Password",
+    "resetPasswordButton": "Reset"
 
 }
