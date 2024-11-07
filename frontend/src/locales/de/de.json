@@ -109,7 +109,24 @@
     "vote_song": "VOTE SONG",
     "welcome_band": "Hallo",
     "update": "Update",
-    "song_already_exists": "Dieses Lied wurde bereits hinzugefügt"
+    "song_already_exists": "Dieses Lied wurde bereits hinzugefügt",
+    "subscriptionPlans": "Abonnement-Pläne",
+    "monthlySubscription": "Monatliches Abonnement",
+    "yearlySubscription": "Jährliches Abonnement",
+    "pleaseLoginOrRegister": "Bitte zuerst einloggen oder registrieren.",
+    "tokenNotFound": "Token nicht gefunden oder undefiniert. Der Benutzer muss sich einloggen.",
+    "tokenRetrieved": "Token abgerufen:",
+    "bandIdRetrieved": "bandId erfolgreich aus dem Token extrahiert:",
+    "tokenDecodeError": "Fehler beim Entschlüsseln des Tokens:",
+    "invalidLoginInfo": "Ungültige Anmeldeinformationen. Bitte erneut anmelden.",
+    "bandIdInvalid": "bandId nicht gefunden oder ungültig.",
+    "invalidUserInfo": "Ungültige Benutzerinformationen.",
+    "startingPayment": "Zahlung wird gestartet. bandId:",
+    "purchaseSuccess": "Kauf erfolgreich! Paddle-Daten:",
+    "paymentWindowClosed": "Zahlungsfenster geschlossen.",
+    "paddleNotDefined": "Paddle ist nicht definiert.",
+    "paddleLoadError": "Paddle konnte nicht geladen werden.",
+    "paddleScriptLoadError": "Paddle-Skript konnte nicht geladen werden."
 
 
 

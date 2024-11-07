@@ -149,6 +149,23 @@
     "view_terms": "Terms and Conditions",
     "accept_terms": "Accept",
     "login_required_to_purchase": "Login Required to Purchase",
-    "PRICING.PURCHASE_BUTTON": "Subscribe Now!"
+    "PRICING.PURCHASE_BUTTON": "Subscribe Now!",
+    "subscriptionPlans": "Subscription Plans",
+    "monthlySubscription": "Monthly Subscription",
+    "yearlySubscription": "Yearly Subscription",
+    "pleaseLoginOrRegister": "Please log in or register first.",
+    "tokenNotFound": "Token not found or undefined. User must log in.",
+    "tokenRetrieved": "Token retrieved:",
+    "bandIdRetrieved": "bandId successfully extracted from token:",
+    "tokenDecodeError": "Token decode error:",
+    "invalidLoginInfo": "Invalid login information. Please log in again.",
+    "bandIdInvalid": "bandId not found or invalid.",
+    "invalidUserInfo": "Invalid user information.",
+    "startingPayment": "Starting payment. bandId:",
+    "purchaseSuccess": "Purchase successful! Paddle data:",
+    "paymentWindowClosed": "Payment window closed.",
+    "paddleNotDefined": "Paddle is not defined.",
+    "paddleLoadError": "Failed to load Paddle.",
+    "paddleScriptLoadError": "Failed to load Paddle script."
 
 }

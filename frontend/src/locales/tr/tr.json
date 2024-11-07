@@ -148,5 +148,22 @@
     "terms_content.section_11_body": "Herhangi bir soru veya endişeniz olması durumunda bizimle support@votesong.live adresinden iletişime geçebilirsiniz.",
     "view_terms": "Kullanım Şartları",
     "accept_terms": "Kabul Et",
-    "login_required_to_purchase": "Öncelikle sisteme giriş yapmalısınız"
+    "login_required_to_purchase": "Öncelikle sisteme giriş yapmalısınız",
+    "subscriptionPlans": "Abonelik Planları",
+    "monthlySubscription": "Aylık Abonelik",
+    "yearlySubscription": "Yıllık Abonelik",
+    "pleaseLoginOrRegister": "Lütfen önce giriş yapın veya kayıt olun.",
+    "tokenNotFound": "Token bulunamadı veya tanımsız. Kullanıcı giriş yapmalı.",
+    "tokenRetrieved": "Token alındı:",
+    "bandIdRetrieved": "bandId token'dan başarıyla çözüldü:",
+    "tokenDecodeError": "Token çözme hatası:",
+    "invalidLoginInfo": "Geçersiz giriş bilgisi. Lütfen tekrar giriş yapın.",
+    "bandIdInvalid": "bandId bulunamadı veya geçersiz.",
+    "invalidUserInfo": "Geçersiz kullanıcı bilgisi.",
+    "startingPayment": "Ödeme başlatılıyor. bandId:",
+    "purchaseSuccess": "Satın alma başarılı! Paddle verileri:",
+    "paymentWindowClosed": "Ödeme penceresi kapatıldı.",
+    "paddleNotDefined": "Paddle tanımlı değil.",
+    "paddleLoadError": "Paddle yüklenemedi.",
+    "paddleScriptLoadError": "Paddle scripti yüklenemedi."
 }

@@ -2,8 +2,12 @@
 
 import React, { useEffect } from 'react';
 import { Box, Typography, Button } from '@mui/material';
+import { useTranslation } from 'react-i18next';
+
 
 const PricesSection = ({ isLoggedIn }) => {
+  const { t } = useTranslation();
+
   useEffect(() => {
     const script = document.createElement('script');
     script.src = "https://cdn.paddle.com/paddle/v2/paddle.js";
@@ -30,7 +34,7 @@ const PricesSection = ({ isLoggedIn }) => {
     const token = localStorage.getItem('token');
     if (!token || token === "undefined") {
       console.error("Token bulunamadı veya tanımsız. Kullanıcı giriş yapmalı.");
-      alert("Lütfen önce giriş yapın veya kayıt olun.");
+      alert(t('pleaseLoginOrRegister'));
       return;
     }
 
@@ -44,14 +48,14 @@ const PricesSection = ({ isLoggedIn }) => {
       console.log("bandId token'dan başarıyla çözüldü:", bandId);
     } catch (error) {
       console.error("Token çözme hatası:", error);
-      alert("Geçersiz giriş bilgisi. Lütfen tekrar giriş yapın.");
+      alert(t('invalidLoginInfo'));
       return;
     }
 
     // Eğer bandId hala geçerli değilse, ödeme başlatma
     if (!bandId) {
       console.error("bandId bulunamadı veya geçersiz.");
-      alert("Geçersiz kullanıcı bilgisi.");
+      alert(t('invalidUserInfo'));
       return;
     }
 
@@ -85,7 +89,7 @@ const PricesSection = ({ isLoggedIn }) => {
     const token = localStorage.getItem('token');
     if (!token || token === "undefined") {
       console.error("Token bulunamadı veya tanımsız. Kullanıcı giriş yapmalı.");
-      alert("Lütfen önce giriş yapın veya kayıt olun.");
+      alert(t('pleaseLoginOrRegister'));
       return;
     }
 
@@ -99,14 +103,14 @@ const PricesSection = ({ isLoggedIn }) => {
       console.log("bandId token'dan başarıyla çözüldü:", bandId);
     } catch (error) {
       console.error("Token çözme hatası:", error);
-      alert("Geçersiz giriş bilgisi. Lütfen tekrar giriş yapın.");
+      alert(t('invalidLoginInfo'));
       return;
     }
 
     // Eğer bandId hala geçerli değilse, ödeme başlatma
     if (!bandId) {
       console.error("bandId bulunamadı veya geçersiz.");
-      alert("Geçersiz kullanıcı bilgisi.");
+      alert(t('invalidUserInfo'));
       return;
     }
 
@@ -140,7 +144,7 @@ const PricesSection = ({ isLoggedIn }) => {
     const token = localStorage.getItem('token');
     if (!token || token === "undefined") {
       console.error("Token bulunamadı veya tanımsız. Kullanıcı giriş yapmalı.");
-      alert("Lütfen önce giriş yapın veya kayıt olun.");
+      alert(t('pleaseLoginOrRegister'));
       return;
     }
 
@@ -154,14 +158,14 @@ const PricesSection = ({ isLoggedIn }) => {
       console.log("bandId token'dan başarıyla çözüldü:", bandId);
     } catch (error) {
       console.error("Token çözme hatası:", error);
-      alert("Geçersiz giriş bilgisi. Lütfen tekrar giriş yapın.");
+      alert(t('invalidLoginInfo'));
       return;
     }
 
     // Eğer bandId hala geçerli değilse, ödeme başlatma
     if (!bandId) {
       console.error("bandId bulunamadı veya geçersiz.");
-      alert("Geçersiz kullanıcı bilgisi.");
+      alert(t('invalidLoginInfo'));
       return;
     }
 
@@ -201,8 +205,8 @@ const PricesSection = ({ isLoggedIn }) => {
         sx={{ mt: 2, ml: 2 }}
         disabled={!isLoggedIn}
       >
-        Aylık Abonelik
-      </Button>
+        {t('monthlySubscription')}
+        </Button>
       <Button
         variant="contained"
         color="success"
@@ -210,8 +214,8 @@ const PricesSection = ({ isLoggedIn }) => {
         sx={{ mt: 2, ml: 2 }}
         disabled={!isLoggedIn}
       >
-        Yıllık Abonelik
-      </Button>
+        {t('yearlySubscription')}
+        </Button>
     </Box>
   );
 };
