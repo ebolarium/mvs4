@@ -112,7 +112,8 @@ const Login = ({ onLoginSuccess }) => {
       <VerificationModal show={showModal} onClose={() => setShowModal(false)} message="Please verify your email to login." />
 
       {/* Forgot Password Modal */}
-      <Modal show={showForgotPassword} onHide={() => setShowForgotPassword(false)} centered>
+      <Modal show={forgotPasswordOpen} onHide={() => setForgotPasswordOpen(false)} centered>
+
         <Modal.Header closeButton>
           <Modal.Title>
             <LockIcon style={{ fontSize: 40, marginRight: '10px', color: '#1976d2' }} />
