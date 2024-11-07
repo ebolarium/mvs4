@@ -76,21 +76,22 @@ const Homepage = () => {
 
       {loginOpen && (
         <ClickAwayListener onClickAway={handleLoginClose}>
-          <Paper
-            sx={{
-              position: 'absolute',
-              top: anchorRef.current?.getBoundingClientRect().bottom + 8 || 0,
-              left: anchorRef.current?.getBoundingClientRect().left || 0,
-              backgroundColor: 'rgba(41, 41, 41, 0.75)',
-              color: '#fff',
-              width: 300,
-              padding: 2,
-              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)',
-              zIndex: 1300,
-            }}
-          >
-            <Login onLoginSuccess={handleLoginSuccess} />
-          </Paper>
+        <Paper
+        sx={{
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        backgroundColor: 'rgba(41, 41, 41, 0.75)',
+        color: '#fff',
+        width: 300,
+        padding: 2,
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)',
+        zIndex: 1300,
+        }}
+        >
+        <Login onLoginSuccess={handleLoginSuccess} />
+        </Paper>
         </ClickAwayListener>
       )}
 
