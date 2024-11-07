@@ -27,7 +27,7 @@ const app = express();
 const server = http.createServer(app);
 
 // Paddle Webhook Secret Key
-const WEBHOOK_SECRET_KEY = 'pdl_ntfset_01jbeg11et89t7579610fhxn5z_YdkhEaae7TAP/gl/GwAkloZGNFFSWf1+';
+const WEBHOOK_SECRET_KEY = process.env.WEBHOOK_SECRET_KEY;
 
 // i18n configuration
 i18n.configure({
