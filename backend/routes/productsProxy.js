@@ -13,8 +13,8 @@ router.get('/products', async (req, res) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        vendor_id: 24248,
-        auth_code: '0ca5518f6c92283bb2600c0e9e2a967376935e0566a4676a19', // API anahtarını kullanıyoruz
+        vendor_id: process.env.PADDLE_VENDOR_ID,
+        auth_code: process.env.PADDLE_AUTH_CODE,
       }),
     });
 
