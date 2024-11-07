@@ -179,6 +179,7 @@
     "resetPasswordButton": "Reset",
     "sendResetLink": "Send Reset Link",
     "email": "E-Mail",
-    "forgotPassword": "Forgot password?"
+    "forgotPassword": "Forgot password?",
+    "passwordResetLinkSent": "Password Reset Link Sent. Please check your mailbox."
 
 }
