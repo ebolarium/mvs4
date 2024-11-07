@@ -5,6 +5,9 @@ const router = express.Router();
 const Band = require('../models/Band');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
+
+
 
 // Şifre sıfırlama token doğrulama ve şifre değiştirme
 router.post('/reset-password/:token', async (req, res) => {
