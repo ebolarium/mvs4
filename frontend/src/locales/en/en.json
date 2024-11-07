@@ -166,6 +166,9 @@
     "paymentWindowClosed": "Payment window closed.",
     "paddleNotDefined": "Paddle is not defined.",
     "paddleLoadError": "Failed to load Paddle.",
-    "paddleScriptLoadError": "Failed to load Paddle script."
+    "paddleScriptLoadError": "Failed to load Paddle script.",
+    "monthlySubscriptionDescription": "Enjoy flexible monthly access to all features with no long-term commitment.",
+    "yearlySubscriptionDescription": "Save money with a yearly plan and enjoy uninterrupted access for 12 months.",
+    "subscribeNow": "Subscribe Now"
 
 }

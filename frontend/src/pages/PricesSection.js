@@ -1,8 +1,11 @@
 // PricesSection.js
 
 import React, { useEffect } from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, Card, CardContent, CardActions } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+
 
 
 const PricesSection = ({ isLoggedIn }) => {
@@ -195,29 +198,55 @@ const PricesSection = ({ isLoggedIn }) => {
   };
 
   return (
-    <Box sx={{ py: 2, textAlign: 'center', backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
-      <Typography variant="h4">{t('subscriptionPlans')}</Typography>
-     
-      <Button
-        variant="contained"
-        color="secondary"
-        onClick={handleMonthlySubscription}
-        sx={{ mt: 2, ml: 2 }}
-        disabled={!isLoggedIn}
-      >
-        {t('monthlySubscription')}
-        </Button>
-      <Button
-        variant="contained"
-        color="success"
-        onClick={handleYearlySubscription}
-        sx={{ mt: 2, ml: 2 }}
-        disabled={!isLoggedIn}
-      >
-        {t('yearlySubscription')}
-        </Button>
+    <Box sx={{ py: 4, textAlign: 'center', backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
+      <Typography variant="h3" gutterBottom>{t('subscriptionPlans')}</Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, mt: 4 }}>
+        <Card sx={{ minWidth: 275, boxShadow: 3 }}>
+          <CardContent>
+            <CalendarMonthIcon sx={{ fontSize: 40, color: 'secondary.main' }} />
+            <Typography variant="h5" component="div" sx={{ mt: 2 }}>{t('monthlySubscription')}</Typography>
+            <Typography variant="h4" sx={{ mt: 2 }}>$9.99</Typography>
+            <Typography variant="body2" sx={{ mt: 2 }}>
+              {t('monthlySubscriptionDescription')}
+            </Typography>
+          </CardContent>
+          <CardActions>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={handleMonthlySubscription}
+              sx={{ mx: 'auto' }}
+              disabled={!isLoggedIn}
+            >
+              {t('subscribeNow')}
+            </Button>
+          </CardActions>
+        </Card>
+        <Card sx={{ minWidth: 275, boxShadow: 3 }}>
+          <CardContent>
+            <MonetizationOnIcon sx={{ fontSize: 40, color: 'success.main' }} />
+            <Typography variant="h5" component="div" sx={{ mt: 2 }}>{t('yearlySubscription')}</Typography>
+            <Typography variant="h4" sx={{ mt: 2 }}>$96.00</Typography>
+            <Typography variant="body2" sx={{ mt: 2 }}>
+              {t('yearlySubscriptionDescription')}
+            </Typography>
+          </CardContent>
+          <CardActions>
+            <Button
+              variant="contained"
+              color="success"
+              onClick={handleYearlySubscription}
+              sx={{ mx: 'auto' }}
+              disabled={!isLoggedIn}
+            >
+              {t('subscribeNow')}
+            </Button>
+          </CardActions>
+        </Card>
+      </Box>
     </Box>
   );
 };
 
 export { PricesSection };
+
