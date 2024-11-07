@@ -28,7 +28,6 @@ async function sendEmail(mailOptions) {
 }
 
 // Şifre Sıfırlama İsteği
-// Şifre Sıfırlama İsteği
 router.post('/send-reset-password', async (req, res) => {
   const { email } = req.body;
 

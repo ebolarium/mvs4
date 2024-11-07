@@ -6,7 +6,7 @@ const VerificationModal = ({ show, onClose, message }) => {
   return (
     <Modal show={show} onHide={onClose} centered>
       <Modal.Header closeButton>
-        <Modal.Title>Thank you!</Modal.Title>
+        <Modal.Title>Registration Complete!</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <p>{message}</p>

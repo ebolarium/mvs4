@@ -127,16 +127,13 @@ app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
       const bandId = data.custom_data.bandId;
 
       try {
-        // Kullanıcının premium durumunu güncelle (is_premium: false)
-        await Band.findByIdAndUpdate(bandId, { is_premium: false });
-        console.log(`Band ${bandId} abonelik durumu güncellendi (is_premium: false).`);
+        // Kullanıcının premium durumunu güncelle (is_premium: true)
+        await Band.findByIdAndUpdate(bandId, { is_premium: true });
+        console.log(`Band ${bandId} premium durumu güncellendi (is_premium: true).`);
       } catch (error) {
         console.error('Error updating band subscription status:', error.message);
         return res.status(500).send('Error updating subscription status');
       }
-    } else {
-      // Diğer olay türlerini sadece logla
-      console.log(`Unhandled Webhook Event Type: ${event_type}`);
     }
 
     res.status(200).send('Webhook received');
