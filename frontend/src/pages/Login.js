@@ -50,7 +50,7 @@ const Login = ({ onLoginSuccess }) => {
 
   const handleForgotPassword = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/email/send-reset-password`, {
+      const response = await fetch(`${API_BASE_URL}/send-reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
