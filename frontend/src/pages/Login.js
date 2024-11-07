@@ -1,6 +1,6 @@
 // Login.js
 import React, { useState } from 'react';
-import { Form, Button, Card } from 'react-bootstrap';
+import { Form, Button, Card, Modal } from 'react-bootstrap';
 import API_BASE_URL from '../config/apiConfig';
 import { useTranslation } from 'react-i18next';
 import VerificationModal from './VerificationModal';
@@ -12,6 +12,8 @@ const Login = ({ onLoginSuccess }) => {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -30,14 +32,12 @@ const Login = ({ onLoginSuccess }) => {
       });
 
       const data = await response.json();
-      console.log('Login Response:', data); // Yanıtı kontrol etmek için ekledik
-
       if (response.ok) {
         if (data.is_verified === true) {
           localStorage.setItem('token', data.token);
-          onLoginSuccess(); // Başarılı login sonrası yönlendir
+          onLoginSuccess();
         } else {
-          setShowModal(true); // Doğrulama gerekliyse modal göster
+          setShowModal(true);
         }
       } else {
         setErrorMessage(`Error: ${t(data.message)}`);
@@ -48,9 +48,26 @@ const Login = ({ onLoginSuccess }) => {
     }
   };
 
-  const handleModalClose = () => {
-    setShowModal(false);
-    navigate('/'); // Ana sayfaya yönlendir
+  const handleForgotPassword = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/email/send-reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: forgotEmail }),
+      });
+
+      if (response.ok) {
+        alert(t('passwordResetLinkSent'));
+        setForgotPasswordOpen(false);
+      } else {
+        alert(t('errorOccurred'));
+      }
+    } catch (error) {
+      console.error('Error sending password reset link:', error);
+      alert(t('errorOccurred'));
+    }
   };
 
   return (
@@ -85,13 +102,36 @@ const Login = ({ onLoginSuccess }) => {
             {t('login')}
           </Button>
         </Form>
+        <Button variant="link" onClick={() => setForgotPasswordOpen(true)} className="mt-3">
+          {t('forgotPassword')}
+        </Button>
       </Card.Body>
 
-      <VerificationModal
-        show={showModal}
-        onClose={handleModalClose}
-        message="Please verify your email to login."
-      />
+      <VerificationModal show={showModal} onClose={() => setShowModal(false)} message="Please verify your email to login." />
+
+      {/* Forgot Password Modal */}
+      <Modal show={forgotPasswordOpen} onHide={() => setForgotPasswordOpen(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>{t('resetPassword')}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group className="mb-3" controlId="formForgotEmail">
+            <Form.Label>{t('email')}</Form.Label>
+            <Form.Control
+              type="email"
+              value={forgotEmail}
+              onChange={(e) => setForgotEmail(e.target.value)}
+              placeholder={t('enter_email')}
+              required
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleForgotPassword}>
+            {t('sendResetLink')}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Card>
   );
 };
