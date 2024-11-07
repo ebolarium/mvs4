@@ -16,33 +16,35 @@ const ResetPassword = () => {
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
-
+  
     if (newPassword !== confirmPassword) {
       setErrorMessage(t('passwordsDoNotMatch'));
       return;
     }
-
+  
     try {
       const response = await fetch(`${API_BASE_URL}/bands/reset-password/${token}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ newPassword }),
+        body: JSON.stringify({ newPassword }), // newPassword alanını gönderiyoruz
       });
-
+  
+      const data = await response.json();
+  
       if (response.ok) {
         setSuccessMessage(t('passwordResetSuccessful'));
-        setTimeout(() => navigate('/login'), 3000); // Başarılıysa 3 saniye sonra login sayfasına yönlendir
+        setTimeout(() => navigate('/login'), 3000);
       } else {
-        const data = await response.json();
         setErrorMessage(t(data.message));
       }
     } catch (error) {
-      console.error('Error resetting password:', error);
+      console.error('Error resetting password:', error.message);
       setErrorMessage(t('errorOccurred'));
     }
   };
+  
 
   return (
     <Card className="p-4 shadow mx-auto" style={{ maxWidth: '400px', marginTop: '50px' }}>

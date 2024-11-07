@@ -18,21 +18,28 @@ router.post('/reset-password/:token', async (req, res) => {
     });
 
     if (!band) {
+      console.error('Invalid or expired token:', token);
       return res.status(400).json({ message: 'Invalid or expired token' });
     }
 
-    // Şifre güncelleme
-    band.band_password = newPassword;
-    band.resetPasswordToken = undefined;
-    band.resetPasswordExpires = undefined;
+// Şifre güncelleme
+if (!newPassword) {
+  console.error('New password is missing');
+  return res.status(400).json({ message: 'New password is required' });
+}
 
-    await band.save();
+band.band_password = newPassword;
+band.resetPasswordToken = undefined;
+band.resetPasswordExpires = undefined;
 
-    res.status(200).json({ message: 'Password updated successfully' });
-  } catch (error) {
-    console.error('Error updating password:', error);
-    res.status(500).json({ message: 'An error occurred while updating password' });
-  }
+await band.save();
+console.log('Password updated successfully for band:', band.band_email);
+
+res.status(200).json({ message: 'Password updated successfully' });
+} catch (error) {
+console.error('Error updating password:', error.message);
+res.status(500).json({ message: 'An error occurred while updating password' });
+}
 });
 
 // E-posta doğrulama token doğrulama
