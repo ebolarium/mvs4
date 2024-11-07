@@ -5,6 +5,8 @@ import API_BASE_URL from '../config/apiConfig';
 import { useTranslation } from 'react-i18next';
 import VerificationModal from './VerificationModal';
 import { useNavigate } from 'react-router-dom';
+import LockIcon from '@mui/icons-material/Lock'; // Material UI'dan Kilit simgesi ekliyoruz
+
 
 const Login = ({ onLoginSuccess }) => {
   const { t } = useTranslation();
@@ -110,9 +112,12 @@ const Login = ({ onLoginSuccess }) => {
       <VerificationModal show={showModal} onClose={() => setShowModal(false)} message="Please verify your email to login." />
 
       {/* Forgot Password Modal */}
-      <Modal show={forgotPasswordOpen} onHide={() => setForgotPasswordOpen(false)} centered>
+      <Modal show={showForgotPassword} onHide={() => setShowForgotPassword(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>{t('resetPassword')}</Modal.Title>
+          <Modal.Title>
+            <LockIcon style={{ fontSize: 40, marginRight: '10px', color: '#1976d2' }} />
+            {t('resetPassword')}
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form.Group className="mb-3" controlId="formForgotEmail">

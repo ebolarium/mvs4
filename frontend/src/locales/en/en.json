@@ -176,6 +176,9 @@
     "enterNewPassword": "Enter New Password",
     "confirmPassword": "Confirm Password",
     "confirmNewPassword": "Confirm New Password",
-    "resetPasswordButton": "Reset"
+    "resetPasswordButton": "Reset",
+    "sendResetLink": "Send Reset Link",
+    "email": "E-Mail",
+    "forgotPassword": "Forgot password?"
 
 }
