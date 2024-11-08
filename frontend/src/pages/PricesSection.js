@@ -41,23 +41,23 @@ const PricesSection = ({ isLoggedIn }) => {
 
     console.log("Token alındı:", token);
 
-    // Token'dan bandId ve bandEmail al
-    let bandId, bandEmail;
+    // Token'dan bandId ve band_email al
+    let bandId, band_email;
     try {
       const payload = JSON.parse(atob(token.split('.')[1])); // Token'ın payload kısmını base64'ten çöz
       bandId = payload.id;
-      bandEmail = payload.email; // E-posta bilgisini alıyoruz
+      band_email = payload.email; // E-posta bilgisini alıyoruz
 
-      console.log("bandId ve bandEmail token'dan başarıyla çözüldü:", bandId, bandEmail);
+      console.log("bandId ve band_email token'dan başarıyla çözüldü:", bandId, band_email);
     } catch (error) {
       console.error("Token çözme hatası:", error);
       alert(t('invalidLoginInfo'));
       return;
     }
 
-    // Eğer bandId veya bandEmail hala geçerli değilse, ödeme başlatma
-    if (!bandId || !bandEmail) {
-      console.error("bandId veya bandEmail bulunamadı veya geçersiz.");
+    // Eğer bandId veya band_email hala geçerli değilse, ödeme başlatma
+    if (!bandId || !band_email) {
+      console.error("bandId veya band_email bulunamadı veya geçersiz.");
       alert(t('invalidUserInfo'));
       return;
     }
@@ -75,7 +75,7 @@ const PricesSection = ({ isLoggedIn }) => {
         customData: {
           "bandId": bandId  // bandId'yi customData olarak gönderiyoruz
         },
-        customer_email: bandEmail, // Müşteri e-posta adresini burada belirtiyoruz
+        customer_email: band_email, // Müşteri e-posta adresini burada belirtiyoruz
         successCallback: function (data) {
           console.log("Satın alma başarılı! Paddle verileri:", data);
         },
@@ -99,25 +99,25 @@ const PricesSection = ({ isLoggedIn }) => {
 
     console.log("Token alındı:", token);
 
-    // Token'dan bandId ve bandEmail al
-    let bandId, bandEmail;
+    // Token'dan bandId ve band_email al
+    let bandId, band_email;
     try {
       const payload = JSON.parse(atob(token.split('.')[1])); // Token'ın payload kısmını base64'ten çöz
       bandId = payload.id;
-      bandEmail = payload.email; // E-posta bilgisini alıyoruz
+      band_email = payload.email; // E-posta bilgisini alıyoruz
       console.log("Token payload:", payload);
       console.log("Çözülen bandId:", payload.id);
-      console.log("Çözülen bandEmail:", payload.email);
-      console.log("bandId ve bandEmail token'dan başarıyla çözüldü:", bandId, bandEmail);
+      console.log("Çözülen band_email:", payload.email);
+      console.log("bandId ve band_email token'dan başarıyla çözüldü:", bandId, band_email);
     } catch (error) {
       console.error("Token çözme hatası:", error);
       alert(t('invalidLoginInfo'));
       return;
     }
 
-    // Eğer bandId veya bandEmail hala geçerli değilse, ödeme başlatma
-    if (!bandId || !bandEmail) {
-      console.error("bandId veya bandEmail bulunamadı veya geçersiz.");
+    // Eğer bandId veya band_email hala geçerli değilse, ödeme başlatma
+    if (!bandId || !band_email) {
+      console.error("bandId veya band_email bulunamadı veya geçersiz.");
       alert(t('invalidUserInfo'));
       return;
     }
@@ -126,7 +126,7 @@ const PricesSection = ({ isLoggedIn }) => {
       console.log("Aylık abonelik başlatılıyor. bandId:", bandId);
       // Paddle entegrasyonu: aylık abonelik için checkout penceresini aç
       console.log("Paddle checkout için gönderilen bandId:", bandId);
-      console.log("Paddle checkout için gönderilen bandEmail:", bandEmail);
+      console.log("Paddle checkout için gönderilen band_email:", band_email);
       window.Paddle.Checkout.open({
         items: [
           {
@@ -137,7 +137,7 @@ const PricesSection = ({ isLoggedIn }) => {
         customData: {
           "bandId": bandId  // bandId'yi customData olarak gönderiyoruz
         },
-        customer_email: bandEmail, // Müşteri e-posta adresini burada belirtiyoruz
+        customer_email: band_email, // Müşteri e-posta adresini burada belirtiyoruz
         successCallback: function (data) {
           console.log("Aylık abonelik başarılı! Paddle verileri:", data);
         },
@@ -161,22 +161,22 @@ const PricesSection = ({ isLoggedIn }) => {
 
     console.log("Token alındı:", token);
 
-    // Token'dan bandId ve bandEmail al
-    let bandId, bandEmail;
+    // Token'dan bandId ve band_email al
+    let bandId, band_email;
     try {
       const payload = JSON.parse(atob(token.split('.')[1])); // Token'ın payload kısmını base64'ten çöz
       bandId = payload.id;
-      bandEmail = payload.email; // E-posta bilgisini alıyoruz
-      console.log("bandId ve bandEmail token'dan başarıyla çözüldü:", bandId, bandEmail);
+      band_email = payload.email; // E-posta bilgisini alıyoruz
+      console.log("bandId ve band_email token'dan başarıyla çözüldü:", bandId, band_email);
     } catch (error) {
       console.error("Token çözme hatası:", error);
       alert(t('invalidLoginInfo'));
       return;
     }
 
-    // Eğer bandId veya bandEmail hala geçerli değilse, ödeme başlatma
-    if (!bandId || !bandEmail) {
-      console.error("bandId veya bandEmail bulunamadı veya geçersiz.");
+    // Eğer bandId veya band_email hala geçerli değilse, ödeme başlatma
+    if (!bandId || !band_email) {
+      console.error("bandId veya band_email bulunamadı veya geçersiz.");
       alert(t('invalidUserInfo'));
       return;
     }
@@ -194,7 +194,7 @@ const PricesSection = ({ isLoggedIn }) => {
         customData: {
           "bandId": bandId  // bandId'yi customData olarak gönderiyoruz
         },
-        customer_email: bandEmail, // Müşteri e-posta adresini burada belirtiyoruz
+        customer_email: band_email, // Müşteri e-posta adresini burada belirtiyoruz
         successCallback: function (data) {
           console.log("Yıllık abonelik başarılı! Paddle verileri:", data);
         },
