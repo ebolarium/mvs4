@@ -105,6 +105,9 @@ const PricesSection = ({ isLoggedIn }) => {
       const payload = JSON.parse(atob(token.split('.')[1])); // Token'ın payload kısmını base64'ten çöz
       bandId = payload.id;
       bandEmail = payload.email; // E-posta bilgisini alıyoruz
+      console.log("Token payload:", payload);
+      console.log("Çözülen bandId:", payload.id);
+      console.log("Çözülen bandEmail:", payload.email);
       console.log("bandId ve bandEmail token'dan başarıyla çözüldü:", bandId, bandEmail);
     } catch (error) {
       console.error("Token çözme hatası:", error);
@@ -122,6 +125,8 @@ const PricesSection = ({ isLoggedIn }) => {
     if (window.Paddle) {
       console.log("Aylık abonelik başlatılıyor. bandId:", bandId);
       // Paddle entegrasyonu: aylık abonelik için checkout penceresini aç
+      console.log("Paddle checkout için gönderilen bandId:", bandId);
+      console.log("Paddle checkout için gönderilen bandEmail:", bandEmail);
       window.Paddle.Checkout.open({
         items: [
           {
