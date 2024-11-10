@@ -31,7 +31,7 @@ const loginBand = async (req, res) => {
 
     const isMatch = await bcrypt.compare(band_password, band.band_password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ message: t('invalid_credentials') });
     }
 
     const token = jwt.sign(

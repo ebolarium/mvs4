@@ -49,13 +49,13 @@ exports.login = async (req, res) => {
     // Kullanıcı var mı kontrol et.
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials.' });
+      return res.status(400).json({ message: t('invalid_credentials') });
     }
 
     // Şifre doğru mu kontrol et.
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials.' });
+      return res.status(400).json({ message: t('invalid_credentials') });
     }
 
     // JWT token oluştur.
