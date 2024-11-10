@@ -34,6 +34,6 @@ exports.vote = async (req, res) => {
 
     res.status(200).json({ message: 'Vote registered successfully.' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: t('server_error') });
   }
 };

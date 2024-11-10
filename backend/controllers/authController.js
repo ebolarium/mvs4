@@ -36,7 +36,7 @@ exports.register = async (req, res) => {
 
     res.status(201).json({ token, userId: user._id });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: t('server_error') });
   }
 };
 
@@ -65,6 +65,6 @@ exports.login = async (req, res) => {
 
     res.status(200).json({ token, userId: user._id });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: t('server_error') });
   }
 };

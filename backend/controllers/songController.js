@@ -134,7 +134,7 @@ const markAsPlayed = async (req, res) => {
     res.status(200).json({ message: 'Song marked as played' });
   } catch (error) {
     console.error('Error marking song as played:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: t('server_error') });
   }
 };
 

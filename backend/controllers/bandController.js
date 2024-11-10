@@ -45,7 +45,8 @@ const loginBand = async (req, res) => {
       is_verified: band.is_verified,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: t('server_error'), error });
+    
   }
 };
 

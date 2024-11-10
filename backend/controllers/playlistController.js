@@ -132,7 +132,7 @@ const getCurrentPlaylist = async (req, res) => {
     res.status(200).json({ playlist });
   } catch (error) {
     console.error('Error fetching current playlist:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: t('server_error') });
   }
 };
 
