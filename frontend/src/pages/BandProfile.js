@@ -167,7 +167,7 @@ const BandProfile = () => {
     <Button 
       variant="outline-primary" 
       className="manage-subscription-button ms-3"
-      onClick={() => window.open('https://sandbox-customer-portal.paddle.com/cpl_01jbedrh3tzrexxmaye7h3npzk', '_blank')}
+      onClick={() => window.open('https://customer-portal.paddle.com/cpl_01jba2ae3kg1pr9nmmkfwdd8mx', '_blank')}
     >
       Manage Subscription
     </Button>

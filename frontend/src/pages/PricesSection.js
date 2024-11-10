@@ -15,9 +15,9 @@ const PricesSection = ({ isLoggedIn }) => {
     script.async = true;
     script.onload = () => {
       if (window.Paddle) {
-        window.Paddle.Environment.set("sandbox");
+        window.Paddle.Environment.set("production");
         window.Paddle.Initialize({
-          token: "test_605824494b6e720104d54646e1c",
+          token: "live_fc1e0defb6165bb3c844fc0177b",
         });
         console.log("Paddle successfully initialized.");
       } else {
@@ -130,14 +130,14 @@ const PricesSection = ({ isLoggedIn }) => {
       window.Paddle.Checkout.open({
         items: [
           {
-            priceId: "pri_01jbedvwaxzpn2q69p88e9yd96",
+            priceId: "pri_01jc2t9w0pt21j6kafhznhm3cj",
             quantity: 1,
           },
         ],
         customData: {
-          "bandId": bandId  // bandId'yi customData olarak gönderiyoruz
+          "bandId": bandId
         },
-        email: bandEmail, // Müşteri e-posta adresini email alanında gönderiyoruz
+        email: bandEmail, 
         successCallback: function (data) {
           console.log("Aylık abonelik başarılı! Paddle verileri:", data);
         },
@@ -187,7 +187,7 @@ const PricesSection = ({ isLoggedIn }) => {
       window.Paddle.Checkout.open({
         items: [
           {
-            priceId: "pri_01jbedwnj09vd7hr99xyhddbsg",
+            priceId: "pri_01jc2tb9wx6gs2896e8t5r34tt",
             quantity: 1,
           },
         ],

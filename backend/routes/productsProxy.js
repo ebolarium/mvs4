@@ -7,7 +7,7 @@ const router = express.Router();
 // /api/products endpoint'i
 router.get('/products', async (req, res) => {
   try {
-    const response = await fetch('https://sandbox-vendors.paddle.com/api/2.0/prices', { // Endpoint'i düzelttik
+    const response = await fetch('https://vendors.paddle.com/api/2.0/prices', { // Endpoint'i düzelttik
       method: 'POST', // Paddle prices endpoint'i POST olarak çalışır
       headers: {
         'Content-Type': 'application/json',
