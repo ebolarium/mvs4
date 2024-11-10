@@ -165,5 +165,20 @@
     "paymentWindowClosed": "Ödeme penceresi kapatıldı.",
     "paddleNotDefined": "Paddle tanımlı değil.",
     "paddleLoadError": "Paddle yüklenemedi.",
-    "paddleScriptLoadError": "Paddle scripti yüklenemedi."
+    "paddleScriptLoadError": "Paddle scripti yüklenemedi.",
+    "resetPassword": "Türkçe çeviri eksik",
+    "enterNewPassword": "Türkçe çeviri eksik",
+    "passwordResetLinkSent": "Türkçe çeviri eksik",
+    "monthlySubscriptionDescription": "Uzun vadeli taahhüt olmadan tüm özelliklere esnek aylık erişimin keyfini çıkarın.",
+    "confirmPassword": "Şifreyi Onayla",
+    "sendResetLink": "Sıfırlama Bağlantısını Gönder",
+    "resetPasswordButton": "Sıfırla",
+    "confirmNewPassword": "Yeni Şifreyi Onayla",
+    "email": "E-Posta",
+    "subscribeNow": "Şimdi Abone Ol",
+    "yearlySubscriptionDescription": "Yıllık bir planla tasarruf edin ve 12 ay boyunca kesintisiz erişim sağlayın.",
+    "newPassword": "Yeni Şifre",
+    "PRICING.PURCHASE_BUTTON": "Şimdi Abone Ol!",
+    "passwordResetSuccessful": "Şifre Başarıyla Sıfırlandı!",
+    "forgotPassword": "Şifrenizi mi unuttunuz?"
 }
