@@ -46,7 +46,7 @@ const Login = ({ onLoginSuccess }) => {
       }
     } catch (error) {
       console.error('Error:', error);
-      setErrorMessage(t('error_logging_in'));
+      setErrorMessage(t('invalidUserInfo'));
     }
   };
 

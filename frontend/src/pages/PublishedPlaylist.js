@@ -262,7 +262,7 @@ const PublishedPlaylist = () => {
               <strong>{song.title}</strong> {t('by')} {song.artist} - 👍 {song.votecount}
             </div>
             <Button
-              style={{ backgroundColor: '#6c757d', color: 'white', borderColor: '#6c757d' }}
+              style={{ backgroundColor: '#0096FF', color: 'white', borderColor: '#6c757d' }}
               onClick={() => handleVote(song._id)}
               disabled={song.played || cooldown > 0}
             >
