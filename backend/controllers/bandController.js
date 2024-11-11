@@ -9,6 +9,7 @@ const admin = require('firebase-admin');
 const fs = require('fs');
 const path = require('path');
 
+
 // Firebase Admin SDK Configuration
 const serviceAccount = require('../config/serviceAccountKey.json'); // Firebase servis hesabı JSON dosyası
 
@@ -31,7 +32,7 @@ const loginBand = async (req, res) => {
 
     const isMatch = await bcrypt.compare(band_password, band.band_password);
     if (!isMatch) {
-      return res.status(400).json({ message: t('invalid_credentials') });
+      return res.status(400).json({ message: 'Invalid Credentials' });
     }
 
     const token = jwt.sign(
@@ -45,7 +46,7 @@ const loginBand = async (req, res) => {
       is_verified: band.is_verified,
     });
   } catch (error) {
-    res.status(500).json({ message: t('server_error'), error });
+    res.status(500).json({ message: 'server_error', error });
     
   }
 };
