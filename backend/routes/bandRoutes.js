@@ -5,7 +5,6 @@ const { protect } = require('../middleware/authMiddleware');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const Band = require('../models/Band');
-const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const fileUpload = require('express-fileupload');
 
@@ -63,7 +62,7 @@ router.post('/send-reset-password', async (req, res) => {
     // Send email logic (assumed to be handled separately)
     const resetURL = `https://votesong.live/reset-password/${resetToken}`;
     // sendEmail function should be implemented in your service to send the reset URL
-    
+
     res.status(200).json({ message: 'Password reset link sent to your email address.' });
   } catch (error) {
     console.error('Error sending password reset email:', error.message);
@@ -91,12 +90,12 @@ router.post('/reset-password/:token', async (req, res) => {
       return res.status(400).json({ message: 'New password is required' });
     }
 
-    // Hash the new password
-    band.band_password = await bcrypt.hash(newPassword, 10);
+    // Assign the new password (hashing will be done in pre('save'))
+    band.band_password = newPassword;
     band.resetPasswordToken = undefined;
     band.resetPasswordExpires = undefined;
 
-    await band.save();
+    await band.save(); // Hashing handled in schema pre('save')
     console.log('Password updated successfully for band:', band.band_email);
 
     res.status(200).json({ message: 'Password updated successfully' });

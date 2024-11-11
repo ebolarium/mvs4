@@ -180,5 +180,6 @@
     "newPassword": "Yeni Şifre",
     "PRICING.PURCHASE_BUTTON": "Şimdi Abone Ol!",
     "passwordResetSuccessful": "Şifre Başarıyla Sıfırlandı!",
-    "forgotPassword": "Şifrenizi mi unuttunuz?"
+    "forgotPassword": "Şifrenizi mi unuttunuz?",
+    "vote": "Oy Ver"
 }

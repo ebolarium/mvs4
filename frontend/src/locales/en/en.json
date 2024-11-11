@@ -180,6 +180,8 @@
     "sendResetLink": "Send Reset Link",
     "email": "E-Mail",
     "forgotPassword": "Forgot password?",
-    "passwordResetLinkSent": "Password Reset Link Sent. Please check your mailbox."
+    "passwordResetLinkSent": "Password Reset Link Sent. Please check your mailbox.",
+    "vote": "Vote"
+
 
 }
