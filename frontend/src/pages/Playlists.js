@@ -8,8 +8,6 @@ import { useTranslation } from 'react-i18next';
 import { FaCog } from 'react-icons/fa'; // Dişli çark iconunu eklemek için
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
-
-
 const Playlists = () => {
   const { t } = useTranslation();
   const [playlist, setPlaylist] = useState(null);
@@ -24,7 +22,6 @@ const Playlists = () => {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [voteCooldown, setVoteCooldown] = useState(5);
   const [isPremium, setIsPremium] = useState(false); // Premium kontrolü için state
-
 
   useEffect(() => {
     fetchSongs();
@@ -44,7 +41,6 @@ const Playlists = () => {
     };
   }, [playlist, socket]);
 
-
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
@@ -60,7 +56,6 @@ const Playlists = () => {
       .then((data) => setIsPremium(data.band.is_premium))
       .catch((error) => console.error('Error fetching profile:', error));
   }, []);
-
 
   const fetchSongs = async () => {
     const token = localStorage.getItem('token');
@@ -98,7 +93,7 @@ const Playlists = () => {
     if (!token) {
       return alert(t('login_required'));
     }
-  
+
     try {
       const response = await fetch(`${API_BASE_URL}/playlist`, {
         method: 'GET',
@@ -106,14 +101,14 @@ const Playlists = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-  
+
       if (response.status === 401) {
         alert(t('session_expired'));
         localStorage.removeItem('token');
         window.location.href = '/';
         return;
       }
-  
+
       if (response.status === 404) {
         setPlaylist(null);
         setIsPublished(false);
@@ -121,25 +116,25 @@ const Playlists = () => {
         dispatch({ type: 'SET_SONGS', payload: [] });
         return;
       }
-  
+
       if (!response.ok) {
         throw new Error(t('error_fetching_playlist'));
       }
-  
+
       const data = await response.json();
-  
+
       const relativeUrl = data.playlist?.relativeUrl
         ? `${API_BASE_URL}${data.playlist.relativeUrl}`
         : data.playlist?.url;
       setQrCodeUrl(relativeUrl);
-  
+
       const processedSongs = data.playlist.songs
         .filter((song) => song.song_id)
         .map((song) => ({
           _id: song.song_id._id,
           title: song.song_id.title,
           artist: song.song_id.artist,
-          key: song.song_id.key || t('no_key_info'), // Eğer key yoksa 'Tune' kullan
+          key: song.song_id.key || t('no_key_info'),
           votecount: song.votecount,
           played: song.played || false,
         }))
@@ -149,11 +144,10 @@ const Playlists = () => {
           }
           return a.played ? 1 : -1;
         });
-  
+
       setPlaylist(data.playlist || null);
       setIsPublished(data.playlist?.published || false);
       dispatch({ type: 'SET_SONGS', payload: processedSongs });
-  
     } catch (error) {
       console.error(t('error_fetching_playlist'), error);
     }
@@ -167,7 +161,6 @@ const Playlists = () => {
     setShowSettingsModal(false);
     localStorage.setItem('voteCooldown', voteCooldown); // Yeni voteCooldown değerini kaydet
   };
-  
 
   const handleSongAction = async (song_id, action) => {
     const token = localStorage.getItem('token');
@@ -187,18 +180,18 @@ const Playlists = () => {
   };
 
   const handlePublish = async () => {
-      if (!isPremium) {
-        alert(t('only_premium_can_publish'));
-        return;
-      }
+    if (!isPremium) {
+      alert(t('only_premium_can_publish'));
+      return;
+    }
 
     const token = localStorage.getItem('token');
     if (!token) {
       return alert(t('login_required'));
     }
-  
+
     const newPublishState = !isPublished;
-  
+
     const response = await fetch(`${API_BASE_URL}/playlist/publish`, {
       method: 'PUT',
       headers: {
@@ -207,61 +200,54 @@ const Playlists = () => {
       },
       body: JSON.stringify({ publish: newPublishState }),
     });
-  
+
     if (!response.ok) {
       const data = await response.json();
       alert(t(data.message));
       return;
     }
-  
+
     setIsPublished(newPublishState);
-  
     fetchPlaylist();
 
-       // Socket üzerinden bir olay yayını ekleyin.
-   if (socket && playlist._id) {
-    socket.emit('playlistUpdated', playlist._id);
-  }
-
+    // Socket üzerinden bir olay yayını ekleyin.
+    if (socket && playlist._id) {
+      socket.emit('playlistUpdated', playlist._id);
+    }
   };
 
-
   // Tüm şarkılar için sıralama fonksiyonu
-const sortAllSongs = () => {
-  const sortedSongs = [...allSongs].sort((a, b) =>
-    isAllSongsAscending
-      ? a.title.localeCompare(b.title)
-      : b.title.localeCompare(a.title)
+  const sortAllSongs = () => {
+    const sortedSongs = [...allSongs].sort((a, b) =>
+      isAllSongsAscending
+        ? a.title.localeCompare(b.title)
+        : b.title.localeCompare(a.title)
+    );
+    dispatch({ type: 'SET_ALL_SONGS', payload: sortedSongs });
+    setIsAllSongsAscending(!isAllSongsAscending);
+  };
+
+  // Playlist şarkıları için sıralama fonksiyonu
+  const sortPlaylistSongs = () => {
+    const sortedPlaylistSongs = [...state.songs].sort((a, b) =>
+      isPlaylistSongsAscending
+        ? a.title.localeCompare(b.title)
+        : b.title.localeCompare(a.title)
+    );
+    dispatch({ type: 'SET_SONGS', payload: sortedPlaylistSongs });
+    setIsPlaylistSongsAscending(!isPlaylistSongsAscending);
+  };
+
+  // Şarkı deposunda playlistte bulunan şarkıları filtrele
+  const availableSongs = allSongs.filter(
+    (song) => !state.songs.some((playlistSong) => playlistSong._id === song._id)
   );
-  dispatch({ type: 'SET_ALL_SONGS', payload: sortedSongs });
-  setIsAllSongsAscending(!isAllSongsAscending);
-};
 
-// Playlist şarkıları için sıralama fonksiyonu
-const sortPlaylistSongs = () => {
-  const sortedPlaylistSongs = [...state.songs].sort((a, b) =>
-    isPlaylistSongsAscending
-      ? a.title.localeCompare(b.title)
-      : b.title.localeCompare(a.title)
+  const renderTooltip = (props) => (
+    <Tooltip id="button-tooltip" {...props}>
+      Premium Only
+    </Tooltip>
   );
-  dispatch({ type: 'SET_SONGS', payload: sortedPlaylistSongs });
-  setIsPlaylistSongsAscending(!isPlaylistSongsAscending);
-};
-
-// Şarkı deposunda playlistte bulunan şarkıları filtrele
-const availableSongs = allSongs.filter(
-  (song) => !state.songs.some((playlistSong) => playlistSong._id === song._id)
-);
-
-  
-
-const renderTooltip = (props) => (
-  <Tooltip id="button-tooltip" {...props}>
-    Premium Only
-  </Tooltip>
-);
-
-
 
   return (
     <Container className="mt-5">
@@ -269,37 +255,36 @@ const renderTooltip = (props) => (
         <Col md={6}>
           <Card className="shadow">
             <Card.Body>
-            <div className="d-flex justify-content-between align-items-center mb-4">
-              <h2 className="text-center mb-4">{t('song_repository')}</h2>
-              <div className="search-container">
-          <Button variant="outline-secondary" onClick={sortAllSongs}>
-            {isAllSongsAscending ? 'A-Z' : 'Z-A'}
-          </Button>
-          <input
-            type="text"
-            placeholder={t('search')}
-            value={searchAllSongsQuery}
-            onChange={(e) => setSearchAllSongsQuery(e.target.value)}
-          />
-
-        </div>
-      </div>
+              <div className="d-flex justify-content-between align-items-center mb-4">
+                <h2 className="text-center mb-4">{t('song_repository')}</h2>
+                <div className="search-container">
+                  <Button variant="outline-secondary" onClick={sortAllSongs}>
+                    {isAllSongsAscending ? 'A-Z' : 'Z-A'}
+                  </Button>
+                  <input
+                    type="text"
+                    placeholder={t('search')}
+                    value={searchAllSongsQuery}
+                    onChange={(e) => setSearchAllSongsQuery(e.target.value)}
+                  />
+                </div>
+              </div>
               <ListGroup style={{ maxHeight: '300px', overflowY: 'auto' }}>
-              {availableSongs
-          .filter((song) =>
-            song.title.toLowerCase().includes(searchAllSongsQuery.toLowerCase())
-          )
-          .map((song) => (
+                {availableSongs
+                  .filter((song) =>
+                    song.title.toLowerCase().includes(searchAllSongsQuery.toLowerCase())
+                  )
+                  .map((song) => (
                     <ListGroup.Item
                       key={song._id}
                       className="d-flex justify-content-between align-items-center"
                     >
-                    <div>
-                      {song.title} {t('by')} {song.artist} /{' '}
-                      <span style={{ color: 'red', fontSize: '0.9em' }}>
-                        {song.key || 'Tune'}
-                      </span>
-                    </div>
+                      <div>
+                        {song.title} {t('by')} {song.artist} /{' '}
+                        <span style={{ color: 'red', fontSize: '0.9em' }}>
+                          {song.key || 'Tune'}
+                        </span>
+                      </div>
 
                       <Button
                         variant="primary"
@@ -318,92 +303,95 @@ const renderTooltip = (props) => (
         <Col md={6}>
           <Card className="shadow">
             <Card.Body>
-            <div className="d-flex justify-content-between align-items-center mb-4">
-              <h2 className="text-center mb-4">{t('playlist')}</h2>
-<Button variant="link" style={{ marginLeft: '10px' }} onClick={handleSettingsClick} disabled={isPublished}>
-<FaCog size={24} />
-</Button>
-              <div className="search-container">
+              <div className="d-flex justify-content-between align-items-center mb-4">
+                <h2 className="text-center mb-4">{t('playlist')}</h2>
+                <Button
+                  variant="link"
+                  style={{ marginLeft: '10px' }}
+                  onClick={handleSettingsClick}
+                  disabled={isPublished}
+                >
+                  <FaCog size={24} />
+                </Button>
+                <div className="search-container">
+                  <Button variant="outline-secondary" onClick={sortPlaylistSongs}>
+                    {isPlaylistSongsAscending ? 'A-Z' : 'Z-A'}
+                  </Button>
 
-          <Button variant="outline-secondary" onClick={sortPlaylistSongs}>
-            {isPlaylistSongsAscending ? 'A-Z' : 'Z-A'}
-          </Button>
+                  <input
+                    type="text"
+                    placeholder={t('search')}
+                    value={searchPlaylistQuery}
+                    onChange={(e) => setSearchPlaylistQuery(e.target.value)}
+                  />
+                </div>
+              </div>
 
-          <input
-            type="text"
-            placeholder={t('search')}
-            value={searchPlaylistQuery}
-            onChange={(e) => setSearchPlaylistQuery(e.target.value)}
-          />
-        </div>
-        </div>
-      
               {playlist ? (
                 <>
                   <ListGroup style={{ maxHeight: '300px', overflowY: 'auto' }}>
                     {state.songs.length > 0 ? (
-state.songs
-.filter((song) =>
-  song.title.toLowerCase().includes(searchPlaylistQuery.toLowerCase())
-)
-.map((song, index) => (
-<ListGroup.Item
-  key={`${song._id}-${index}`}
-  className="d-flex justify-content-between align-items-center"
->
-  <div className="w-100">
-    <Row className="align-items-center">
-      <Col xs={3} className="fw-bold" style={{ fontSize: '1.0em' }}>
-        {song.title}
-      </Col>
-      <Col xs={3} className="text-muted">
-        {t('by')} {song.artist}
-      </Col>
-      <Col xs={2} className="text-danger" style={{ fontSize: '0.9em' }}>
-        {song.key || 'Tune'}
-      </Col>
-      <Col xs={2} className="text-muted">
-        {t('votes')}: {song.votecount}
-      </Col>
-      <Col xs={2} className="text-end">
-        <Button
-          variant="danger"
-          className="ms-3"
-          onClick={() => handleSongAction(song._id, 'remove')}
-          disabled={isPublished} // Yayınlandıysa deaktif et
-        >
-          {t('remove')}
-        </Button>
-      </Col>
-    </Row>
-  </div>
-</ListGroup.Item>
-                      ))
+                      state.songs
+                        .filter((song) =>
+                          song.title.toLowerCase().includes(searchPlaylistQuery.toLowerCase())
+                        )
+                        .map((song, index) => (
+                          <ListGroup.Item
+                            key={`${song._id}-${index}`}
+                            className="d-flex justify-content-between align-items-center"
+                          >
+                            <div className="w-100">
+                              <Row className="align-items-center">
+                                <Col xs={3} className="fw-bold" style={{ fontSize: '1.0em' }}>
+                                  {song.title}
+                                </Col>
+                                <Col xs={3} className="text-muted">
+                                  {t('by')} {song.artist}
+                                </Col>
+                                <Col xs={2} className="text-danger" style={{ fontSize: '0.9em' }}>
+                                  {song.key || 'Tune'}
+                                </Col>
+                                <Col xs={2} className="text-muted">
+                                  {t('votes')}: {song.votecount}
+                                </Col>
+                                <Col xs={2} className="text-end">
+                                  <Button
+                                    variant="danger"
+                                    className="ms-3"
+                                    onClick={() => handleSongAction(song._id, 'remove')}
+                                    disabled={isPublished} // Yayınlandıysa deaktif et
+                                  >
+                                    {t('remove')}
+                                  </Button>
+                                </Col>
+                              </Row>
+                            </div>
+                          </ListGroup.Item>
+                        ))
                     ) : (
                       <p>{t('no_songs_available')}</p>
                     )}
                   </ListGroup>
-<OverlayTrigger
-placement="top"
-overlay={!isPremium ? renderTooltip : <></>} // Premium değilse tooltip göster
->
-<span>
-<Button
-className="mt-4"
-variant={isPublished ? 'danger' : 'success'}
-onClick={handlePublish}
-disabled={!isPremium || (state.songs.length === 0 && !isPublished)} // Premium değilse veya liste boşsa pasif
->
-{isPublished ? t('unpublish') : t('publish')}
-</Button>
-</span>
-</OverlayTrigger>
-
+                  <OverlayTrigger
+                    placement="top"
+                    overlay={!isPremium ? renderTooltip : <></>} // Premium değilse tooltip göster
+                  >
+                    <span>
+                      <Button
+                        className="mt-4"
+                        variant={isPublished ? 'danger' : 'success'}
+                        onClick={handlePublish}
+                        disabled={!isPremium || (state.songs.length === 0 && !isPublished)} // Premium değilse veya liste boşsa pasif
+                      >
+                        {isPublished ? t('unpublish') : t('publish')}
+                      </Button>
+                    </span>
+                  </OverlayTrigger>
 
                   {isPublished && (
                     <>
                       <p className="mt-3">
-                        {t('playlist_url')}: 
+                        {t('playlist_url')}:{' '}
                         <a href={qrCodeUrl} target="_blank" rel="noopener noreferrer">
                           {qrCodeUrl}
                         </a>
@@ -423,8 +411,8 @@ disabled={!isPremium || (state.songs.length === 0 && !isPublished)} // Premium d
         </Col>
       </Row>
 
-            {/* Settings Modal */}
-            <Modal show={showSettingsModal} onHide={() => setShowSettingsModal(false)}>
+      {/* Settings Modal */}
+      <Modal show={showSettingsModal} onHide={() => setShowSettingsModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>{t('settings')}</Modal.Title>
         </Modal.Header>
