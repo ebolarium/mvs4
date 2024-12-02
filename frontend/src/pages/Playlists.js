@@ -189,6 +189,57 @@ const Playlists = () => {
     }
   };
 
+  const handleSettingsClick = () => {
+    setShowSettingsModal(true);
+  };
+
+  const handleSaveSettings = () => {
+    setShowSettingsModal(false);
+    localStorage.setItem('voteCooldown', voteCooldown);
+  };
+
+  const handleSongAction = async (song_id, action) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      return alert(t('login_required'));
+    }
+
+    await fetch(`${API_BASE_URL}/playlist/update-songs`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ song_id, action }),
+    });
+    fetchPlaylist();
+  };
+
+  const sortAllSongs = () => {
+    const sortedSongs = [...allSongs].sort((a, b) =>
+      isAllSongsAscending
+        ? a.title.localeCompare(b.title)
+        : b.title.localeCompare(a.title)
+    );
+    dispatch({ type: 'SET_ALL_SONGS', payload: sortedSongs });
+    setIsAllSongsAscending(!isAllSongsAscending);
+  };
+
+  const sortPlaylistSongs = () => {
+    const sortedPlaylistSongs = [...state.songs].sort((a, b) =>
+      isPlaylistSongsAscending
+        ? a.title.localeCompare(b.title)
+        : b.title.localeCompare(a.title)
+    );
+    dispatch({ type: 'SET_SONGS', payload: sortedPlaylistSongs });
+    setIsPlaylistSongsAscending(!isPlaylistSongsAscending);
+  };
+
+  // Şarkı deposunda playlistte bulunan şarkıları filtrele
+  const availableSongs = allSongs.filter(
+    (song) => !state.songs.some((playlistSong) => playlistSong._id === song._id)
+  );
+
   const renderTooltip = (props) => (
     <Tooltip id="button-tooltip" {...props}>
       Premium Only
