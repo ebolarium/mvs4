@@ -10,18 +10,18 @@ import { useTranslation } from 'react-i18next';
 const GigMode = ({ playlistId }) => {
   const { t } = useTranslation();
   const { state, dispatch, socket } = useContext(GlobalStateContext);
-  const [showFullscreen, setShowFullscreen] = React.useState(false);
+  const [showFullscreen, setShowFullscreen] = useState(false);
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [requestSongs, setRequestSongs] = useState([]);
 
-  // fetchInitialData fonksiyonunu tanımlayın
+  // Playlist verilerini çekmek için fonksiyon
   const fetchInitialData = () => {
     const token = localStorage.getItem('token');
     if (!token) {
       return alert(t('login_required'));
     }
 
-    fetch(`${API_BASE_URL}/playlist`, {
+    fetch(`${API_BASE_URL}/playlist/${playlistId}`, {  // playlistId'yi kullanarak doğru playlist'i çekiyoruz
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -57,6 +57,12 @@ const GigMode = ({ playlistId }) => {
       })
       .catch((error) => console.error(t('error_fetching_playlist'), error));
   };
+
+  // PlaylistId değişimini izlemek ve playlist verilerini almak için useEffect
+  useEffect(() => {
+    if (!playlistId) return;
+    fetchInitialData();
+  }, [playlistId]); // playlistId her değiştiğinde fetchInitialData çalışacak
 
   useEffect(() => {
     if (!playlistId || !socket) {
@@ -104,28 +110,21 @@ const GigMode = ({ playlistId }) => {
     }
   };
 
+  // Socket olaylarını izlemek için useEffect
   useEffect(() => {
     if (socket && playlistId) {
       socket.on('newSongRequest', (newSong) => {
         setRequestSongs((prevSongs) => [...prevSongs, newSong]);
       });
 
-      return () => {
-        socket.off('newSongRequest');
-      };
-    }
-  }, [socket, playlistId]);
-
-  useEffect(() => {
-    if (socket && playlistId) {
       socket.on('playlistUpdated', (updatedPlaylistId) => {
         if (updatedPlaylistId === playlistId) {
-          // Playlist güncellenmişse, verileri yeniden al
           fetchInitialData();
         }
       });
-  
+
       return () => {
+        socket.off('newSongRequest');
         socket.off('playlistUpdated');
       };
     }
@@ -155,9 +154,7 @@ const GigMode = ({ playlistId }) => {
         state.songs.map((song) => (
           <ListGroup.Item
             key={song._id}
-            className={`d-flex justify-content-between align-items-center ${
-              song.played ? 'bg-secondary text-muted' : ''
-            }`}
+            className={`d-flex justify-content-between align-items-center ${song.played ? 'bg-secondary text-muted' : ''}`}
           >
             <div style={{ fontSize: '1.2rem', fontWeight: 'normal' }}>
               <span style={{ color: 'black', fontSize: '1.4em' }}>{song.title} </span>{t('by')} {song.artist} /{'  '} {'  '}
