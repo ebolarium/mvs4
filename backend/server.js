@@ -19,8 +19,6 @@ const CryptoJS = require('crypto-js');
 const Band = require('./models/Band'); // Band modelini ekledik
 const schedule = require('node-schedule');
 
-
-
 dotenv.config(); // Environment variables'ları yükleyin
 
 const app = express();
@@ -95,7 +93,6 @@ app.post('/paddle/webhook', express.raw({ type: '*/*' }), async (req, res) => {
     console.log(`Webhook event received: ${event_type}`);
 
     // Olay türüne göre işlem yap
-    
     if (event_type === 'subscription.updated' && data.scheduled_change?.action === 'cancel') {
       const bandId = data.custom_data?.bandId;
       const effectiveAt = data.scheduled_change.effective_at;
@@ -189,8 +186,6 @@ function hashPayload(payload, secret) {
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 
-
-
 // Routes
 app.use('/api/bands', bandRoutes);
 app.use('/api/songs', songRoutes);
@@ -239,6 +234,11 @@ io.on('connection', (socket) => {
   // Handle songRequested event
   socket.on('songRequested', (song, playlistId) => {
     socket.to(playlistId).emit('newSongRequest', song);
+  });
+
+  // Playlist yayınlandığında veya güncellendiğinde yayını yap
+  socket.on('playlistUpdated', (playlistId) => {
+    io.to(playlistId).emit('playlistUpdated', playlistId);
   });
 
   socket.on('disconnect', () => {});

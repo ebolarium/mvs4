@@ -86,6 +86,26 @@ const GigMode = ({ playlistId }) => {
     };
   }, [playlistId, socket, dispatch, t]);
 
+  // Socket olaylarını izlemek için useEffect
+  useEffect(() => {
+    if (socket && playlistId) {
+      socket.on('newSongRequest', (newSong) => {
+        setRequestSongs((prevSongs) => [...prevSongs, newSong]);
+      });
+
+      socket.on('playlistUpdated', (updatedPlaylistId) => {
+        if (updatedPlaylistId === playlistId) {
+          fetchInitialData();
+        }
+      });
+
+      return () => {
+        socket.off('newSongRequest');
+        socket.off('playlistUpdated');
+      };
+    }
+  }, [socket, playlistId]);
+
   const handleMarkAsPlayed = async (songId) => {
     try {
       const response = await fetch(`${API_BASE_URL}/songs/markAsPlayed/${songId}`, {
@@ -109,26 +129,6 @@ const GigMode = ({ playlistId }) => {
       console.error(t('error_marking_song_as_played'), error);
     }
   };
-
-  // Socket olaylarını izlemek için useEffect
-  useEffect(() => {
-    if (socket && playlistId) {
-      socket.on('newSongRequest', (newSong) => {
-        setRequestSongs((prevSongs) => [...prevSongs, newSong]);
-      });
-
-      socket.on('playlistUpdated', (updatedPlaylistId) => {
-        if (updatedPlaylistId === playlistId) {
-          fetchInitialData();
-        }
-      });
-
-      return () => {
-        socket.off('newSongRequest');
-        socket.off('playlistUpdated');
-      };
-    }
-  }, [socket, playlistId]);
 
   const renderRequestSongList = () => (
     <ListGroup>

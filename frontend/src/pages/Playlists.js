@@ -5,7 +5,7 @@ import { Container, Row, Col, Button, Card, ListGroup, Modal, Form } from 'react
 import { GlobalStateContext } from '../context/GlobalStateProvider';
 import API_BASE_URL from '../config/apiConfig';
 import { useTranslation } from 'react-i18next';
-import { FaCog } from 'react-icons/fa'; // Dişli çark iconunu eklemek için
+import { FaCog } from 'react-icons/fa';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 const Playlists = () => {
@@ -21,7 +21,7 @@ const Playlists = () => {
   const [isPlaylistSongsAscending, setIsPlaylistSongsAscending] = useState(true);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [voteCooldown, setVoteCooldown] = useState(5);
-  const [isPremium, setIsPremium] = useState(false); // Premium kontrolü için state
+  const [isPremium, setIsPremium] = useState(false);
 
   useEffect(() => {
     fetchSongs();
@@ -45,7 +45,6 @@ const Playlists = () => {
     const token = localStorage.getItem('token');
     if (!token) return;
 
-    // Kullanıcı profilini al ve is_premium bilgisini set et
     fetch(`${API_BASE_URL}/bands/profile`, {
       method: 'GET',
       headers: {
@@ -153,32 +152,6 @@ const Playlists = () => {
     }
   };
 
-  const handleSettingsClick = () => {
-    setShowSettingsModal(true);
-  };
-
-  const handleSaveSettings = () => {
-    setShowSettingsModal(false);
-    localStorage.setItem('voteCooldown', voteCooldown); // Yeni voteCooldown değerini kaydet
-  };
-
-  const handleSongAction = async (song_id, action) => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      return alert(t('login_required'));
-    }
-
-    await fetch(`${API_BASE_URL}/playlist/update-songs`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ song_id, action }),
-    });
-    fetchPlaylist();
-  };
-
   const handlePublish = async () => {
     if (!isPremium) {
       alert(t('only_premium_can_publish'));
@@ -215,33 +188,6 @@ const Playlists = () => {
       socket.emit('playlistUpdated', playlist._id);
     }
   };
-
-  // Tüm şarkılar için sıralama fonksiyonu
-  const sortAllSongs = () => {
-    const sortedSongs = [...allSongs].sort((a, b) =>
-      isAllSongsAscending
-        ? a.title.localeCompare(b.title)
-        : b.title.localeCompare(a.title)
-    );
-    dispatch({ type: 'SET_ALL_SONGS', payload: sortedSongs });
-    setIsAllSongsAscending(!isAllSongsAscending);
-  };
-
-  // Playlist şarkıları için sıralama fonksiyonu
-  const sortPlaylistSongs = () => {
-    const sortedPlaylistSongs = [...state.songs].sort((a, b) =>
-      isPlaylistSongsAscending
-        ? a.title.localeCompare(b.title)
-        : b.title.localeCompare(a.title)
-    );
-    dispatch({ type: 'SET_SONGS', payload: sortedPlaylistSongs });
-    setIsPlaylistSongsAscending(!isPlaylistSongsAscending);
-  };
-
-  // Şarkı deposunda playlistte bulunan şarkıları filtrele
-  const availableSongs = allSongs.filter(
-    (song) => !state.songs.some((playlistSong) => playlistSong._id === song._id)
-  );
 
   const renderTooltip = (props) => (
     <Tooltip id="button-tooltip" {...props}>
@@ -289,7 +235,7 @@ const Playlists = () => {
                       <Button
                         variant="primary"
                         onClick={() => handleSongAction(song._id, 'add')}
-                        disabled={isPublished} // Disable when published
+                        disabled={isPublished}
                       >
                         {t('add')}
                       </Button>
@@ -359,7 +305,7 @@ const Playlists = () => {
                                     variant="danger"
                                     className="ms-3"
                                     onClick={() => handleSongAction(song._id, 'remove')}
-                                    disabled={isPublished} // Yayınlandıysa deaktif et
+                                    disabled={isPublished}
                                   >
                                     {t('remove')}
                                   </Button>
@@ -374,14 +320,14 @@ const Playlists = () => {
                   </ListGroup>
                   <OverlayTrigger
                     placement="top"
-                    overlay={!isPremium ? renderTooltip : <></>} // Premium değilse tooltip göster
+                    overlay={!isPremium ? renderTooltip : <></>}
                   >
                     <span>
                       <Button
                         className="mt-4"
                         variant={isPublished ? 'danger' : 'success'}
                         onClick={handlePublish}
-                        disabled={!isPremium || (state.songs.length === 0 && !isPublished)} // Premium değilse veya liste boşsa pasif
+                        disabled={!isPremium || (state.songs.length === 0 && !isPublished)}
                       >
                         {isPublished ? t('unpublish') : t('publish')}
                       </Button>
@@ -391,7 +337,7 @@ const Playlists = () => {
                   {isPublished && (
                     <>
                       <p className="mt-3">
-                        {t('playlist_url')}:{' '}
+                        {t('playlist_url')}: 
                         <a href={qrCodeUrl} target="_blank" rel="noopener noreferrer">
                           {qrCodeUrl}
                         </a>

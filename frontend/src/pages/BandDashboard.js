@@ -86,6 +86,21 @@ const BandDashboard = () => {
       .finally(() => setLoading(false));
   }, [navigate, t]);
 
+  useEffect(() => {
+    if (state.socket) {
+      state.socket.on('playlistUpdated', (updatedPlaylistId) => {
+        // Playlist güncellendiğinde verileri yeniden getir
+        if (playlistId && updatedPlaylistId === playlistId) {
+          window.location.reload(); // En basit yöntem tüm sayfayı yenilemek olabilir.
+        }
+      });
+
+      return () => {
+        state.socket.off('playlistUpdated');
+      };
+    }
+  }, [state.socket, playlistId]);
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     alert(t('logged_out_successfully'));
