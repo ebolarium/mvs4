@@ -1,0 +1,6 @@
+git add .
+
+git commit -m "Değişiklik açıklaması burada"
+
+
+git push origin main
