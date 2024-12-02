@@ -217,6 +217,12 @@ const Playlists = () => {
     setIsPublished(newPublishState);
   
     fetchPlaylist();
+
+       // Socket üzerinden bir olay yayını ekleyin.
+   if (socket && playlist._id) {
+    socket.emit('playlistUpdated', playlist._id);
+  }
+
   };
 
 

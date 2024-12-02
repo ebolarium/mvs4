@@ -115,6 +115,24 @@ const GigMode = ({ playlistId }) => {
     }
   }, [socket, playlistId]);
 
+
+  useEffect(() => {
+    if (socket && playlistId) {
+      socket.on('playlistUpdated', (updatedPlaylistId) => {
+        if (updatedPlaylistId === playlistId) {
+          // Playlist güncellenmişse, verileri yeniden al
+          fetchInitialData();
+        }
+      });
+  
+      return () => {
+        socket.off('playlistUpdated');
+      };
+    }
+  }, [socket, playlistId]);
+
+
+
   const renderRequestSongList = () => (
     <ListGroup>
       {requestSongs.length === 0 ? (
